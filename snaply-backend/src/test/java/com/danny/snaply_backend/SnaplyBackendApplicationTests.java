@@ -1,0 +1,13 @@
+package com.danny.snaply_backend;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class SnaplyBackendApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
