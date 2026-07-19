@@ -34,7 +34,7 @@ public class UserService {
         return userRepository.findByGoogleId(googleId);
     }
 
-    @CachePut(value = CacheConstants.USERS_BY_EMAIL, key = "#email")    
+    @CachePut(value = CacheConstants.USERS_BY_EMAIL, key = "#user.email")    
     public User save(User user) {
         return userRepository.save(user);
     }
@@ -69,7 +69,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    @CachePut(value = CacheConstants.USERS_BY_EMAIL, key = "#email")    
+    @CachePut(value = CacheConstants.USERS_BY_EMAIL, key = "#user.email")    
     public User updateRefreshToken(User user, String refreshToken) {
         user.setRefreshToken(refreshToken);
         return userRepository.save(user);
