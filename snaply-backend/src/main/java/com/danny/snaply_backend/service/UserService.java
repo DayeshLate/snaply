@@ -69,10 +69,33 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    @CachePut(value = CacheConstants.USERS_BY_EMAIL, key = "#user.email")    
-    public User updateRefreshToken(User user, String refreshToken) {
-        user.setRefreshToken(refreshToken);
-        return userRepository.save(user);
+    public User createOrGetDevUser(String name, String email) {
+        return userRepository.findByEmail(email)
+                .orElseGet(() -> save(User.builder()
+                        .googleId("dev:" + email)
+                        .name(name)
+                        .email(email)
+                        .profilePicture(null)
+                        .role(User.Role.USER)
+                        .enabled(true)
+                        .build()));
+    }
+
+    @CachePut(value = CacheConstants.USERS_BY_EMAIL, key = "#email")
+    public User createOrGetMagicLinkUser(String email) {
+        return userRepository.findByEmail(email)
+                .orElseGet(() -> {
+                    String nameFromEmail = email.contains("@")
+                            ? email.substring(0, email.indexOf("@"))
+                            : email;
+
+                    return userRepository.save(User.builder()
+                            .name(nameFromEmail)
+                            .email(email)
+                            .role(User.Role.USER)
+                            .enabled(true)
+                            .build());
+                });
     }
 
     @CacheEvict(value = CacheConstants.USERS_BY_EMAIL, key = "#email")    

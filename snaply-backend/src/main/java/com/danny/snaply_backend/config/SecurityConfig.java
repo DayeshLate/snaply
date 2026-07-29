@@ -1,7 +1,5 @@
 package com.danny.snaply_backend.config;
 
-import com.danny.snaply_backend.oauth.CustomOAuth2UserService;
-import com.danny.snaply_backend.oauth.OAuth2SuccessHandler;
 import com.danny.snaply_backend.security.JwtAuthenticationEntryPoint;
 import com.danny.snaply_backend.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -28,8 +25,6 @@ public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Value("${app.frontend.url:}")
     private String frontendUrl;
@@ -40,7 +35,7 @@ public class SecurityConfig {
 		.csrf(csrf -> csrf.disable())
 		.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 		.sessionManagement(session -> session
-			.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+			.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		.exceptionHandling(ex -> ex
 			.authenticationEntryPoint(jwtAuthenticationEntryPoint))
 		.authorizeHttpRequests(auth -> auth
@@ -48,22 +43,17 @@ public class SecurityConfig {
 				"/",
 				"/error",
 				"/favicon.ico",
-				"/oauth2/**",
-				"/login/**",
-				"/api/auth/oauth2/**"
+				"/api/auth/magic-link",
+				"/api/auth/verify",
+				"/api/auth/dev-login"
 			).permitAll()
 			.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 			.anyRequest().authenticated())
-		.oauth2Login(oauth2 -> oauth2
-			.userInfoEndpoint(userInfo -> userInfo
-				.userService(customOAuth2UserService))
-			.successHandler(oAuth2SuccessHandler))
 		.logout(logout -> logout
 			.logoutUrl("/api/auth/logout")
 			.invalidateHttpSession(true)
 			.clearAuthentication(true)
-			.deleteCookies("JSESSIONID"))
-		.httpBasic(Customizer.withDefaults());
+			.deleteCookies("JSESSIONID"));
 
 	http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -18,7 +18,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "google_id", nullable = false, unique = true)
+    @Column(name = "google_id", unique = true)
     private String googleId;
 
     @Column(nullable = false)
@@ -29,9 +29,6 @@ public class User {
 
     @Column(name = "profile_picture")
     private String profilePicture;
-
-    @Column(length = 2000)
-    private String refreshToken;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
