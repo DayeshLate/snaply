@@ -75,8 +75,9 @@ public class MagicLinkService {
             return null;
         }
 
-        // Delete immediately — one-time use
-        stringRedisTemplate.delete(key);
+        // Set a short grace period (60s) instead of immediate deletion
+        // to handle email client link pre-fetches, browser tab refreshes, or double clicks.
+        stringRedisTemplate.expire(key, Duration.ofSeconds(60));
         log.info("Magic link verified for {}", email);
         return email;
     }
