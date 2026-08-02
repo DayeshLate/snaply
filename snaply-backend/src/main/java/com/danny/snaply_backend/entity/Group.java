@@ -40,11 +40,7 @@ public class Group {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
-    @JoinColumn(name = "owner_drive_account_id", nullable = false)
-    private UserDriveAccount ownerDriveAccount;
-
-    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "group_created_by", nullable = false)
     private User user;
     
     public void createTime(){

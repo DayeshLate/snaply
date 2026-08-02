@@ -32,16 +32,32 @@ public class User {
     @Column(name = "profile_picture")
     private String profilePicture;
 
+    @Column(name = "google_email", unique = true)
+    private String googleEmail;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
+    @Column(name = "drive_root_folder_id")
+    private String driveRootFolderId;
+
+    @Column(name = "is_drive_connected")
+    @Builder.Default
+    private boolean isDriveConnected = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
     private Role role = Role.USER;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<UserDriveAccount> userDriveAccount = new ArrayList<>();
+    private List<Group> groups = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<GroupMembers> groupMemberships = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Group> groups = new ArrayList<>();
+    private List<Notification> notifications = new ArrayList<>();
 
     @Builder.Default
     private boolean enabled = true;
