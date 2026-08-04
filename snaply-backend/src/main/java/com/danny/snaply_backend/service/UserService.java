@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.danny.snaply_backend.config.CacheConstants;
+import com.danny.snaply_backend.entity.Group;
 import com.danny.snaply_backend.entity.User;
 import com.danny.snaply_backend.repository.UserRepository;
 
@@ -97,6 +100,22 @@ public class UserService {
                             .build());
                 });
     }
+
+
+@Transactional(readOnly = true)
+public User getCurrentUser() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    if (authentication == null || !authentication.isAuthenticated()
+            || "anonymousUser".equals(authentication.getPrincipal())) {
+        throw new RuntimeException("No authenticated user found");
+    }
+
+    String email = authentication.getName(); // Assuming email is the username
+
+    return findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+}
 
     @CacheEvict(value = CacheConstants.USERS_BY_EMAIL, key = "#email")    
     public void evictUserCache(String email) {

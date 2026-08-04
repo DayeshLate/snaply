@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,8 +47,9 @@ public class GroupMembers {
 
     @Column(name = "is_accepted", nullable = false)
     @Builder.Default
-    private Boolean isAccepted= false;
+    private boolean isAccepted= false;
 
+    @PrePersist
     public void joinTime(){
         this.joinedAt = LocalDateTime.now();
     }
