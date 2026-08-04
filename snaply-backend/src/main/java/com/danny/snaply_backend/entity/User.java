@@ -35,6 +35,13 @@ public class User {
     @Column(name = "google_email", unique = true)
     private String googleEmail;
 
+    @Column(name = "password_hash")
+    private String passwordHash;
+
+    @Column(name = "email_verified", nullable = false)
+    @Builder.Default
+    private boolean emailVerified = true;
+
     @Column(name = "refresh_token")
     private String refreshToken;
 

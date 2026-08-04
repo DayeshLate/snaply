@@ -17,6 +17,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
@@ -45,7 +47,10 @@ public class SecurityConfig {
 				"/favicon.ico",
 				"/api/auth/magic-link",
 				"/api/auth/verify",
-				"/api/auth/dev-login"
+				"/api/auth/dev-login",
+				"/api/auth/register",
+				"/api/auth/verify-email",
+				"/api/auth/login"
 			).permitAll()
 			.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 			.anyRequest().authenticated())
@@ -73,5 +78,10 @@ public class SecurityConfig {
 	UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 	source.registerCorsConfiguration("/**", configuration);
 	return source;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

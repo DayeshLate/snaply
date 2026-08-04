@@ -1,10 +1,14 @@
 package com.danny.snaply_backend.controller;
 
+import com.danny.snaply_backend.dto.LoginRequest;
 import com.danny.snaply_backend.dto.LoginResponse;
 import com.danny.snaply_backend.dto.MagicLinkRequest;
+import com.danny.snaply_backend.dto.RegisterRequest;
+import com.danny.snaply_backend.dto.VerifyOtpRequest;
 import com.danny.snaply_backend.entity.User;
 import com.danny.snaply_backend.service.JwtService;
 import com.danny.snaply_backend.service.MagicLinkService;
+import com.danny.snaply_backend.service.PasswordAuthService;
 import com.danny.snaply_backend.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,6 +42,7 @@ public class AuthController {
 	private final JwtService jwtService;
 	private final UserService userService;
 	private final MagicLinkService magicLinkService;
+	private final PasswordAuthService passwordAuthService;
 
 	@Value("${app.auth.dev-login-enabled:false}")
 	private boolean devLoginEnabled;
@@ -88,6 +93,55 @@ public class AuthController {
 		return issueAuthResponse(user, response);
 	}
 
+	// ---------------------------------------------------------------
+	// Password-based auth endpoints
+	// ---------------------------------------------------------------
+
+	/**
+	 * Step 1 — Create a pending account and send a 6-digit OTP to the email.
+	 */
+	@PostMapping("/register")
+	public ResponseEntity<Map<String, String>> register(
+			@Valid @RequestBody RegisterRequest request
+	) {
+		passwordAuthService.register(request.getEmail(), request.getPassword(), request.getName());
+		return ResponseEntity.ok(Map.of(
+				"message", "Verification code sent to " + request.getEmail() + ". Please check your inbox."));
+	}
+
+	/**
+	 * Step 2 — Submit the OTP to verify email ownership and activate the account.
+	 * Returns a JWT identical to the magic-link flow.
+	 */
+	@PostMapping("/verify-email")
+	public ResponseEntity<?> verifyEmail(
+			@Valid @RequestBody VerifyOtpRequest request,
+			HttpServletResponse response
+	) {
+		String token = passwordAuthService.verifyOtp(request.getEmail(), request.getOtp());
+		User user = userService.findByEmail(request.getEmail())
+				.orElseThrow(() -> new RuntimeException("User not found after OTP verification"));
+		return issueAuthResponseWithToken(user, token, response);
+	}
+
+	/**
+	 * Login with email + password — returns a JWT.
+	 */
+	@PostMapping("/login")
+	public ResponseEntity<?> login(
+			@Valid @RequestBody LoginRequest request,
+			HttpServletResponse response
+	) {
+		String token = passwordAuthService.login(request.getEmail(), request.getPassword());
+		User user = userService.findByEmail(request.getEmail())
+				.orElseThrow(() -> new RuntimeException("User not found after login"));
+		return issueAuthResponseWithToken(user, token, response);
+	}
+
+	// ---------------------------------------------------------------
+	// Dev / magic-link endpoints (unchanged)
+	// ---------------------------------------------------------------
+
 	@PostMapping("/logout")
 	public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -102,12 +156,17 @@ public class AuthController {
 
 	private ResponseEntity<LoginResponse> issueAuthResponse(User user, HttpServletResponse response) {
 		String token = jwtService.generateToken(user.getEmail());
+		return issueAuthResponseWithToken(user, token, response);
+	}
+
+	/** Used when the token has already been generated (password-auth flow). */
+	private ResponseEntity<LoginResponse> issueAuthResponseWithToken(
+			User user, String token, HttpServletResponse response) {
 		Cookie cookie = new Cookie(ACCESS_TOKEN_COOKIE, token);
 		cookie.setHttpOnly(true);
 		cookie.setPath("/");
 		cookie.setMaxAge((int) Duration.ofMillis(86_400_000L).getSeconds());
 		response.addCookie(cookie);
-
 		return ResponseEntity.ok(toLoginResponse(user, token));
 	}
 
