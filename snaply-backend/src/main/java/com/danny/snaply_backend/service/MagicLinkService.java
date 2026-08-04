@@ -29,12 +29,8 @@ public class MagicLinkService {
     @Value("${magic-link.expiration-ms:600000}")
     private long magicLinkExpirationMs;
 
-    @Value("${app.frontend.url:}")
-    private String frontendUrl;
-
-    public String getFrontendUrl() {
-        return frontendUrl;
-    }
+    @Value("${app.backend.url:http://localhost:8080}")
+    private String backendUrl;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -83,13 +79,7 @@ public class MagicLinkService {
     }
 
     private String buildMagicLink(String token) {
-        String baseUrl;
-        if (frontendUrl != null && !frontendUrl.isBlank()) {
-            baseUrl = frontendUrl + "/auth/verify";
-        } else {
-            baseUrl = "http://localhost:8080/api/auth/verify";
-        }
-        return baseUrl + "?token=" + token;
+        return backendUrl + "/api/auth/verify?token=" + token;
     }
 
     private void sendEmail(String to, String magicLink) throws MessagingException {
