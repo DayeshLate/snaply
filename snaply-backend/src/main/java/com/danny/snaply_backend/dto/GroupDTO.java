@@ -27,7 +27,7 @@ public class GroupDTO {
 
     public LocalDateTime createdAt;
 
-    public List<GroupMembers> groupMembers = new ArrayList<>();
+    public List<GroupMembersDTO> groupMembers = new ArrayList<>();
 
     public User user;
 

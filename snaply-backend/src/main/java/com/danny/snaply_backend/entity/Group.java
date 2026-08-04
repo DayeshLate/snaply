@@ -48,7 +48,7 @@ public class Group {
     @JoinColumn(name = "group_created_by", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "Group",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "group",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<GroupMembers> groupMembers = new ArrayList<>();
     
     public void createTime(){

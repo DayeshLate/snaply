@@ -32,12 +32,13 @@ public class GroupService {
     }
 
     public String deleteGroup(GroupDTO groupDTO){
-        if(userService.getCurrentUser().getId() != groupDTO.getUser().getId()){
-            return "you can't delete this Group";
-        }else{
-            groupRepository.delete(toEntity(groupDTO));
-            return "Group deleted successfully";
+        Group group = groupRepository.findById(groupDTO.getId())
+        .orElseThrow(() -> new RuntimeException("Group not found"));
+        if (!group.getUser().getId().equals(userService.getCurrentUser().getId())) {
+            return "You can't delete this group";
         }
+        groupRepository.delete(group);
+        return "Group deleted successfully";
     }
 
     public GroupDTO toDTO(Group group){
@@ -62,7 +63,9 @@ public class GroupService {
             .description(dto.getDescription())
             .createdAt(dto.getCreatedAt())
             .driveFolderId(dto.getDriveFolderId())
-            .groupMembers(dto.getGroupMembers()
+            .groupMembers(dto.getGroupMembers() == null
+                            ? List.of()
+                            : dto.getGroupMembers()
                             .stream()
                             .map(groupMembersService :: toEntity)
                             .toList())

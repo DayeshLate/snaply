@@ -32,17 +32,16 @@ public class MagicLinkService {
     @Value("${app.frontend.url:}")
     private String frontendUrl;
 
+    public String getFrontendUrl() {
+        return frontendUrl;
+    }
+
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    /**
-     * Generates a secure token, stores it in Redis mapped to the email,
-     * and sends the magic link email via Google SMTP.
-     */
     public void sendMagicLink(String email) {
         String token = generateSecureToken();
 
-        // Store token -> email in Redis with TTL
         stringRedisTemplate.opsForValue().set(
                 redisKey(token),
                 email,
@@ -55,17 +54,13 @@ public class MagicLinkService {
             sendEmail(email, magicLink);
             log.info("Magic link sent to {}", email);
         } catch (MessagingException ex) {
-            // Clean up Redis key if email fails
             stringRedisTemplate.delete(redisKey(token));
             log.error("Failed to send magic link email to {}: {}", email, ex.getMessage());
             throw new RuntimeException("Failed to send magic link email. Please try again.", ex);
         }
     }
 
-    /**
-     * Verifies the magic link token. Returns the email if valid,
-     * deletes the token (one-time use). Returns null if invalid/expired.
-     */
+   
     public String verifyToken(String token) {
         String key = redisKey(token);
         String email = stringRedisTemplate.opsForValue().get(key);
@@ -75,8 +70,7 @@ public class MagicLinkService {
             return null;
         }
 
-        // Set a short grace period (60s) instead of immediate deletion
-        // to handle email client link pre-fetches, browser tab refreshes, or double clicks.
+       
         stringRedisTemplate.expire(key, Duration.ofSeconds(60));
         log.info("Magic link verified for {}", email);
         return email;
