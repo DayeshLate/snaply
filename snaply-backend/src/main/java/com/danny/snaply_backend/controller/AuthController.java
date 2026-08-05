@@ -4,7 +4,6 @@ import com.danny.snaply_backend.dto.LoginRequest;
 import com.danny.snaply_backend.dto.LoginResponse;
 import com.danny.snaply_backend.dto.MagicLinkRequest;
 import com.danny.snaply_backend.dto.RegisterRequest;
-import com.danny.snaply_backend.dto.VerifyOtpRequest;
 import com.danny.snaply_backend.entity.User;
 import com.danny.snaply_backend.service.JwtService;
 import com.danny.snaply_backend.service.MagicLinkService;
@@ -98,29 +97,16 @@ public class AuthController {
 	// ---------------------------------------------------------------
 
 	/**
-	 * Step 1 — Create a pending account and send a 6-digit OTP to the email.
+	 * Register with email + password — activates account immediately and returns a JWT.
 	 */
 	@PostMapping("/register")
-	public ResponseEntity<Map<String, String>> register(
-			@Valid @RequestBody RegisterRequest request
-	) {
-		passwordAuthService.register(request.getEmail(), request.getPassword(), request.getName());
-		return ResponseEntity.ok(Map.of(
-				"message", "Verification code sent to " + request.getEmail() + ". Please check your inbox."));
-	}
-
-	/**
-	 * Step 2 — Submit the OTP to verify email ownership and activate the account.
-	 * Returns a JWT identical to the magic-link flow.
-	 */
-	@PostMapping("/verify-email")
-	public ResponseEntity<?> verifyEmail(
-			@Valid @RequestBody VerifyOtpRequest request,
+	public ResponseEntity<?> register(
+			@Valid @RequestBody RegisterRequest request,
 			HttpServletResponse response
 	) {
-		String token = passwordAuthService.verifyOtp(request.getEmail(), request.getOtp());
+		String token = passwordAuthService.register(request.getEmail(), request.getPassword(), request.getName());
 		User user = userService.findByEmail(request.getEmail())
-				.orElseThrow(() -> new RuntimeException("User not found after OTP verification"));
+				.orElseThrow(() -> new RuntimeException("User not found after registration"));
 		return issueAuthResponseWithToken(user, token, response);
 	}
 
