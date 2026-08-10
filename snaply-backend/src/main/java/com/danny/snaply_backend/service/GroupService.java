@@ -46,7 +46,8 @@ public class GroupService {
     }
 
     public List<GroupDTO> getAllGroups(){
-        List<Group> groups = groupRepository.findByUserId(userService.getCurrentUser().getId()) ;
+        List<Group> groups = groupRepository.findByUserId(userService.getCurrentUser().getId())
+            .orElse(List.of());
         return groups.stream()
             .map(this::toDTO)
             .toList();

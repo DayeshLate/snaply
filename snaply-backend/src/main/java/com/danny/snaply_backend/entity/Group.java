@@ -38,6 +38,9 @@ public class Group {
     @Column(name = "drive_folder_id", nullable = false)
     private String driveFolderId;
 
+    @Column(nullable = false, unique = true)
+    private String inviteCode;
+
     @Column(name = "groupdp")
     private String groupDp;
 

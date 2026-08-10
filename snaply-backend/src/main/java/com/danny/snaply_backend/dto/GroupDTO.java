@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.danny.snaply_backend.entity.GroupMembers;
 import com.danny.snaply_backend.entity.User;
 
 import lombok.Builder;
@@ -30,5 +29,7 @@ public class GroupDTO {
     public List<GroupMembersDTO> groupMembers = new ArrayList<>();
 
     public User user;
+
+    public String inviteCode;
 
 }
