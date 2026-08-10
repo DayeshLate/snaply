@@ -1,6 +1,6 @@
 package com.danny.snaply_backend.entity;
 
-public enum GroupRole {
+public enum Role {
     OWNER,
     ADMIN,
     EDITOR,

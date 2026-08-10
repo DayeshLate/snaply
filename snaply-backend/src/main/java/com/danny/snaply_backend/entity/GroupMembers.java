@@ -31,7 +31,7 @@ public class GroupMembers {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private GroupRole role;
+    private Role role;
 
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
