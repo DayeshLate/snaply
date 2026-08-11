@@ -9,12 +9,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+
+import com.danny.snaply_backend.security.RedisSessionAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -24,15 +27,38 @@ public class SecurityConfig {
     private String frontendUrl;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            RedisSessionAuthenticationFilter redisSessionAuthenticationFilter
+    ) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .anyRequest().permitAll());
+
+                .requestMatchers(
+                    HttpMethod.OPTIONS,
+                    "/**"
+                ).permitAll()
+
+                .requestMatchers(
+                    "/api/auth/register",
+                    "/api/auth/login",
+                    "/oauth2/**",
+                    "/login/**",
+                    "/api/auth/*"
+                ).permitAll()
+
+                .anyRequest()
+                .authenticated()
+            );
+
+        http.addFilterBefore(
+                redisSessionAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class
+        );
 
         return http.build();
     }
@@ -40,10 +66,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(false);
-        configuration.setAllowedOriginPatterns(List.of(
-            frontendUrl == null || frontendUrl.isBlank() ? "*" : frontendUrl
-        ));
+        boolean hasFrontendOrigin = frontendUrl != null && !frontendUrl.isBlank();
+        configuration.setAllowCredentials(hasFrontendOrigin);
+        if (hasFrontendOrigin) {
+            configuration.setAllowedOrigins(List.of(frontendUrl));
+        } else {
+            configuration.setAllowedOriginPatterns(List.of("*"));
+        }
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
 

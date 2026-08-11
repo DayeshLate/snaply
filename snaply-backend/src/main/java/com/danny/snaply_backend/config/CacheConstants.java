@@ -8,6 +8,7 @@ public final class CacheConstants {
     public static final String PHOTOS = "photos";
     public static final String AUTH_VERIFICATION = "auth:verification:";
     public static final String AUTH_SESSION = "auth:session:";
+    public static final String AUTH_COOKIE = "snaply_access_token";
 
     private CacheConstants() {}
 }

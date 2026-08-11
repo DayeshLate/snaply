@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,7 +36,7 @@ public class Group {
 
     private String description;
 
-    @Column(name = "drive_folder_id", nullable = false)
+    @Column(name = "drive_folder_id")
     private String driveFolderId;
 
     @Column(nullable = false, unique = true)
@@ -54,6 +55,7 @@ public class Group {
     @OneToMany(mappedBy = "group",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<GroupMembers> groupMembers = new ArrayList<>();
     
+    @PrePersist
     public void createTime(){
         this.createdAt = LocalDateTime.now();
     }

@@ -161,6 +161,60 @@ public class GroupService {
         return toDTO(group);
     }
 
+    @Transactional
+        public JoinRequest requestToJoin(String inviteCode) {
+
+        Group group = groupRepository
+                .findByInviteCode(inviteCode)
+                .orElseThrow(() ->
+                        new RuntimeException("Invalid invite code")
+                );
+
+        Long userId = userService.getCurrentUser().getId();
+
+        if (group.getUser().getId().equals(userId)) {
+                throw new RuntimeException(
+                        "You are already the owner of this group"
+                );
+        }
+
+        if (groupMembersRepository.existsByGroupIdAndUserId(group.getId(),userId)) {
+                throw new RuntimeException(
+                        "You are already a member of this group"
+                );
+        }
+
+        var existingRequest =
+                joinRequestRepository.findByGroupIdAndUserId(
+                        String.valueOf(group.getId()),
+                        String.valueOf(userId)
+                );
+
+        if (existingRequest.isPresent()) {
+
+                JoinRequest request = existingRequest.get();
+
+                if (request.getStatus() == JoinRequest.Status.PENDING) {
+                throw new RuntimeException(
+                        "Join request already pending"
+                );
+                }
+
+                request.setStatus(JoinRequest.Status.PENDING);
+                request.setRespondedAt(null);
+
+                return joinRequestRepository.save(request);
+        }
+
+        JoinRequest request = JoinRequest.builder()
+                .groupId(String.valueOf(group.getId()))
+                .userId(String.valueOf(userId))
+                .status(JoinRequest.Status.PENDING)
+                .build();
+
+        return joinRequestRepository.save(request);
+        }
+
     public String deleteGroup(long id) {
 
         Group group = groupRepository

@@ -14,6 +14,8 @@ public interface JoinRequestRepository
             String userId
     );
 
+    
+
     List<JoinRequest> findByGroupIdAndStatus(
             String groupId,
             JoinRequest.Status status
