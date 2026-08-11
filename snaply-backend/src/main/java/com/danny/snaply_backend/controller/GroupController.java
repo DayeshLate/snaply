@@ -3,6 +3,7 @@ package com.danny.snaply_backend.controller;
 import com.danny.snaply_backend.dto.GroupDTO;
 import com.danny.snaply_backend.entity.GroupMembers;
 import com.danny.snaply_backend.entity.JoinRequest;
+import com.danny.snaply_backend.service.GroupMembersService;
 import com.danny.snaply_backend.service.GroupService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 public class GroupController {
 
     private final GroupService groupService;
+    private final GroupMembersService groupMembersService;
 
     @PostMapping("/create")
     public ResponseEntity<GroupDTO> createGroup(
@@ -47,8 +49,7 @@ public class GroupController {
             @PathVariable String requestId
     ) {
 
-        GroupMembers member =
-                groupService.acceptJoinRequest(requestId);
+        GroupMembers member =groupMembersService.toEntity(groupService.acceptJoinRequest(requestId));
 
         return ResponseEntity.ok(member);
     }

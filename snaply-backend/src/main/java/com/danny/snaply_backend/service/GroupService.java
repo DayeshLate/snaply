@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.danny.snaply_backend.dto.GroupDTO;
+import com.danny.snaply_backend.dto.GroupMembersDTO;
 import com.danny.snaply_backend.entity.Group;
 import com.danny.snaply_backend.entity.GroupMembers;
 import com.danny.snaply_backend.entity.JoinRequest;
@@ -57,7 +58,7 @@ public class GroupService {
         return toDTO(savedGroup);
     }
 
-    public GroupMembers acceptJoinRequest(String requestId) {
+    public GroupMembersDTO acceptJoinRequest(String requestId) {
 
         JoinRequest request = joinRequestRepository
                 .findById(requestId)
@@ -112,7 +113,7 @@ public class GroupService {
 
         joinRequestRepository.save(request);
 
-        return groupMembersRepository.save(member);
+        return groupMembersService.toDTO(groupMembersRepository.save(member));
     }
 
     public JoinRequest rejectRequest(String requestId) {
