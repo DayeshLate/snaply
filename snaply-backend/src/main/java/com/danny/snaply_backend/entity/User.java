@@ -48,6 +48,10 @@ public class User {
     @Column(name = "drive_root_folder_id")
     private String driveRootFolderId;
 
+    @Column(name = "group_folders")
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Folder> folder;
+
     @Column(name = "is_drive_connected")
     @Builder.Default
     private boolean isDriveConnected = false;
