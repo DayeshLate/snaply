@@ -32,6 +32,8 @@ public class GroupDTO {
 
     public List<GroupMembersDTO> groupMembers = new ArrayList<>();
 
+    public List<FolderDTO> folderDTOs = new ArrayList<>();
+    
     public User user;
 
     public String inviteCode;

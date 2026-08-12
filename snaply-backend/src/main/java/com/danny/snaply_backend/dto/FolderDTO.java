@@ -6,8 +6,10 @@ import com.danny.snaply_backend.entity.Group;
 import com.danny.snaply_backend.entity.User;
 
 import lombok.Builder;
+import lombok.Data;
 
 @Builder
+@Data
 public class FolderDTO {
     
     public long id;

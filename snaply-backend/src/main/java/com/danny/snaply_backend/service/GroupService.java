@@ -1,6 +1,7 @@
 package com.danny.snaply_backend.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class GroupService {
 
     private final GroupRepository groupRepository;
+    private final FolderService folderService;
     private final UserService userService;
     private final GroupMembersService groupMembersService;
     private final GroupMembersRepository groupMembersRepository;
@@ -287,6 +289,16 @@ public class GroupService {
                                         .map(groupMembersService::toDTO)
                                         .toList()
                 )
+                .folderDTOs(
+                    group.getFolder() == null
+                            ? new ArrayList<>()
+                            : group.getFolder()
+                                    .stream()
+                                    .map(folderService::toDTO)
+                                    .toList()
+            )
+                .user(group.getUser())
+                .inviteCode(group.getInviteCode())
                 .build();
     }
 
@@ -306,6 +318,14 @@ public class GroupService {
                                         .map(groupMembersService::toEntity)
                                         .toList()
                 )
+                .folder(
+                    dto.getFolderDTOs() == null
+                            ? new ArrayList<>()
+                            : dto.getFolderDTOs()
+                                    .stream()
+                                    .map(folderService::toEntity)
+                                    .toList()
+            )
                 .build();
     }
 }
