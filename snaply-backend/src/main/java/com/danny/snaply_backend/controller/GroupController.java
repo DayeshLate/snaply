@@ -65,6 +65,11 @@ public class GroupController {
         return ResponseEntity.ok(request);
     }
 
+    @PostMapping("/delete/{groupId}/member/{membarId}")
+    public ResponseEntity<String> deleteMember(@PathVariable long groupId, @PathVariable long memberId){
+        String response = groupService.removeGroupMember(memberId, groupId);
+        return ResponseEntity.ok(response);
+    }
 
 
     @GetMapping("/get/{id}")
@@ -80,12 +85,9 @@ public class GroupController {
 
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteGroup(
-            @PathVariable long id
-    ) {
+    public ResponseEntity<String> deleteGroup(@PathVariable long id) {
 
-        String result =
-                groupService.deleteGroup(id);
+        String result =groupService.deleteGroup(id);
 
         return ResponseEntity.ok(result);
     }

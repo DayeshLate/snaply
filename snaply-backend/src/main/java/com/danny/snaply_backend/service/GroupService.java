@@ -2,6 +2,7 @@ package com.danny.snaply_backend.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -148,6 +149,26 @@ public class GroupService {
         request.setRespondedAt(LocalDateTime.now());
 
         return joinRequestRepository.save(request);
+    }
+
+    public String removeGroupMember(long groupMemberId,long groupId){
+        Long currentUserId =userService.getCurrentUser().getId();
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(()-> new RuntimeException("Group not found"));
+        if (!group.getUser().getId().equals(currentUserId)) {
+            return "You can't delete memer of this group";
+        }
+        if(!groupMembersRepository.existsByIdAndGroupId(groupMemberId)){
+                return "Member not present";
+        }
+        GroupMembers members = groupMembersRepository.findByIdAndGroupId(groupMemberId,groupId);
+        if(members == null){
+                return "Member not found in the this group";
+        }
+
+        groupMembersRepository.delete(members);
+        return "Member deleted successfully";
+
     }
 
     @Transactional(readOnly = true)
