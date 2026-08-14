@@ -259,6 +259,31 @@ public class GroupService {
         return "Group deleted successfully";
     }
 
+    public String changeRole(long memeberId, long groupId, Role role){
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(()-> new RuntimeException("Group not found"));
+
+        GroupMembers member = groupMembersRepository.findById(memeberId)
+                        .orElseThrow(()-> new RuntimeException("Member not found"));
+
+        long CurrentUser = userService.getCurrentUser().getId();
+        if(!groupMembersRepository.existsByGroupIdAndUserId(groupId, memeberId)){
+                throw new RuntimeException("User not found in the group");
+        }
+
+        GroupMembers groupMember = groupMembersRepository.findByIdAndGroupId(memeberId, groupId);
+
+        List<GroupMembersDTO> owners = groupMembersService.getByGroupmembersByRole(groupId, Role.OWNER);
+        boolean isOwner = owners.stream().anyMatch(owner -> owner.getUser().getId().equals(CurrentUser));
+        if(!isOwner){
+                throw new RuntimeException("You are not admin to change role !");
+        }
+        groupMember.setRole(Role.ADMIN);
+        groupMembersRepository.save(groupMember);
+        return "Role change successfully !";
+
+    }
+
     @Transactional(readOnly = true)
     public List<GroupDTO> getAllGroups() {
 

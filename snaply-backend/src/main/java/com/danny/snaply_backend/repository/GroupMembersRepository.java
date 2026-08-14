@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.danny.snaply_backend.entity.GroupMembers;
+import com.danny.snaply_backend.entity.Role;
 
 public interface GroupMembersRepository extends JpaRepository<GroupMembers,Long> {
     
@@ -20,4 +21,6 @@ public interface GroupMembersRepository extends JpaRepository<GroupMembers,Long>
     boolean existsByIdAndGroupId(long groupMembarId);
 
     GroupMembers findByIdAndGroupId(long groupMemberId, long groupId);
+
+    List<GroupMembers> findByGroupIdAndRolMembers(Long groupId,Role  role);
 }

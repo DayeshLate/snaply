@@ -1,10 +1,14 @@
 package com.danny.snaply_backend.service;
 
+import java.util.List;
+import java.util.Optional;
+
+
 import org.springframework.stereotype.Service;
 
 import com.danny.snaply_backend.dto.GroupMembersDTO;
-import com.danny.snaply_backend.entity.Group;
 import com.danny.snaply_backend.entity.GroupMembers;
+import com.danny.snaply_backend.entity.Role;
 import com.danny.snaply_backend.repository.GroupMembersRepository;
 
 @Service
@@ -16,6 +20,10 @@ public class GroupMembersService {
         this.groupMembersRepository = groupMembersRepository;
     }
 
+    public List<GroupMembersDTO> getByGroupmembersByRole(long groupId, Role role){
+        List<GroupMembers>  members = groupMembersRepository.findByGroupIdAndRolMembers(groupId, role);
+        return members.stream().map(this::toDTO).toList();
+    }
 
 
     public GroupMembersDTO toDTO(GroupMembers groupMembers){
