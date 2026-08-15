@@ -1,6 +1,8 @@
 package com.danny.snaply_backend.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.danny.snaply_backend.entity.Group;
 import com.danny.snaply_backend.entity.User;
@@ -25,4 +27,6 @@ public class FolderDTO {
     public User user;
 
     public LocalDateTime createdAt;
+
+    public List<MediaDTO> media = new ArrayList<>();
 }

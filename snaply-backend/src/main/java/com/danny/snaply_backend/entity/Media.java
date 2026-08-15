@@ -47,9 +47,7 @@ public class Media {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folder_id",nullable = false)
     private Folder folder;
-
-    // folder uplodedBy
-
+    
     @PrePersist
     public void createAt(){
         this.createdAt = LocalDateTime.now();
