@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.danny.snaply_backend.dto.GroupDTO;
 import com.danny.snaply_backend.dto.GroupMembersDTO;
+import com.danny.snaply_backend.entity.Folder;
 import com.danny.snaply_backend.entity.Group;
 import com.danny.snaply_backend.entity.GroupMembers;
 import com.danny.snaply_backend.entity.JoinRequest;
@@ -48,6 +49,10 @@ public class GroupService {
         group.setInviteCode(inviteCode);
 
         Group savedGroup = groupRepository.save(group);
+
+        Folder folder = Folder.builder().name("Folder").group(savedGroup).build();
+        folderService.createFolder(folder);
+        
 
         GroupMembers owner = GroupMembers.builder()
                 .group(savedGroup)

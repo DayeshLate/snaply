@@ -70,6 +70,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Notification> notifications = new ArrayList<>();
 
+    @OneToMany(mappedBy = "uplodedBy", cascade = CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
+    private List<Media> media = new ArrayList<>();
+
     @Builder.Default
     private boolean enabled = true;
 

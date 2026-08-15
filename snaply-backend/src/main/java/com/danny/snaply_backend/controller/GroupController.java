@@ -3,6 +3,7 @@ package com.danny.snaply_backend.controller;
 import com.danny.snaply_backend.dto.GroupDTO;
 import com.danny.snaply_backend.entity.GroupMembers;
 import com.danny.snaply_backend.entity.JoinRequest;
+import com.danny.snaply_backend.entity.Role;
 import com.danny.snaply_backend.service.GroupMembersService;
 import com.danny.snaply_backend.service.GroupService;
 
@@ -100,4 +101,11 @@ public class GroupController {
                 groupService.getAllGroups()
         );
     }
+
+    @GetMapping("/changeRole/{groupId}/{groupMember}")
+    public ResponseEntity<String> changeRoleToAdmin(@PathVariable long groupId, @PathVariable long groupMember){
+        return ResponseEntity.ok(groupService.changeRole(groupMember,groupId,Role.ADMIN));
+    }
+
+    
 }
