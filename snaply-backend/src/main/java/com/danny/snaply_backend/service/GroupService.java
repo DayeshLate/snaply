@@ -66,6 +66,16 @@ public class GroupService {
         return toDTO(savedGroup);
     }
 
+    public boolean existGroupById(Long groupId){
+       return groupRepository.existsById(groupId);
+    }
+
+    public Group getGroupById(Long groupId){
+        return groupRepository.findById(groupId)
+                .orElseThrow(()-> new RuntimeException("group not found"));
+    }
+
+
     public GroupMembersDTO acceptJoinRequest(String requestId) {
 
         JoinRequest request = joinRequestRepository

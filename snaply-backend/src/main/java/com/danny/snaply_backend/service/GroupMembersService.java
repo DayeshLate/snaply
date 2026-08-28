@@ -25,6 +25,20 @@ public class GroupMembersService {
         return members.stream().map(this::toDTO).toList();
     }
 
+    public List<GroupMembersDTO> getMembersOfGroup(Long groupId){
+        List<GroupMembers> members = groupMembersRepository.findByGroupId(groupId);
+        return members.stream().map(this::toDTO).toList();
+    }
+
+    public boolean existByUserAndGroup(Long userId, Long groupId){
+       return groupMembersRepository.existsByGroupIdAndUserId(groupId, userId);
+    }
+
+    public GroupMembersDTO getByUserAndGroup(Long userId,Long groupId){
+        GroupMembers member = groupMembersRepository.findByUserIdAndGroupId(userId, groupId);
+        return toDTO(member);
+    }
+
 
     public GroupMembersDTO toDTO(GroupMembers groupMembers){
         return GroupMembersDTO.builder()

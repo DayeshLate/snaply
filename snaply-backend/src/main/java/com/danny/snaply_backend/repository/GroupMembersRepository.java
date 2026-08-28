@@ -14,13 +14,15 @@ public interface GroupMembersRepository extends JpaRepository<GroupMembers,Long>
             String userId
     );
 
-    List<GroupMembers> findByGroupId(String groupId);
+    List<GroupMembers> findByGroupId(Long groupId);
 
     boolean existsByGroupIdAndUserId(Long groupId, Long userId);
 
     boolean existsByIdAndGroupId(long groupMembarId);
 
     GroupMembers findByIdAndGroupId(long groupMemberId, long groupId);
+
+    GroupMembers findByUserIdAndGroupId(Long userId, Long groupId);
 
     List<GroupMembers> findByGroupIdAndRolMembers(Long groupId,Role  role);
 }
