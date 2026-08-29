@@ -1,5 +1,6 @@
 package com.danny.snaply_backend.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -30,6 +31,11 @@ public class FolderService {
             .orElseThrow(()-> new RuntimeException("folder not found"));
 
         return toDTO(folder);
+    }
+
+    public List<FolderDTO> getAllFolders(){
+        List<Folder> folders = folderReposiory.findAll();
+        return folders.stream().map(this::toDTO).toList();
     }
 
     public String deleteFolderByOwner(Long groupId,Long folderId){
@@ -66,7 +72,7 @@ public class FolderService {
         folderReposiory.deleteById(folderId);
         return "folder deleted successfully";
     }
-
+    
     
     public Folder toEntity(FolderDTO dto){
         return Folder.builder()
