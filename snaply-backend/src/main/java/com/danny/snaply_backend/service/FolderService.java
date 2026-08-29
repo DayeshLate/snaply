@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.danny.snaply_backend.dto.FolderDTO;
 import com.danny.snaply_backend.dto.GroupMembersDTO;
 import com.danny.snaply_backend.entity.Folder;
+import com.danny.snaply_backend.entity.Group;
 import com.danny.snaply_backend.entity.Role;
 import com.danny.snaply_backend.repository.FolderReposiory;
 
@@ -64,7 +65,7 @@ public class FolderService {
             return "you are not member of this group";
         }
 
-        GroupMembersDTO groupMembers = groupMembersService.getByUserAndGroup(folderId, groupId);
+        GroupMembersDTO groupMembers = groupMembersService.getByUserAndGroup(userService.getCurrentUser().getId(), groupId);
 
         if(groupMembers.getRole() != Role.ADMIN){
             return "you are not Admin of this group";
@@ -72,7 +73,22 @@ public class FolderService {
         folderReposiory.deleteById(folderId);
         return "folder deleted successfully";
     }
-    
+
+    public String addFolderInGroup(Long groupId,Folder folder){
+        if(!groupService.existGroupById(groupId)){
+            return "Group does not exist";
+        }
+        GroupMembersDTO member = groupMembersService.getByUserAndGroup(userService.getCurrentUser().getId(), groupId);
+        if(member.role == Role.VIEWER){
+            return "Yoou dont have access to add the folder";
+        }
+        Folder newFolder = folder;
+        Group group = groupService.getGroupById(groupId);
+        newFolder.setGroup(group);
+        newFolder.setOwner(userService.getCurrentUser());
+        folderReposiory.save(newFolder);
+        return "Folder added successfully in the group";
+    }
     
     public Folder toEntity(FolderDTO dto){
         return Folder.builder()
