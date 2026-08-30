@@ -17,4 +17,8 @@ public interface MediaRepository extends JpaRepository<Media,Long>{
     Optional<Media> findByDriveFileId(String driveFileId);
 
     boolean existsByDriveFileId(String driveFileId);
+
+    List<Media> findAllByFolderId(Long folderId);
+
+    Long countByFolderId(Long folderId);    
 }
