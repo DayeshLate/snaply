@@ -20,6 +20,8 @@ import com.danny.snaply_backend.repository.GroupMembersRepository;
 import com.danny.snaply_backend.repository.GroupRepository;
 import com.danny.snaply_backend.repository.JoinRequestRepository;
 import com.danny.snaply_backend.repository.UserRepository;
+import com.danny.snaply_backend.repository.FolderReposiory;
+import com.danny.snaply_backend.service.FolderMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,13 +30,14 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class GroupService {
 
-    private final GroupRepository groupRepository;
-    private final FolderService folderService;
-    private final UserService userService;
-    private final GroupMembersService groupMembersService;
-    private final GroupMembersRepository groupMembersRepository;
-    private final JoinRequestRepository joinRequestRepository;
-    private final UserRepository userRepository;
+        private final GroupRepository groupRepository;
+        private final FolderReposiory folderReposiory;
+        private final FolderMapper folderMapper;
+        private final UserService userService;
+        private final GroupMembersService groupMembersService;
+        private final GroupMembersRepository groupMembersRepository;
+        private final JoinRequestRepository joinRequestRepository;
+        private final UserRepository userRepository;
 
     public GroupDTO createGroup(GroupDTO groupDTO) {
 
@@ -51,7 +54,7 @@ public class GroupService {
         Group savedGroup = groupRepository.save(group);
 
         Folder folder = Folder.builder().name("Folder").group(savedGroup).build();
-        folderService.createFolder(folder);
+        folderReposiory.save(folder);
         
 
         GroupMembers owner = GroupMembers.builder()
@@ -333,9 +336,9 @@ public class GroupService {
                     group.getFolder() == null
                             ? new ArrayList<>()
                             : group.getFolder()
-                                    .stream()
-                                    .map(folderService::toDTO)
-                                    .toList()
+                                            .stream()
+                                            .map(folderMapper::toDTO)
+                                            .toList()
             )
                 .user(group.getUser())
                 .inviteCode(group.getInviteCode())
@@ -359,11 +362,11 @@ public class GroupService {
                                         .toList()
                 )
                 .folder(
-                    dto.getFolderDTOs() == null
+                    : dto.getFolderDTOs() == null
                             ? new ArrayList<>()
                             : dto.getFolderDTOs()
                                     .stream()
-                                    .map(folderService::toEntity)
+                                    .map(folderMapper::toEntity)
                                     .toList()
             )
                 .build();
