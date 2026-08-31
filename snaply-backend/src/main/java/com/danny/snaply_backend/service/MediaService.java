@@ -22,6 +22,7 @@ public class MediaService {
     private final FolderService folderService;
     private final GroupService groupService;
     private final GroupMembersService groupMembersService;
+    private final MediaMapper mediaMapper;
 
     public String createMedia(Media media){
         FolderDTO folder = folderService.getFolderById(media.getFolder().getId());
@@ -58,30 +59,10 @@ public class MediaService {
     
     
     public Media toEntity(MediaDTO dto){
-        return Media.builder()
-            .id(dto.getId())
-            .fileName(dto.getFileName())
-            .mimeType(dto.getMimeType())
-            .fileSize(dto.getFileSize())
-            .driveFileId(dto.getDriveFileId())
-            .fileUrl(dto.getFileUrl())
-            .createdAt(dto.getCreatedAt())
-            .uplodedBy(dto.getUplodedBy())
-            .folder(dto.getFolder())
-            .build();
+        return mediaMapper.toEntity(dto);
     }
 
     public MediaDTO toDTO(Media entity){
-        return MediaDTO.builder()
-            .id(entity.getId())
-            .fileName(entity.getFileName())
-            .mimeType(entity.getMimeType())
-            .fileSize(entity.getFileSize())
-            .driveFileId(entity.getDriveFileId())
-            .fileUrl(entity.getFileUrl())
-            .createdAt(entity.getCreatedAt())
-            .uplodedBy(entity.getUplodedBy())
-            .folder(entity.getFolder())
-            .build();
+        return mediaMapper.toDTO(entity);
     }
 }

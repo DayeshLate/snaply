@@ -135,3 +135,33 @@ flowchart TD
 - The backend is safe to develop without a frontend because the magic link in the email points to the backend directly when `FRONTEND_URL` is blank.
 - If you change the JWT secret or clear Redis, all existing tokens become invalid.
 - Google SMTP requires a Google App Password (not your regular Google password). Enable 2FA on your Google account first, then create an App Password at https://myaccount.google.com/apppasswords.
+
+
+## Media
+Controller
+
+createMedia
+deleteMedia
+getCountOfMediaInFolder
+getAllMediaByFolder
+getMediaById
+uploadMedia
+downloadMedia
+updateMedia
+searchMedia
+getMediaByUser
+bulkDeleteMedia
+
+Service
+
+createMedia
+deleteMedia
+getCountOfMediaInFolder
+getAllMediaByFolder
+getMediaById
+storeMedia (or uploadToStorage)
+getMediaFileStream (or generateDownloadUrl)
+updateMedia
+searchMedia
+getMediaByUser
+bulkDeleteMedia

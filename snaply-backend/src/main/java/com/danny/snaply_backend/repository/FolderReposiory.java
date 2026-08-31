@@ -14,7 +14,7 @@ public interface FolderReposiory extends JpaRepository<Folder,Long> {
 
     Optional<Folder> findByIdAndGroupId(Long folderId, Long groupId);
 
-    Optional<Folder> findByGroupIdAndParentFolderIsNull(Long groupId);
+    Optional<Folder> findByGroupIdAndParentFolderIdIsNull(Long groupId);
 
     Optional<Folder> findByDriveFolderId(String driveFolderId);
 }

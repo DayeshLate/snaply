@@ -2,7 +2,6 @@ package com.danny.snaply_backend.controller;
 
 import java.util.List;
 
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +14,6 @@ import com.danny.snaply_backend.dto.MediaDTO;
 import com.danny.snaply_backend.entity.Media;
 import com.danny.snaply_backend.service.MediaService;
 
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 
 @RestController

@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class FolderService {
 
     private final FolderReposiory folderReposiory;
-    private final MediaService mediaService;
+    private final MediaMapper mediaMapper;
     private final GroupService groupService;
     private final UserService userService;
     private final GroupMembersService groupMembersService;
@@ -99,7 +99,7 @@ public class FolderService {
             .group(dto.getGroup())
             .owner(dto.getUser())
             .createdAt(dto.getCreatedAt())
-            .media(dto.getMedia().stream().map(mediaService :: toEntity).toList())
+            .media(dto.getMedia().stream().map(mediaMapper :: toEntity).toList())
             .build();
     }
 
@@ -112,7 +112,7 @@ public class FolderService {
                 .group(entity.getGroup())
                 .user(entity.getOwner())
                 .createdAt(entity.getCreatedAt())
-                .media(entity.getMedia().stream().map(mediaService :: toDTO).toList())
+                .media(entity.getMedia().stream().map(mediaMapper :: toDTO).toList())
                 .build();
     }
 }

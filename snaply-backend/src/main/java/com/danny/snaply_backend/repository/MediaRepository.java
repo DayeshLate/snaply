@@ -10,7 +10,7 @@ import com.danny.snaply_backend.entity.Media;
 public interface MediaRepository extends JpaRepository<Media,Long>{
     List<Media> findByFolderId(Long folderId);
 
-    List<Media> findByUploadedById(Long userId);
+    List<Media> findByUplodedBy(Long userId);
 
     Optional<Media> findByIdAndFolderId(Long mediaId, Long folderId);
 
