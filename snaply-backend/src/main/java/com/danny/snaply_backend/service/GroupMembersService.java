@@ -21,7 +21,7 @@ public class GroupMembersService {
     }
 
     public List<GroupMembersDTO> getByGroupmembersByRole(long groupId, Role role){
-        List<GroupMembers>  members = groupMembersRepository.findByGroupIdAndRolMembers(groupId, role);
+        List<GroupMembers>  members = groupMembersRepository.findByGroupIdAndRole(groupId, role);
         return members.stream().map(this::toDTO).toList();
     }
 

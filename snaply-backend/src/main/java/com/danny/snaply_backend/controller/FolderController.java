@@ -29,7 +29,7 @@ public class FolderController {
         return ResponseEntity.ok(folderService.getAllFolders());
     }
 
-    @PostMapping("/addFolder/{groupId)")
+    @PostMapping("/addFolder/{groupId}")
     public ResponseEntity<String> addFolderInGroup(@RequestBody Folder folder, @PathVariable Long groupId){
         String result = folderService.addFolderInGroup(groupId, folder);
         return ResponseEntity.ok(result);

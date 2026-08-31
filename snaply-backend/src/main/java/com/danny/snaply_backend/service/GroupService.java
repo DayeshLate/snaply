@@ -178,7 +178,7 @@ public class GroupService {
         if (!group.getUser().getId().equals(currentUserId)) {
             return "You can't delete memer of this group";
         }
-        if(!groupMembersRepository.existsByIdAndGroupId(groupMemberId)){
+        if(!groupMembersRepository.existsByIdAndGroupId(groupMemberId, groupId)){
                 return "Member not present";
         }
         GroupMembers members = groupMembersRepository.findByIdAndGroupId(groupMemberId,groupId);
@@ -362,7 +362,7 @@ public class GroupService {
                                         .toList()
                 )
                 .folder(
-                    : dto.getFolderDTOs() == null
+                    dto.getFolderDTOs() == null
                             ? new ArrayList<>()
                             : dto.getFolderDTOs()
                                     .stream()
