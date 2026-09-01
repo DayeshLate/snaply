@@ -3,7 +3,11 @@ package com.danny.snaply_backend.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import com.danny.snaply_backend.config.CacheConstants;
 import com.danny.snaply_backend.dto.FolderDTO;
 import com.danny.snaply_backend.dto.GroupMembersDTO;
 import com.danny.snaply_backend.entity.Folder;
@@ -23,10 +27,12 @@ public class FolderService {
     private final UserService userService;
     private final GroupMembersService groupMembersService;
 
+    @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL}, allEntries = true)
     public void createFolder(Folder folder){
         folderReposiory.save(folder);
     }
 
+    @Cacheable(value = CacheConstants.FOLDERS_BY_ID, key = "#folderId")
     public FolderDTO getFolderById(Long folderId){
         Folder folder = folderReposiory.findById(folderId)
             .orElseThrow(()-> new RuntimeException("folder not found"));
@@ -34,11 +40,13 @@ public class FolderService {
         return toDTO(folder);
     }
 
+    @Cacheable(value = CacheConstants.FOLDERS_ALL, key = "'all'")
     public List<FolderDTO> getAllFolders(){
         List<Folder> folders = folderReposiory.findAll();
         return folders.stream().map(this::toDTO).toList();
     }
 
+    @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL}, allEntries = true)
     public String deleteFolderByOwner(Long groupId,Long folderId){
         if(!folderReposiory.existsById(folderId)){
             return "folder not found";
@@ -54,6 +62,7 @@ public class FolderService {
         return "folder deleted successfully";
     }
 
+    @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL}, allEntries = true)
     public String deleteFolderByAdmin(Long groupId, Long folderId){
         if(!folderReposiory.existsById(folderId)){
             return "folder not found";
@@ -74,6 +83,7 @@ public class FolderService {
         return "folder deleted successfully";
     }
 
+    @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL}, allEntries = true)
     public String addFolderInGroup(Long groupId,Folder folder){
         if(!groupService.existGroupById(groupId)){
             return "Group does not exist";
