@@ -29,8 +29,6 @@ public interface JoinRequestRepository
             String userId
     );
 
-    Optional<JoinRequest> findByUserIdOptional(
-            String userId
-    );
+    Optional<List<JoinRequest>> findByUserId(String userId);
 
 }
