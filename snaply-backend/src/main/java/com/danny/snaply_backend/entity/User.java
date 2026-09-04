@@ -1,5 +1,7 @@
 package com.danny.snaply_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -50,7 +52,9 @@ public class User {
 
     @Column(name = "group_folders")
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Folder> folder;
+    @JsonIgnore
+    @Builder.Default
+    private List<Folder> folder = new ArrayList<>();
 
     @Column(name = "is_drive_connected")
     @Builder.Default
@@ -62,15 +66,23 @@ public class User {
     private Role role = Role.USER;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonIgnore
+    @Builder.Default
     private List<Group> groups = new ArrayList<>();
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JsonIgnore
+    @Builder.Default
     private List<GroupMembers> groupMemberships = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonIgnore
+    @Builder.Default
     private List<Notification> notifications = new ArrayList<>();
 
     @OneToMany(mappedBy = "uplodedBy", cascade = CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
+    @JsonIgnore
+    @Builder.Default
     private List<Media> media = new ArrayList<>();
 
     @Builder.Default

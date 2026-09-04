@@ -1,5 +1,7 @@
 package com.danny.snaply_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,13 +51,17 @@ public class Group {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Folder> folder;
+    @JsonIgnore
+    @Builder.Default
+    private List<Folder> folder = new ArrayList<>();
 
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "group_created_by", nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "group",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JsonIgnore
+    @Builder.Default
     private List<GroupMembers> groupMembers = new ArrayList<>();
     
     @PrePersist

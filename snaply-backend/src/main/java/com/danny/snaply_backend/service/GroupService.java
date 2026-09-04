@@ -53,7 +53,11 @@ public class GroupService {
 
         Group savedGroup = groupRepository.save(group);
 
-        Folder folder = Folder.builder().name("Folder").group(savedGroup).build();
+        Folder folder = Folder.builder()
+                .name("Folder")
+                .group(savedGroup)
+                .owner(userService.getCurrentUser())
+                .build();
         folderReposiory.save(folder);
         
 

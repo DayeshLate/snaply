@@ -1,5 +1,7 @@
 package com.danny.snaply_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +44,17 @@ public class Folder {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
+    @JsonIgnore
     private Group group;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
+    @JsonIgnore
     private User owner;
 
     @OneToMany(mappedBy = "folder",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JsonIgnore
+    @Builder.Default
     private List<Media> media = new ArrayList<>();
 
     private LocalDateTime createdAt;
