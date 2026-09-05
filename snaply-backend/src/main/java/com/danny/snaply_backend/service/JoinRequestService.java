@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-
 import com.danny.snaply_backend.dto.JoinRequestDTO;
 import com.danny.snaply_backend.entity.JoinRequest;
 import com.danny.snaply_backend.repository.JoinRequestRepository;
@@ -14,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 
 @Service 
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 public class JoinRequestService {
     
     private final JoinRequestRepository joinRequestRepository;
@@ -28,6 +27,19 @@ public class JoinRequestService {
         }
         return joinRequestByUser.get().stream().map(this::toDTO).toList();
 
+    }
+
+    public List<JoinRequestDTO> getRequestByGroupId(String groupId){
+        Optional<List<JoinRequest>> joinRequestByGroup = joinRequestRepository.findByGroupId(groupId);
+        if(joinRequestByGroup.isEmpty()){
+            return Collections.emptyList();
+        }
+        return joinRequestByGroup.get().stream().map(this::toDTO).toList();
+    }
+    public JoinRequestDTO getRequestById(String id){
+        JoinRequest request = joinRequestRepository.findById(id)
+            .orElseThrow(()-> new RuntimeException("Request not found"));
+        return toDTO(request);
     }
 
     public JoinRequestDTO toDTO(JoinRequest entity){

@@ -14,10 +14,9 @@ public interface JoinRequestRepository
             String userId
     );
 
-    Optional<JoinRequest> findByGroupIdAndUserIdOptional(
-            String groupId,
-            String userId
-    );
+    Optional<List<JoinRequest>> findByGroupId(
+            String groupId
+            );
 
     List<JoinRequest> findByGroupIdAndStatus(
             String groupId,

@@ -108,6 +108,7 @@ public class GroupService {
             );
         }
 
+        
         if (request.getStatus() != JoinRequest.Status.PENDING) {
             throw new RuntimeException("Request is not pending");
         }
