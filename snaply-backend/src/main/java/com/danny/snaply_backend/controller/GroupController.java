@@ -6,6 +6,7 @@ import com.danny.snaply_backend.entity.JoinRequest;
 import com.danny.snaply_backend.entity.Role;
 import com.danny.snaply_backend.service.GroupMembersService;
 import com.danny.snaply_backend.service.GroupService;
+import com.danny.snaply_backend.service.JoinRequestService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +22,7 @@ public class GroupController {
 
     private final GroupService groupService;
     private final GroupMembersService groupMembersService;
+    private final JoinRequestService joinRequestService;
 
     @PostMapping("/create")
     public ResponseEntity<GroupDTO> createGroup(
@@ -50,7 +52,7 @@ public class GroupController {
             @PathVariable String requestId
     ) {
 
-        GroupMembers member =groupMembersService.toEntity(groupService.acceptJoinRequest(requestId));
+        GroupMembers member = groupMembersService.toEntity(joinRequestService.acceptJoinRequest(requestId));
 
         return ResponseEntity.ok(member);
     }
@@ -61,7 +63,7 @@ public class GroupController {
     ) {
 
         JoinRequest request =
-                groupService.rejectRequest(requestId);
+                joinRequestService.rejectRequest(requestId);
 
         return ResponseEntity.ok(request);
     }
