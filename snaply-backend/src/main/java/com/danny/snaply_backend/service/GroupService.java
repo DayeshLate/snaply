@@ -208,13 +208,11 @@ public class GroupService {
     @Transactional(readOnly = true)
     public List<GroupDTO> getAllGroups() {
 
-        List<Group> groups = groupRepository
-                .findByUserId(
-                        userService.getCurrentUser().getId()
-                )
-                .orElse(List.of());
+        Long currentUserId = userService.getCurrentUser().getId();
 
-        return groups.stream()
+        return groupMembersRepository.findByUserId(currentUserId).stream()
+                .filter(GroupMembers::isAccepted)
+                .map(GroupMembers::getGroup)
                 .map(this::toDTO)
                 .toList();
     }

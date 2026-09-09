@@ -8,6 +8,8 @@ import com.danny.snaply_backend.entity.GroupMembers;
 import com.danny.snaply_backend.entity.Role;
 
 public interface GroupMembersRepository extends JpaRepository<GroupMembers,Long> {
+
+    List<GroupMembers> findByUserId(Long userId);
     
     boolean existsByGroupIdAndUserId(
             String groupId,
