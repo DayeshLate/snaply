@@ -5,9 +5,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.danny.snaply_backend.config.CacheConstants;
 import com.danny.snaply_backend.dto.GroupMembersDTO;
 import com.danny.snaply_backend.dto.JoinRequestDTO;
 import com.danny.snaply_backend.entity.Group;
@@ -35,9 +38,10 @@ public class JoinRequestService {
     private final GroupMembersService groupMembersService;
     private final UserRepository userRepository;
 
+    @Cacheable(value = CacheConstants.JOIN_REQUEST_BY_USER, key = "@userService.getCurrentUser().id")
     public List<JoinRequestDTO> getRequestByUserId(){
-        Long user = userService.getCurrentUser().getId();
-        Optional<List<JoinRequest>> joinRequestByUser = joinRequestRepository.findByUserId(user.toString());
+        Long userId = userService.getCurrentUser().getId();
+        Optional<List<JoinRequest>> joinRequestByUser = joinRequestRepository.findByUserId(userId.toString());
         if(joinRequestByUser.isEmpty()){
             return Collections.emptyList();
         }
@@ -45,6 +49,7 @@ public class JoinRequestService {
 
     }
 
+    @Cacheable(value = CacheConstants.JOIN_REQUEST_BY_GROUP, key = "#groupId")
     public List<JoinRequestDTO> getRequestByGroupId(String groupId){
         Optional<List<JoinRequest>> joinRequestByGroup = joinRequestRepository.findByGroupId(groupId);
         if(joinRequestByGroup.isEmpty()){
@@ -52,12 +57,21 @@ public class JoinRequestService {
         }
         return joinRequestByGroup.get().stream().map(this::toDTO).toList();
     }
+
+    @Cacheable(value = CacheConstants.JOIN_REQUEST_BY_ID, key = "#id")
     public JoinRequestDTO getRequestById(String id){
         JoinRequest request = joinRequestRepository.findById(id)
             .orElseThrow(()-> new RuntimeException("Request not found"));
         return toDTO(request);
     }
 
+    @CacheEvict(value = {
+        CacheConstants.JOIN_REQUEST_BY_ID,
+        CacheConstants.JOIN_REQUEST_BY_USER,
+        CacheConstants.JOIN_REQUEST_BY_GROUP,
+        CacheConstants.GROUP_BY_ID,
+        CacheConstants.GROUPS_ALL
+    }, allEntries = true)
     public GroupMembersDTO acceptJoinRequest(String requestId) {
         JoinRequest request = joinRequestRepository
                 .findById(requestId)
@@ -98,9 +112,14 @@ public class JoinRequestService {
 
         joinRequestRepository.save(request);
 
-        return groupMembersService.toDTO(groupMembersRepository.save(member));
+        return groupMembersService.save(member);
     }
 
+    @CacheEvict(value = {
+        CacheConstants.JOIN_REQUEST_BY_ID,
+        CacheConstants.JOIN_REQUEST_BY_USER,
+        CacheConstants.JOIN_REQUEST_BY_GROUP
+    }, allEntries = true)
     public JoinRequest rejectRequest(String requestId) {
         JoinRequest request = joinRequestRepository
                 .findById(requestId)
