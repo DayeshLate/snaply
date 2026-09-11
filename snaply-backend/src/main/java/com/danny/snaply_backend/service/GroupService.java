@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.danny.snaply_backend.config.CacheConstants;
 import com.danny.snaply_backend.dto.GroupDTO;
 import com.danny.snaply_backend.dto.GroupMembersDTO;
 import com.danny.snaply_backend.entity.Folder;
@@ -34,6 +37,7 @@ public class GroupService {
         private final GroupMembersRepository groupMembersRepository;
         private final JoinRequestRepository joinRequestRepository;
 
+        @CacheEvict(value = {CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
     public GroupDTO createGroup(GroupDTO groupDTO) {
 
         String inviteCode = UUID.randomUUID()
@@ -71,6 +75,7 @@ public class GroupService {
        return groupRepository.existsById(groupId);
     }
 
+
     public Group getGroupById(Long groupId){
         return groupRepository.findById(groupId)
                 .orElseThrow(()-> new RuntimeException("group not found"));
@@ -97,7 +102,8 @@ public class GroupService {
 
     }
 
-    @Transactional(readOnly = true)
+        @Transactional(readOnly = true)
+        @Cacheable(value = CacheConstants.GROUP_BY_ID, key = "#id")
     public GroupDTO getGroup(long id) {
 
         Group group = groupRepository
@@ -109,7 +115,7 @@ public class GroupService {
         return toDTO(group);
     }
 
-    @Transactional
+        @Transactional
         public JoinRequest requestToJoin(String inviteCode) {
 
         Group group = groupRepository
@@ -163,6 +169,7 @@ public class GroupService {
         return joinRequestRepository.save(request);
         }
 
+        @CacheEvict(value = {CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
     public String deleteGroup(long id) {
 
         Group group = groupRepository
@@ -183,6 +190,7 @@ public class GroupService {
         return "Group deleted successfully";
     }
 
+        @CacheEvict(value = {CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
     public String changeRole(long memeberId, long groupId, Role role){
         groupRepository.findById(groupId)
                 .orElseThrow(()-> new RuntimeException("Group not found"));
@@ -205,7 +213,8 @@ public class GroupService {
 
     }
 
-    @Transactional(readOnly = true)
+        @Transactional(readOnly = true)
+        @Cacheable(value = CacheConstants.GROUPS_ALL, key = "'all'")
     public List<GroupDTO> getAllGroups() {
 
         Long currentUserId = userService.getCurrentUser().getId();

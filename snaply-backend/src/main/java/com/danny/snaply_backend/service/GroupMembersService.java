@@ -47,7 +47,9 @@ public class GroupMembersService {
         CacheConstants.GROUP_MEMBERS_BY_GROUP,
         CacheConstants.GROUP_MEMBERS_BY_ROLE,
         CacheConstants.GROUP_MEMBERS_BY_USER_AND_GROUP,
-        CacheConstants.GROUP_MEMBER_EXISTS_BY_USER_AND_GROUP
+        CacheConstants.GROUP_MEMBER_EXISTS_BY_USER_AND_GROUP,
+        CacheConstants.GROUP_BY_ID,
+        CacheConstants.GROUPS_ALL
     }, allEntries = true)
     public GroupMembersDTO save(GroupMembers groupMembers) {
         return toDTO(groupMembersRepository.save(groupMembers));

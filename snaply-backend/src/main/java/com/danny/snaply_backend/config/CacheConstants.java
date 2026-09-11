@@ -12,6 +12,8 @@ public final class CacheConstants {
     public static final String GROUP_MEMBERS_BY_ROLE = "groupMembersByRole";
     public static final String GROUP_MEMBERS_BY_USER_AND_GROUP = "groupMembersByUserAndGroup";
     public static final String GROUP_MEMBER_EXISTS_BY_USER_AND_GROUP = "groupMemberExistsByUserAndGroup";
+    public static final String GROUP_BY_ID = "groupById";
+    public static final String GROUPS_ALL = "groupsAll";
     public static final String AUTH_VERIFICATION = "auth:verification:";
     public static final String AUTH_SESSION = "auth:session:";
     public static final String AUTH_COOKIE = "snaply_access_token";

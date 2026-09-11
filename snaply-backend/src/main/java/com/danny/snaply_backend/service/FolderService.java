@@ -27,7 +27,7 @@ public class FolderService {
     private final UserService userService;
     private final GroupMembersService groupMembersService;
 
-    @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL}, allEntries = true)
+    @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL, CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
     public void createFolder(Folder folder){
         folderReposiory.save(folder);
     }
@@ -46,7 +46,7 @@ public class FolderService {
         return folders.stream().map(this::toDTO).toList();
     }
 
-    @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL}, allEntries = true)
+    @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL, CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
     public String deleteFolderByOwner(Long groupId,Long folderId){
         if(!folderReposiory.existsById(folderId)){
             return "folder not found";
@@ -62,7 +62,7 @@ public class FolderService {
         return "folder deleted successfully";
     }
 
-    @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL}, allEntries = true)
+    @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL, CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
     public String deleteFolderByAdmin(Long groupId, Long folderId){
         if(!folderReposiory.existsById(folderId)){
             return "folder not found";
@@ -83,7 +83,7 @@ public class FolderService {
         return "folder deleted successfully";
     }
 
-    @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL}, allEntries = true)
+    @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL, CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
     public String addFolderInGroup(Long groupId,Folder folder){
         if(!groupService.existGroupById(groupId)){
             return "Group does not exist";
