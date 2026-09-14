@@ -3,6 +3,7 @@ package com.danny.snaply_backend.dto;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.danny.snaply_backend.entity.Folder;
 import com.danny.snaply_backend.entity.User;
 
@@ -27,8 +28,10 @@ public class MediaDTO {
 
     public LocalDateTime createdAt;
 
+    @JsonIgnore
     public User uplodedBy;
 
+    @JsonIgnore
     public Folder folder;
 
 }

@@ -2,6 +2,7 @@ package com.danny.snaply_backend.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.danny.snaply_backend.entity.Group;
 import com.danny.snaply_backend.entity.Role;
 import com.danny.snaply_backend.entity.User;
@@ -17,8 +18,10 @@ public class GroupMembersDTO {
 
     public Role role;
 
+    @JsonIgnore
     public Group group;
 
+    @JsonIgnore
     public User user;
 
     public LocalDateTime joinedAt;

@@ -2,6 +2,7 @@ package com.danny.snaply_backend.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.danny.snaply_backend.entity.User;
 
 import lombok.Data;
@@ -17,6 +18,7 @@ public class NotificationDTO {
 
     public boolean isRead;
 
+    @JsonIgnore
     public User user;
 
     public LocalDateTime createdAt;

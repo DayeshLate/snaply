@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.danny.snaply_backend.entity.User;
 
 import lombok.AllArgsConstructor;
@@ -30,10 +31,13 @@ public class GroupDTO {
 
     public LocalDateTime createdAt;
 
+    @Builder.Default
     public List<GroupMembersDTO> groupMembers = new ArrayList<>();
 
+    @Builder.Default
     public List<FolderDTO> folderDTOs = new ArrayList<>();
     
+    @JsonIgnore
     public User user;
 
     public String inviteCode;
