@@ -23,7 +23,7 @@ public class AuthService {
 
     private final UserService userService;
     private final EmailService emailService;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${app.backend.url:http://localhost:8080}")
     private String backendUrl;
@@ -52,14 +52,14 @@ public class AuthService {
     @Transactional
     public User verifyEmail(String token) {
         String key = CacheConstants.AUTH_VERIFICATION + token;
-        Object emailValue = redisTemplate.opsForValue().get(key);
+        String emailValue = redisTemplate.opsForValue().get(key);
 
         if (emailValue == null) {
             throw new RuntimeException("Invalid or expired verification token");
         }
 
         redisTemplate.delete(key);
-        String email = emailValue.toString();
+        String email = emailValue;
 
         User user = userService.findByEmailDirect(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -92,13 +92,13 @@ public class AuthService {
     }
 
     public User me(String token) {
-        Object emailValue = redisTemplate.opsForValue().get(CacheConstants.AUTH_SESSION + token);
+        String emailValue = redisTemplate.opsForValue().get(CacheConstants.AUTH_SESSION + token);
 
         if (emailValue == null) {
             throw new RuntimeException("Invalid or expired session token");
         }
 
-        return userService.findByEmailDirect(emailValue.toString())
+        return userService.findByEmailDirect(emailValue)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 

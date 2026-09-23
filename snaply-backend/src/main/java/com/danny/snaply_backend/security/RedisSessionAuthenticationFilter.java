@@ -22,11 +22,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class RedisSessionAuthenticationFilter extends OncePerRequestFilter {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private final UserService userService;
 
     public RedisSessionAuthenticationFilter(
-            RedisTemplate<String, Object> redisTemplate,
+            RedisTemplate<String, String> redisTemplate,
             UserService userService
     ) {
         this.redisTemplate = redisTemplate;
@@ -66,12 +66,12 @@ public class RedisSessionAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private Optional<User> resolveUser(String token) {
-        Object emailValue = redisTemplate.opsForValue().get(CacheConstants.AUTH_SESSION + token);
+        String emailValue = redisTemplate.opsForValue().get(CacheConstants.AUTH_SESSION + token);
         if (emailValue == null) {
             return Optional.empty();
         }
 
-        return userService.findByEmailDirect(emailValue.toString());
+        return userService.findByEmailDirect(emailValue);
     }
 
     private void setAuthentication(User user, HttpServletRequest request) {

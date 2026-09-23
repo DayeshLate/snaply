@@ -2,8 +2,10 @@ package com.danny.snaply_backend.config;
 
 import java.time.Duration;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
@@ -26,17 +28,26 @@ public class RedisConfig {
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        ObjectMapper cacheMapper = new ObjectMapper();
+        cacheMapper.registerModule(new JavaTimeModule());
+        cacheMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        cacheMapper.activateDefaultTyping(
+                BasicPolymorphicTypeValidator.builder()
+                        .allowIfSubType("com.danny.snaply_backend")
+                        .allowIfSubType("java.util")
+                        .build(),
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+        );
 
         GenericJackson2JsonRedisSerializer serializer =
-                new GenericJackson2JsonRedisSerializer(mapper);
+                new GenericJackson2JsonRedisSerializer(cacheMapper);
 
         RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration
                 .defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(30))
                 .disableCachingNullValues()
+                .prefixCacheNameWith("snaply:v2:")
                 .serializeKeysWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
                                 new StringRedisSerializer()
@@ -62,17 +73,15 @@ public class RedisConfig {
         }
 
         @Bean
-        public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory, ObjectMapper mapper) {
-                RedisTemplate<String, Object> template = new RedisTemplate<>();
+        public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory connectionFactory) {
+                RedisTemplate<String, String> template = new RedisTemplate<>();
                 template.setConnectionFactory(connectionFactory);
 
-                Jackson2JsonRedisSerializer<Object> jacksonSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
-                jacksonSerializer.setObjectMapper(mapper);
-
-                template.setKeySerializer(new StringRedisSerializer());
-                template.setValueSerializer(jacksonSerializer);
-                template.setHashKeySerializer(new StringRedisSerializer());
-                template.setHashValueSerializer(jacksonSerializer);
+                StringRedisSerializer serializer = new StringRedisSerializer();
+                template.setKeySerializer(serializer);
+                template.setValueSerializer(serializer);
+                template.setHashKeySerializer(serializer);
+                template.setHashValueSerializer(serializer);
                 template.afterPropertiesSet();
 
                 return template;
