@@ -112,6 +112,18 @@ public class GroupService {
                         new RuntimeException("Group not found")
                 );
 
+        Long currentUserId = userService.getCurrentUser().getId();
+
+        boolean isGroupOwner = group.getUser() != null && group.getUser().getId().equals(currentUserId);
+        boolean isGroupMember = group.getGroupMembers() != null &&
+                group.getGroupMembers().stream()
+                        .filter(GroupMembers::isAccepted)
+                        .anyMatch(member -> member.getUser() != null && member.getUser().getId().equals(currentUserId));
+
+        if (!isGroupOwner && !isGroupMember) {
+                throw new RuntimeException("You are not allowed to access this group");
+        }
+
         return toDTO(group);
     }
 
