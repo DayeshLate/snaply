@@ -4,11 +4,15 @@ import java.time.LocalDateTime;
 
 import com.danny.snaply_backend.entity.JoinRequest.Status;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data 
+@NoArgsConstructor
+@AllArgsConstructor
 public class JoinRequestDTO {
     
     public String id;

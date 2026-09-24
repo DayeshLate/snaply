@@ -7,11 +7,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.danny.snaply_backend.entity.Folder;
 import com.danny.snaply_backend.entity.User;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MediaDTO {
     
     public Long id;

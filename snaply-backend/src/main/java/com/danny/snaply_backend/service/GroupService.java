@@ -138,13 +138,16 @@ public class GroupService {
 
         Long userId = userService.getCurrentUser().getId();
 
-        if (group.getUser().getId().equals(userId)) {
+        if (group.getUser() != null && group.getUser().getId().equals(userId)) {
                 throw new RuntimeException(
                         "You are already the owner of this group"
                 );
         }
 
-        if (groupMembersRepository.existsByGroupIdAndUserId(group.getId(),userId)) {
+        GroupMembers currentMembership =
+                groupMembersRepository.findByUserIdAndGroupId(userId, group.getId());
+
+        if (currentMembership != null && currentMembership.isAccepted()) {
                 throw new RuntimeException(
                         "You are already a member of this group"
                 );
@@ -225,8 +228,7 @@ public class GroupService {
 
     }
 
-        @Transactional(readOnly = true)
-        @Cacheable(value = CacheConstants.GROUPS_ALL, key = "'all'")
+@Transactional(readOnly = true)
     public List<GroupDTO> getAllGroups() {
 
         Long currentUserId = userService.getCurrentUser().getId();
