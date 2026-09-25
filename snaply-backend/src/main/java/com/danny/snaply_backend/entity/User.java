@@ -38,13 +38,15 @@ public class User {
     private String googleEmail;
 
     @Column(name = "password_hash")
+    @JsonIgnore
     private String passwordHash;
 
     @Column(name = "email_verified", nullable = false)
     @Builder.Default
     private boolean emailVerified = true;
 
-    @Column(name = "refresh_token")
+    @Column(name = "refresh_token", columnDefinition = "TEXT")
+    @JsonIgnore
     private String refreshToken;
 
     @Column(name = "drive_root_folder_id")

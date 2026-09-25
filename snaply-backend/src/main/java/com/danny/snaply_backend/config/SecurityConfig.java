@@ -48,7 +48,8 @@ public class SecurityConfig {
                     "/api/auth/login",
                     "/oauth2/**",
                     "/login/**",
-                    "/api/auth/*"
+                    "/api/auth/*",
+                    "/api/drive/callback"
                 ).permitAll()
 
                 .anyRequest()

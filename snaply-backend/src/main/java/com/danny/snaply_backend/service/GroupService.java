@@ -17,6 +17,7 @@ import com.danny.snaply_backend.entity.Group;
 import com.danny.snaply_backend.entity.GroupMembers;
 import com.danny.snaply_backend.entity.JoinRequest;
 import com.danny.snaply_backend.entity.Role;
+import com.danny.snaply_backend.entity.User;
 import com.danny.snaply_backend.repository.GroupMembersRepository;
 import com.danny.snaply_backend.repository.GroupRepository;
 import com.danny.snaply_backend.repository.JoinRequestRepository;
@@ -36,6 +37,7 @@ public class GroupService {
         private final GroupMembersService groupMembersService;
         private final GroupMembersRepository groupMembersRepository;
         private final JoinRequestRepository joinRequestRepository;
+        private final GoogleDriveService googleDriveService;
 
         @CacheEvict(value = {CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
     public GroupDTO createGroup(GroupDTO groupDTO) {
@@ -46,22 +48,41 @@ public class GroupService {
                 .substring(0, 10);
 
         Group group = toEntity(groupDTO);
+        User currentUser = userService.getCurrentUser();
 
-        group.setUser(userService.getCurrentUser());
+        group.setUser(currentUser);
         group.setInviteCode(inviteCode);
+
+        if (currentUser.isDriveConnected()) {
+            try {
+                String groupDriveId = googleDriveService.createFolder(currentUser, group.getName(), currentUser.getDriveRootFolderId());
+                group.setDriveFolderId(groupDriveId);
+            } catch (Exception e) {
+                // Graceful fallback: group is created even if Drive API call fails
+            }
+        }
 
         Group savedGroup = groupRepository.save(group);
 
         Folder folder = Folder.builder()
                 .name("Folder")
                 .group(savedGroup)
-                .owner(userService.getCurrentUser())
+                .owner(currentUser)
                 .build();
+
+        if (currentUser.isDriveConnected() && savedGroup.getDriveFolderId() != null) {
+            try {
+                String folderDriveId = googleDriveService.createFolder(currentUser, folder.getName(), savedGroup.getDriveFolderId());
+                folder.setDriveFolderId(folderDriveId);
+            } catch (Exception e) {
+                // Graceful fallback
+            }
+        }
         folderReposiory.save(folder);
 
         GroupMembers owner = GroupMembers.builder()
                 .group(savedGroup)
-                .user(userService.getCurrentUser())
+                .user(currentUser)
                 .role(Role.OWNER)
                 .isAccepted(true)
                 .build();
@@ -198,6 +219,12 @@ public class GroupService {
 
         if (!group.getUser().getId().equals(currentUserId)) {
             return "You can't delete this group";
+        }
+
+        if (group.getDriveFolderId() != null && group.getUser().isDriveConnected()) {
+            try {
+                googleDriveService.deleteFileOrFolder(group.getUser(), group.getDriveFolderId());
+            } catch (Exception ignored) {}
         }
 
         groupRepository.delete(group);
