@@ -25,6 +25,9 @@ public class AuthService {
     private final EmailService emailService;
     private final RedisTemplate<String, String> redisTemplate;
 
+    @Value("${AUTH_DEV_LOGIN_ENABLED:false}")
+    private boolean devLoginEnabled;
+
     @Value("${app.backend.url:http://localhost:8080}")
     private String backendUrl;
 
@@ -89,6 +92,23 @@ public class AuthService {
         );
 
         return new AuthResponse(token, user, "Login successful");
+    }
+
+    public AuthResponse devLogin(String name, String email) {
+        if (!devLoginEnabled) {
+            throw new RuntimeException("Dev login is disabled");
+        }
+
+        User user = userService.createOrGetDevUser(name, email);
+
+        String token = UUID.randomUUID().toString();
+        redisTemplate.opsForValue().set(
+                CacheConstants.AUTH_SESSION + token,
+                user.getEmail(),
+                SESSION_TTL
+        );
+
+        return new AuthResponse(token, user, "Dev login successful");
     }
 
     public User me(String token) {

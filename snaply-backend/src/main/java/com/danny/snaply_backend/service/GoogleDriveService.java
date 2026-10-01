@@ -65,7 +65,8 @@ public class GoogleDriveService {
                 .queryParam("access_type", "offline")
                 .queryParam("prompt", "consent select_account")
                 .queryParam("state", state)
-                .build()
+            .encode()
+            .build()
                 .toUriString();
     }
 

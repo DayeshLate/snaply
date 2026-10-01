@@ -57,11 +57,11 @@ public class GoogleDriveController {
     ) {
         if (error != null && !error.isBlank()) {
             log.warn("Google Drive OAuth error received: {}", error);
-            if (frontendUrl != null && !frontendUrl.isBlank()) {
-                return ResponseEntity.status(HttpStatus.FOUND)
-                        .location(URI.create(frontendUrl + "/settings?drive_error=" + error))
-                        .build();
-            }
+            // if (frontendUrl != null && !frontendUrl.isBlank()) {
+            //     return ResponseEntity.status(HttpStatus.FOUND)
+            //             .location(URI.create(frontendUrl + "/settings?drive_error=" + error))
+            //             .build();
+            // }
             return ResponseEntity.badRequest()
                     .contentType(MediaType.TEXT_HTML)
                     .body("<h3>Google Drive Authorization Failed</h3><p>Error: " + error + "</p>");
