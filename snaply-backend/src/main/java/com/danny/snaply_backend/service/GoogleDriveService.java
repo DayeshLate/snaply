@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -94,12 +95,16 @@ public class GoogleDriveService {
 
         JsonNode tokenResponse;
         try {
-            tokenResponse = googleRestClient.post()
+            String responseStr = googleRestClient.post()
                     .uri("https://oauth2.googleapis.com/token")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(tokenRequest)
                     .retrieve()
-                    .body(JsonNode.class);
+                    .body(String.class);
+            tokenResponse = parseJsonNode(responseStr);
+        } catch (RestClientResponseException e) {
+            log.error("Failed to exchange code with Google: {} - Response: {}", e.getMessage(), e.getResponseBodyAsString());
+            throw new RuntimeException("Failed to exchange authorization code with Google: " + e.getResponseBodyAsString());
         } catch (Exception e) {
             log.error("Failed to exchange code with Google: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to exchange authorization code with Google: " + e.getMessage());
@@ -119,11 +124,12 @@ public class GoogleDriveService {
 
         JsonNode userInfo = null;
         try {
-            userInfo = googleRestClient.get()
+            String userInfoStr = googleRestClient.get()
                     .uri("https://www.googleapis.com/oauth2/v3/userinfo")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                     .retrieve()
-                    .body(JsonNode.class);
+                    .body(String.class);
+            userInfo = parseJsonNode(userInfoStr);
         } catch (Exception e) {
             log.warn("Failed to retrieve Google userinfo: {}", e.getMessage());
         }
@@ -173,12 +179,16 @@ public class GoogleDriveService {
 
         JsonNode refreshResponse;
         try {
-            refreshResponse = googleRestClient.post()
+            String refreshStr = googleRestClient.post()
                     .uri("https://oauth2.googleapis.com/token")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(refreshRequest)
                     .retrieve()
-                    .body(JsonNode.class);
+                    .body(String.class);
+            refreshResponse = parseJsonNode(refreshStr);
+        } catch (RestClientResponseException e) {
+            log.error("Failed to refresh Google access token for user {}: {} - Response: {}", user.getEmail(), e.getMessage(), e.getResponseBodyAsString());
+            throw new RuntimeException("Failed to refresh Google Drive session. Please reconnect your Google Drive account.");
         } catch (Exception e) {
             log.error("Failed to refresh Google access token for user {}: {}", user.getEmail(), e.getMessage());
             throw new RuntimeException("Failed to refresh Google Drive session. Please reconnect your Google Drive account.");
@@ -210,13 +220,15 @@ public class GoogleDriveService {
         }
 
         try {
-            JsonNode response = googleRestClient.post()
+            String responseStr = googleRestClient.post()
                     .uri("https://www.googleapis.com/drive/v3/files?fields=id,name")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(folderMeta)
                     .retrieve()
-                    .body(JsonNode.class);
+                    .body(String.class);
+
+            JsonNode response = parseJsonNode(responseStr);
 
             if (response != null && response.has("id")) {
                 return response.get("id").asText();
@@ -265,13 +277,15 @@ public class GoogleDriveService {
             baos.write(fileBytes);
             baos.write(("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
 
-            JsonNode response = googleRestClient.post()
+            String responseStr = googleRestClient.post()
                     .uri("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,mimeType,size,webViewLink,webContentLink")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                     .header(HttpHeaders.CONTENT_TYPE, "multipart/related; boundary=" + boundary)
                     .body(baos.toByteArray())
                     .retrieve()
-                    .body(JsonNode.class);
+                    .body(String.class);
+
+            JsonNode response = parseJsonNode(responseStr);
 
             if (response == null || !response.has("id")) {
                 throw new RuntimeException("Google Drive file upload failed - no ID returned");
@@ -351,11 +365,13 @@ public class GoogleDriveService {
     private String ensureSnaplyRootFolder(String accessToken, String existingFolderId) {
         if (existingFolderId != null && !existingFolderId.isBlank()) {
             try {
-                JsonNode existing = googleRestClient.get()
+                String existingStr = googleRestClient.get()
                         .uri("https://www.googleapis.com/drive/v3/files/{id}?fields=id,trashed", existingFolderId)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                         .retrieve()
-                        .body(JsonNode.class);
+                        .body(String.class);
+
+                JsonNode existing = parseJsonNode(existingStr);
 
                 if (existing != null && !existing.path("trashed").asBoolean(false)) {
                     return existingFolderId;
@@ -366,12 +382,14 @@ public class GoogleDriveService {
         }
 
         try {
-            JsonNode searchNode = googleRestClient.get()
+            String searchStr = googleRestClient.get()
                     .uri("https://www.googleapis.com/drive/v3/files?q={q}&fields=files(id,name)",
                             "name = 'Snaply' and mimeType = 'application/vnd.google-apps.folder' and trashed = false")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                     .retrieve()
-                    .body(JsonNode.class);
+                    .body(String.class);
+
+            JsonNode searchNode = parseJsonNode(searchStr);
 
             if (searchNode != null && searchNode.has("files") && !searchNode.get("files").isEmpty()) {
                 return searchNode.get("files").get(0).get("id").asText();
@@ -384,13 +402,15 @@ public class GoogleDriveService {
                     "mimeType", "application/vnd.google-apps.folder"
             );
 
-            JsonNode created = googleRestClient.post()
+            String createdStr = googleRestClient.post()
                     .uri("https://www.googleapis.com/drive/v3/files?fields=id,name")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(folderMeta)
                     .retrieve()
-                    .body(JsonNode.class);
+                    .body(String.class);
+
+            JsonNode created = parseJsonNode(createdStr);
 
             if (created != null && created.has("id")) {
                 return created.get("id").asText();
@@ -402,6 +422,18 @@ public class GoogleDriveService {
         return null;
     }
 
+    private JsonNode parseJsonNode(String json) {
+        if (json == null || json.isBlank()) {
+            return null;
+        }
+        try {
+            return objectMapper.readTree(json);
+        } catch (Exception e) {
+            log.error("Failed to parse JSON response: {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
     private void cacheAccessToken(Long userId, String accessToken, int expiresIn) {
         long ttlSeconds = Math.max(expiresIn - 60, 60);
         redisTemplate.opsForValue().set(
@@ -411,3 +443,4 @@ public class GoogleDriveService {
         );
     }
 }
+

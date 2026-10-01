@@ -90,7 +90,7 @@ public class GoogleDriveController {
                     <style>
                         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #0f172a; color: #f8fafc; }
                         .card { background: #1e293b; padding: 2.5rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-width: 480px; text-align: center; border: 1px solid #334155; }
-                        .icon { width: 56px; height: 56px; margin: 0 auto 1.5rem; background: #059669; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+                        .icon { width: 56px; height: 56px; margin: 0 auto 1.5rem; background: #059669; border-radius: 9999px; display: flex; align-items: center; justify-content: center; }
                         .icon svg { width: 32px; height: 32px; fill: white; }
                         h2 { margin: 0 0 0.5rem; color: #f1f5f9; font-size: 1.5rem; }
                         p { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; margin: 0.5rem 0; }
@@ -104,12 +104,12 @@ public class GoogleDriveController {
                         </div>
                         <h2>Google Drive Connected!</h2>
                         <p>Your Google Drive account has been linked to Snaply.</p>
-                        <div class="badge">%s</div>
+                        <div class="badge">{{EMAIL}}</div>
                         <p style="margin-top: 1.5rem; font-size: 0.85rem; color: #64748b;">You can safely close this window and continue using Snaply.</p>
                     </div>
                 </body>
                 </html>
-                """.formatted(user.getGoogleEmail() != null ? user.getGoogleEmail() : "Drive Connected");
+                """.replace("{{EMAIL}}", user.getGoogleEmail() != null ? user.getGoogleEmail() : "Drive Connected");
 
             return ResponseEntity.ok()
                     .contentType(MediaType.TEXT_HTML)
