@@ -109,4 +109,10 @@ public class MediaController {
         List<MediaDTO> media = mediaService.getAllMediaByFolder(folderId);
         return ResponseEntity.ok(media);
     }
+
+    @GetMapping("/group/{groupId}")
+    public ResponseEntity<List<MediaDTO>> getAllMediaByGroup(@PathVariable Long groupId) {
+        List<MediaDTO> media = mediaService.getAllMediaByGroup(groupId);
+        return ResponseEntity.ok(media);
+    }
 }
