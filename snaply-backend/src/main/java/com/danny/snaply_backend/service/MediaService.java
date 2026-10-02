@@ -58,31 +58,40 @@ public class MediaService {
         Long groupId = folder.getGroup().getId();
 
         // Check if user is authorized to upload to this group
-        boolean isGroupOwner = folder.getGroup().getUser().getId().equals(currentUser.getId());
-        boolean isFolderOwner = folder.getOwner().getId().equals(currentUser.getId());
+        GroupMembersDTO member = null;
+        if (groupMembersService.existByUserAndGroup(currentUser.getId(), groupId)) {
+            member = groupMembersService.getByUserAndGroup(currentUser.getId(), groupId);
+        }
 
-        if (!isGroupOwner && !isFolderOwner) {
-            if (!groupMembersService.existByUserAndGroup(currentUser.getId(), groupId)) {
-                throw new RuntimeException("You are not a member of this group");
+        boolean isGroupOwner = (folder.getGroup().getUser() != null && folder.getGroup().getUser().getId().equals(currentUser.getId()))
+                || (member != null && member.isAccepted() && member.getRole() == Role.OWNER);
+
+        if (!isGroupOwner) {
+            if (member == null || !member.isAccepted()) {
+                throw new RuntimeException("Access Denied: You are not an active member of this group");
             }
-            GroupMembersDTO member = groupMembersService.getByUserAndGroup(currentUser.getId(), groupId);
             if (member.getRole() == Role.VIEWER) {
-                throw new RuntimeException("Viewers do not have permission to upload files");
+                throw new RuntimeException("Access Denied: Viewers do not have permission to push or upload files to this group");
             }
         }
 
-        // Determine which Google Drive account to store the file into
-        User driveUser = folder.getOwner().isDriveConnected() ? folder.getOwner()
-                : (folder.getGroup().getUser().isDriveConnected() ? folder.getGroup().getUser()
+        // Determine which Google Drive account to store the file into (prefer group creator who has Snaply root folder)
+        User driveUser = (folder.getGroup().getUser() != null && folder.getGroup().getUser().isDriveConnected())
+                ? folder.getGroup().getUser()
+                : (folder.getOwner() != null && folder.getOwner().isDriveConnected() ? folder.getOwner()
                 : (currentUser.isDriveConnected() ? currentUser : null));
 
         if (driveUser == null || !driveUser.isDriveConnected()) {
-            throw new RuntimeException("No connected Google Drive account found to store this file. Please connect your Google Drive first.");
+            throw new RuntimeException("No connected Google Drive account found to store this file. The group owner must connect Google Drive.");
         }
 
-        String targetDriveFolder = folder.getDriveFolderId() != null ? folder.getDriveFolderId()
-                : (folder.getGroup().getDriveFolderId() != null ? folder.getGroup().getDriveFolderId()
-                : driveUser.getDriveRootFolderId());
+        String targetDriveFolder = folder.getDriveFolderId();
+        if (targetDriveFolder == null || targetDriveFolder.isBlank()) {
+            targetDriveFolder = folder.getGroup().getDriveFolderId();
+        }
+        if (targetDriveFolder == null || targetDriveFolder.isBlank()) {
+            targetDriveFolder = googleDriveService.getOrCreateSnaplyRootFolder(driveUser);
+        }
 
         GoogleDriveFileDTO driveFile = googleDriveService.uploadFile(driveUser, file, targetDriveFolder);
 
@@ -105,6 +114,8 @@ public class MediaService {
         Media media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new RuntimeException("Media not found with ID: " + mediaId));
 
+        validateMemberAccess(media.getFolder().getGroup().getId());
+
         if (media.getDriveFileId() == null || media.getDriveFileId().isBlank()) {
             throw new RuntimeException("Media does not have an associated Google Drive file ID");
         }
@@ -118,6 +129,9 @@ public class MediaService {
     public MediaDTO getMediaById(Long mediaId) {
         Media media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new RuntimeException("Media not found with ID: " + mediaId));
+
+        validateMemberAccess(media.getFolder().getGroup().getId());
+
         return toDTO(media);
     }
 
@@ -130,12 +144,30 @@ public class MediaService {
         CacheConstants.GROUPS_ALL
     }, allEntries = true)
     public String createMedia(Media media){
-        FolderDTO folder = folderService.getFolderById(media.getFolder().getId());
-        
-        if(!folder.getUser().getId().equals(userService.getCurrentUser().getId())){
-            return "You cant add the data into this folder because you are not the owner of this folder";
+        Folder folder = folderReposiory.findById(media.getFolder().getId())
+                .orElseThrow(() -> new RuntimeException("Folder not found"));
+
+        User currentUser = userService.getCurrentUser();
+        Long groupId = folder.getGroup().getId();
+
+        GroupMembersDTO member = null;
+        if (groupMembersService.existByUserAndGroup(currentUser.getId(), groupId)) {
+            member = groupMembersService.getByUserAndGroup(currentUser.getId(), groupId);
         }
-        media.setUplodedBy(userService.getCurrentUser());
+
+        boolean isGroupOwner = (folder.getGroup().getUser() != null && folder.getGroup().getUser().getId().equals(currentUser.getId()))
+                || (member != null && member.isAccepted() && member.getRole() == Role.OWNER);
+
+        if (!isGroupOwner) {
+            if (member == null || !member.isAccepted()) {
+                return "Access Denied: You are not an active member of this group";
+            }
+            if (member.getRole() == Role.VIEWER) {
+                return "Access Denied: Viewers do not have permission to add media to this folder";
+            }
+        }
+
+        media.setUplodedBy(currentUser);
         mediaRepository.save(media);
         return "data uploded successfully";
     }
@@ -153,12 +185,24 @@ public class MediaService {
                 .orElseThrow(()-> new RuntimeException("data does not exist"));
 
         User currentUser = userService.getCurrentUser();
-        boolean isUploader = media.getUplodedBy().getId().equals(currentUser.getId());
-        boolean isFolderOwner = media.getFolder().getOwner().getId().equals(currentUser.getId());
-        boolean isGroupOwner = media.getFolder().getGroup().getUser().getId().equals(currentUser.getId());
+        Long groupId = media.getFolder().getGroup().getId();
 
-        if (!isUploader && !isFolderOwner && !isGroupOwner) {
-            return "You cant delete the data into this folder because you are not authorized";
+        GroupMembersDTO member = null;
+        if (groupMembersService.existByUserAndGroup(currentUser.getId(), groupId)) {
+            member = groupMembersService.getByUserAndGroup(currentUser.getId(), groupId);
+        }
+
+        boolean isGroupOwner = (media.getFolder().getGroup().getUser() != null && media.getFolder().getGroup().getUser().getId().equals(currentUser.getId()))
+                || (member != null && member.isAccepted() && member.getRole() == Role.OWNER);
+        boolean isAdmin = member != null && member.isAccepted() && member.getRole() == Role.ADMIN;
+        boolean isUploader = media.getUplodedBy() != null && media.getUplodedBy().getId().equals(currentUser.getId());
+
+        if (member == null || !member.isAccepted() || member.getRole() == Role.VIEWER) {
+            return "Access Denied: You are not authorized to delete media in this group";
+        }
+
+        if (!isGroupOwner && !isAdmin && !isUploader) {
+            return "Access Denied: Only Group Owners, Admins, or the original uploader can delete this media";
         }
 
         if (media.getDriveFileId() != null && !media.getDriveFileId().isBlank()) {
@@ -176,13 +220,39 @@ public class MediaService {
 
     @Cacheable(value = CacheConstants.MEDIA_COUNT_BY_FOLDER, key = "#folderId")
     public Long getCountOfMediaInFolder(Long folderId){
+        Folder folder = folderReposiory.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("Folder not found with ID: " + folderId));
+        validateMemberAccess(folder.getGroup().getId());
         return mediaRepository.countByFolderId(folderId);
     }
 
     @Cacheable(value = CacheConstants.MEDIA_BY_FOLDER, key = "#folderId")
     public List<MediaDTO> getAllMediaByFolder(Long folderId){
+        Folder folder = folderReposiory.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("Folder not found with ID: " + folderId));
+
+        validateMemberAccess(folder.getGroup().getId());
+
         List<Media> medias = mediaRepository.findAllByFolderId(folderId);
         return medias.stream().map(this::toDTO).toList();
+    }
+
+    public List<MediaDTO> getAllMediaByGroup(Long groupId){
+        validateMemberAccess(groupId);
+        List<Media> medias = mediaRepository.findAllByGroupId(groupId);
+        return medias.stream().map(this::toDTO).toList();
+    }
+
+    private void validateMemberAccess(Long groupId) {
+        User currentUser = userService.getCurrentUser();
+        GroupMembersDTO member = null;
+        if (groupMembersService.existByUserAndGroup(currentUser.getId(), groupId)) {
+            member = groupMembersService.getByUserAndGroup(currentUser.getId(), groupId);
+        }
+
+        if (member == null || !member.isAccepted()) {
+            throw new RuntimeException("Access Denied: You must be an accepted member of this group to view its media");
+        }
     }
 
     private User getDriveUserForMedia(Media media) {

@@ -205,12 +205,26 @@ public class GoogleDriveService {
         return accessToken;
     }
 
+    public String getOrCreateSnaplyRootFolder(User user) {
+        if (!user.isDriveConnected()) {
+            return null;
+        }
+        String accessToken = getValidAccessToken(user);
+        String rootFolderId = ensureSnaplyRootFolder(accessToken, user.getDriveRootFolderId());
+        if (rootFolderId != null && !rootFolderId.equals(user.getDriveRootFolderId())) {
+            user.setDriveRootFolderId(rootFolderId);
+            userRepository.save(user);
+            userService.evictUserCache(user.getEmail());
+        }
+        return rootFolderId;
+    }
+
     public String createFolder(User user, String folderName, String parentFolderId) {
         String accessToken = getValidAccessToken(user);
 
         String parent = (parentFolderId != null && !parentFolderId.isBlank())
                 ? parentFolderId
-                : user.getDriveRootFolderId();
+                : getOrCreateSnaplyRootFolder(user);
 
         Map<String, Object> folderMeta = new HashMap<>();
         folderMeta.put("name", folderName);

@@ -55,7 +55,8 @@ public class GroupService {
 
         if (currentUser.isDriveConnected()) {
             try {
-                String groupDriveId = googleDriveService.createFolder(currentUser, group.getName(), currentUser.getDriveRootFolderId());
+                String snaplyRootId = googleDriveService.getOrCreateSnaplyRootFolder(currentUser);
+                String groupDriveId = googleDriveService.createFolder(currentUser, group.getName(), snaplyRootId);
                 group.setDriveFolderId(groupDriveId);
             } catch (Exception e) {
                 // Graceful fallback: group is created even if Drive API call fails
@@ -65,7 +66,7 @@ public class GroupService {
         Group savedGroup = groupRepository.save(group);
 
         Folder folder = Folder.builder()
-                .name("Folder")
+                .name("General")
                 .group(savedGroup)
                 .owner(currentUser)
                 .build();
@@ -103,24 +104,38 @@ public class GroupService {
     }
 
 
-    public String removeGroupMember(long groupMemberId,long groupId){
-        Long currentUserId =userService.getCurrentUser().getId();
+    public String removeGroupMember(long groupMemberId, long groupId) {
+        Long currentUserId = userService.getCurrentUser().getId();
         Group group = groupRepository.findById(groupId)
-                .orElseThrow(()-> new RuntimeException("Group not found"));
-        if (!group.getUser().getId().equals(currentUserId)) {
-            return "You can't delete memer of this group";
-        }
-        if(!groupMembersRepository.existsByIdAndGroupId(groupMemberId, groupId)){
-                return "Member not present";
-        }
-        GroupMembers members = groupMembersRepository.findByIdAndGroupId(groupMemberId,groupId);
-        if(members == null){
-                return "Member not found in the this group";
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        GroupMembers currentMember = groupMembersRepository.findByUserIdAndGroupId(currentUserId, groupId);
+        boolean isOwner = (group.getUser() != null && group.getUser().getId().equals(currentUserId))
+                || (currentMember != null && currentMember.isAccepted() && currentMember.getRole() == Role.OWNER);
+        boolean isAdmin = currentMember != null && currentMember.isAccepted() && currentMember.getRole() == Role.ADMIN;
+
+        if (!isOwner && !isAdmin) {
+            return "You do not have permission to remove members from this group";
         }
 
-        groupMembersRepository.delete(members);
+        GroupMembers targetMember = groupMembersRepository.findByUserIdAndGroupId(groupMemberId, groupId);
+        if (targetMember == null) {
+            targetMember = groupMembersRepository.findByIdAndGroupId(groupMemberId, groupId);
+        }
+        if (targetMember == null) {
+            return "Member not found in this group";
+        }
+
+        if (targetMember.getRole() == Role.OWNER || (group.getUser() != null && group.getUser().getId().equals(targetMember.getUser().getId()))) {
+            return "Cannot remove the group owner";
+        }
+
+        if (!isOwner && targetMember.getRole() == Role.ADMIN) {
+            return "Admins cannot remove another Admin";
+        }
+
+        groupMembersRepository.delete(targetMember);
         return "Member deleted successfully";
-
     }
 
         @Transactional(readOnly = true)
@@ -232,27 +247,53 @@ public class GroupService {
         return "Group deleted successfully";
     }
 
-        @CacheEvict(value = {CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
-    public String changeRole(long memeberId, long groupId, Role role){
-        groupRepository.findById(groupId)
-                .orElseThrow(()-> new RuntimeException("Group not found"));
+    @CacheEvict(value = {
+        CacheConstants.GROUP_BY_ID,
+        CacheConstants.GROUPS_ALL,
+        CacheConstants.GROUP_MEMBERS_BY_GROUP,
+        CacheConstants.GROUP_MEMBERS_BY_ROLE,
+        CacheConstants.GROUP_MEMBERS_BY_USER_AND_GROUP,
+        CacheConstants.GROUP_MEMBER_EXISTS_BY_USER_AND_GROUP
+    }, allEntries = true)
+    public String changeRole(long targetUserIdOrMemberId, long groupId, Role role) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found with ID: " + groupId));
 
-        long CurrentUser = userService.getCurrentUser().getId();
-        if(!groupMembersRepository.existsByGroupIdAndUserId(groupId, memeberId)){
-                throw new RuntimeException("User not found in the group");
+        long currentUserId = userService.getCurrentUser().getId();
+
+        GroupMembers currentMember = groupMembersRepository.findByUserIdAndGroupId(currentUserId, groupId);
+        boolean isOwner = (group.getUser() != null && group.getUser().getId().equals(currentUserId))
+                || (currentMember != null && currentMember.isAccepted() && currentMember.getRole() == Role.OWNER);
+        boolean isAdmin = currentMember != null && currentMember.isAccepted() && currentMember.getRole() == Role.ADMIN;
+
+        if (!isOwner && !isAdmin) {
+            throw new RuntimeException("Access Denied: Only Group OWNER or ADMIN can change member roles");
         }
 
-        GroupMembers groupMember = groupMembersRepository.findByIdAndGroupId(memeberId, groupId);
-
-        List<GroupMembersDTO> owners = groupMembersService.getByGroupmembersByRole(groupId, Role.OWNER);
-        boolean isOwner = owners.stream().anyMatch(owner -> owner.getUser().getId().equals(CurrentUser));
-        if(!isOwner){
-                throw new RuntimeException("You are not admin to change role !");
+        GroupMembers targetMember = groupMembersRepository.findByUserIdAndGroupId(targetUserIdOrMemberId, groupId);
+        if (targetMember == null) {
+            targetMember = groupMembersRepository.findByIdAndGroupId(targetUserIdOrMemberId, groupId);
         }
-        groupMember.setRole(Role.ADMIN);
-        groupMembersRepository.save(groupMember);
-        return "Role change successfully !";
+        if (targetMember == null || !targetMember.isAccepted()) {
+            throw new RuntimeException("Target user is not an active member of this group");
+        }
 
+        if (targetMember.getRole() == Role.OWNER || (group.getUser() != null && group.getUser().getId().equals(targetMember.getUser().getId()))) {
+            throw new RuntimeException("Cannot change the role of the group owner");
+        }
+
+        if (!isOwner) {
+            if (role == Role.OWNER || role == Role.ADMIN) {
+                throw new RuntimeException("Access Denied: Only the Group OWNER can promote members to ADMIN or OWNER");
+            }
+            if (targetMember.getRole() == Role.ADMIN) {
+                throw new RuntimeException("Access Denied: Admins cannot change the role of another Admin");
+            }
+        }
+
+        targetMember.setRole(role);
+        groupMembersRepository.save(targetMember);
+        return "Member role updated to " + role + " successfully";
     }
 
 @Transactional(readOnly = true)

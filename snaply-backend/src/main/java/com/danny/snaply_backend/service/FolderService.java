@@ -102,26 +102,35 @@ public class FolderService {
     }
 
     @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL, CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
-    public String addFolderInGroup(Long groupId,Folder folder){
+    public String addFolderInGroup(Long groupId, Folder folder){
         if(!groupService.existGroupById(groupId)){
             return "Group does not exist";
         }
-        GroupMembersDTO member = groupMembersService.getByUserAndGroup(userService.getCurrentUser().getId(), groupId);
-        if(member.role == Role.VIEWER){
-            return "Yoou dont have access to add the folder";
+        User currentUser = userService.getCurrentUser();
+        if (!groupMembersService.existByUserAndGroup(currentUser.getId(), groupId)) {
+            return "You are not a member of this group";
+        }
+        GroupMembersDTO member = groupMembersService.getByUserAndGroup(currentUser.getId(), groupId);
+        if (member == null || !member.isAccepted()) {
+            return "You are not an active member of this group";
+        }
+        if (member.getRole() == Role.VIEWER) {
+            return "Access Denied: Viewers do not have permission to add folders";
         }
         Folder newFolder = folder;
         Group group = groupService.getGroupById(groupId);
-        User currentUser = userService.getCurrentUser();
         newFolder.setGroup(group);
         newFolder.setOwner(currentUser);
 
-        User driveUser = currentUser.isDriveConnected() ? currentUser :
-                         (group.getUser().isDriveConnected() ? group.getUser() : null);
+        User driveUser = (group.getUser() != null && group.getUser().isDriveConnected()) ? group.getUser() :
+                         (currentUser.isDriveConnected() ? currentUser : null);
 
         if (driveUser != null && driveUser.isDriveConnected()) {
             try {
-                String parentDriveId = group.getDriveFolderId() != null ? group.getDriveFolderId() : driveUser.getDriveRootFolderId();
+                String parentDriveId = group.getDriveFolderId();
+                if (parentDriveId == null || parentDriveId.isBlank()) {
+                    parentDriveId = googleDriveService.getOrCreateSnaplyRootFolder(driveUser);
+                }
                 String driveFolderId = googleDriveService.createFolder(driveUser, newFolder.getName(), parentDriveId);
                 newFolder.setDriveFolderId(driveFolderId);
             } catch (Exception ignored) {}

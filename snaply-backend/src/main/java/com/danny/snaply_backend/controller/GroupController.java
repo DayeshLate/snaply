@@ -104,9 +104,22 @@ public class GroupController {
         );
     }
 
+    @PostMapping("/changeRole/{groupId}/{groupMember}")
+    public ResponseEntity<String> changeRole(
+            @PathVariable long groupId,
+            @PathVariable long groupMember,
+            @RequestParam Role role
+    ) {
+        return ResponseEntity.ok(groupService.changeRole(groupMember, groupId, role));
+    }
+
     @GetMapping("/changeRole/{groupId}/{groupMember}")
-    public ResponseEntity<String> changeRoleToAdmin(@PathVariable long groupId, @PathVariable long groupMember){
-        return ResponseEntity.ok(groupService.changeRole(groupMember,groupId,Role.ADMIN));
+    public ResponseEntity<String> changeRoleToAdmin(
+            @PathVariable long groupId,
+            @PathVariable long groupMember,
+            @RequestParam(required = false, defaultValue = "ADMIN") Role role
+    ) {
+        return ResponseEntity.ok(groupService.changeRole(groupMember, groupId, role));
     }
 
     
