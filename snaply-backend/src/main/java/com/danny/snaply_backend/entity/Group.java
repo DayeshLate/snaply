@@ -63,6 +63,11 @@ public class Group {
     @JsonIgnore
     @Builder.Default
     private List<GroupMembers> groupMembers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    @Builder.Default
+    private List<ChatMessage> chatMessages = new ArrayList<>();
     
     @PrePersist
     public void createTime(){

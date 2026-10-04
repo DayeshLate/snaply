@@ -87,6 +87,11 @@ public class User {
     @Builder.Default
     private List<Media> media = new ArrayList<>();
 
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    @Builder.Default
+    private List<ChatMessage> sentMessages = new ArrayList<>();
+
     @Builder.Default
     private boolean enabled = true;
 
