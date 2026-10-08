@@ -12,9 +12,11 @@ import com.danny.snaply_backend.dto.FolderDTO;
 import com.danny.snaply_backend.dto.GroupMembersDTO;
 import com.danny.snaply_backend.entity.Folder;
 import com.danny.snaply_backend.entity.Group;
+import com.danny.snaply_backend.entity.GroupMembers;
 import com.danny.snaply_backend.entity.Role;
 import com.danny.snaply_backend.entity.User;
 import com.danny.snaply_backend.repository.FolderReposiory;
+import com.danny.snaply_backend.repository.GroupMembersRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +29,7 @@ public class FolderService {
     private final GroupService groupService;
     private final UserService userService;
     private final GroupMembersService groupMembersService;
+    private final GroupMembersRepository groupMembersRepository;
     private final GoogleDriveService googleDriveService;
 
     @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL, CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
@@ -37,14 +40,29 @@ public class FolderService {
     @Cacheable(value = CacheConstants.FOLDERS_BY_ID, key = "#folderId")
     public FolderDTO getFolderById(Long folderId){
         Folder folder = folderReposiory.findById(folderId)
-            .orElseThrow(()-> new RuntimeException("folder not found"));
+            .orElseThrow(()-> new RuntimeException("Folder not found"));
+
+        validateFolderAccess(folder);
 
         return toDTO(folder);
     }
 
-    @Cacheable(value = CacheConstants.FOLDERS_ALL, key = "'all'")
+    @Cacheable(value = CacheConstants.FOLDERS_ALL, key = "@userService.getCurrentUser().id")
     public List<FolderDTO> getAllFolders(){
-        List<Folder> folders = folderReposiory.findAll();
+        User currentUser = userService.getCurrentUser();
+        List<GroupMembers> myMemberships = groupMembersRepository.findByUserId(currentUser.getId());
+        List<Long> groupIds = myMemberships.stream()
+                .filter(GroupMembers::isAccepted)
+                .map(m -> m.getGroup().getId())
+                .distinct()
+                .toList();
+
+        List<Folder> folders;
+        if (groupIds.isEmpty()) {
+            folders = folderReposiory.findByOwnerId(currentUser.getId());
+        } else {
+            folders = folderReposiory.findByGroupIdIn(groupIds);
+        }
         return folders.stream().map(this::toDTO).toList();
     }
 
@@ -57,7 +75,8 @@ public class FolderService {
             return "group is not exist";
         }
         Optional<Folder> folder = folderReposiory.findById(folderId);
-        if(folder.get().getOwner() != userService.getCurrentUser()){
+        Long currentUserId = userService.getCurrentUser().getId();
+        if(folder.get().getOwner() == null || !folder.get().getOwner().getId().equals(currentUserId)){
             return "you are not ownwer of this group";
         }
         if (folder.get().getDriveFolderId() != null && folder.get().getOwner().isDriveConnected()) {
@@ -162,7 +181,27 @@ public class FolderService {
                 .group(entity.getGroup())
                 .user(entity.getOwner())
                 .createdAt(entity.getCreatedAt())
-                .media(entity.getMedia().stream().map(mediaMapper :: toDTO).toList())
+                .media(entity.getMedia() != null ? entity.getMedia().stream().map(mediaMapper :: toDTO).toList() : List.of())
                 .build();
+    }
+
+    private void validateFolderAccess(Folder folder) {
+        User currentUser = userService.getCurrentUser();
+        if (folder.getGroup() != null) {
+            Long groupId = folder.getGroup().getId();
+            boolean isOwner = folder.getGroup().getUser() != null && folder.getGroup().getUser().getId().equals(currentUser.getId());
+            boolean isMember = groupMembersService.existByUserAndGroup(currentUser.getId(), groupId);
+            if (!isOwner && !isMember) {
+                throw new RuntimeException("Access Denied: You are not a member of this group");
+            }
+            if (!isOwner) {
+                GroupMembersDTO member = groupMembersService.getByUserAndGroup(currentUser.getId(), groupId);
+                if (member == null || !member.isAccepted()) {
+                    throw new RuntimeException("Access Denied: You are not an active member of this group");
+                }
+            }
+        } else if (folder.getOwner() != null && !folder.getOwner().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Access Denied: You do not have access to this folder");
+        }
     }
 }

@@ -68,7 +68,7 @@ public class GroupController {
         return ResponseEntity.ok(request);
     }
 
-    @PostMapping("/delete/{groupId}/member/{membarId}")
+    @PostMapping("/delete/{groupId}/member/{memberId}")
     public ResponseEntity<String> deleteMember(@PathVariable long groupId, @PathVariable long memberId){
         String response = groupService.removeGroupMember(memberId, groupId);
         return ResponseEntity.ok(response);
@@ -109,15 +109,6 @@ public class GroupController {
             @PathVariable long groupId,
             @PathVariable long groupMember,
             @RequestParam Role role
-    ) {
-        return ResponseEntity.ok(groupService.changeRole(groupMember, groupId, role));
-    }
-
-    @GetMapping("/changeRole/{groupId}/{groupMember}")
-    public ResponseEntity<String> changeRoleToAdmin(
-            @PathVariable long groupId,
-            @PathVariable long groupMember,
-            @RequestParam(required = false, defaultValue = "ADMIN") Role role
     ) {
         return ResponseEntity.ok(groupService.changeRole(groupMember, groupId, role));
     }

@@ -62,9 +62,10 @@ public class GoogleDriveController {
             //             .location(URI.create(frontendUrl + "/settings?drive_error=" + error))
             //             .build();
             // }
+            String safeError = org.springframework.web.util.HtmlUtils.htmlEscape(error);
             return ResponseEntity.badRequest()
                     .contentType(MediaType.TEXT_HTML)
-                    .body("<h3>Google Drive Authorization Failed</h3><p>Error: " + error + "</p>");
+                    .body("<h3>Google Drive Authorization Failed</h3><p>Error: " + safeError + "</p>");
         }
 
         if (code == null || state == null) {
@@ -109,17 +110,21 @@ public class GoogleDriveController {
                     </div>
                 </body>
                 </html>
-                """.replace("{{EMAIL}}", user.getGoogleEmail() != null ? user.getGoogleEmail() : "Drive Connected");
+                """;
+                String displayEmail = org.springframework.web.util.HtmlUtils.htmlEscape(
+                        user.getGoogleEmail() != null ? user.getGoogleEmail() : "Drive Connected"
+                );
 
             return ResponseEntity.ok()
                     .contentType(MediaType.TEXT_HTML)
-                    .body(htmlSuccess);
+                    .body(htmlSuccess.replace("{{EMAIL}}", displayEmail));
 
         } catch (Exception e) {
             log.error("Failed to complete Google Drive callback: {}", e.getMessage(), e);
+            String safeMsg = org.springframework.web.util.HtmlUtils.htmlEscape(e.getMessage() != null ? e.getMessage() : "Unknown error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.TEXT_HTML)
-                    .body("<h3>Google Drive Connection Failed</h3><p>" + e.getMessage() + "</p>");
+                    .body("<h3>Google Drive Connection Failed</h3><p>" + safeMsg + "</p>");
         }
     }
 

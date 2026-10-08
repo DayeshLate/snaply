@@ -47,7 +47,7 @@ public class MediaController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
-                        .filename(mediaDownload.fileName())
+                        .filename(sanitizeFilename(mediaDownload.fileName()))
                         .build()
                         .toString())
                 .contentType(MediaType.parseMediaType(contentType))
@@ -62,7 +62,7 @@ public class MediaController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline()
-                        .filename(mediaDownload.fileName())
+                        .filename(sanitizeFilename(mediaDownload.fileName()))
                         .build()
                         .toString())
                 .contentType(MediaType.parseMediaType(contentType))
@@ -114,5 +114,12 @@ public class MediaController {
     public ResponseEntity<List<MediaDTO>> getAllMediaByGroup(@PathVariable Long groupId) {
         List<MediaDTO> media = mediaService.getAllMediaByGroup(groupId);
         return ResponseEntity.ok(media);
+    }
+
+    private String sanitizeFilename(String filename) {
+        if (filename == null || filename.isBlank()) {
+            return "file";
+        }
+        return filename.replaceAll("[\\r\\n\"\\\\]", "_").trim();
     }
 }

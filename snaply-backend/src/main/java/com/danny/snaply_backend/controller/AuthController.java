@@ -1,23 +1,34 @@
 package com.danny.snaply_backend.controller;
 
-import com.danny.snaply_backend.dto.AuthLoginRequest;
-import com.danny.snaply_backend.dto.AuthRegisterRequest;
-import com.danny.snaply_backend.dto.AuthResponse;
-import com.danny.snaply_backend.config.CacheConstants;
-import com.danny.snaply_backend.entity.User;
-import com.danny.snaply_backend.service.AuthService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.net.URI;
+
 import org.springframework.beans.factory.annotation.Value;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseCookie;
-import org.springframework.web.bind.annotation.*;
-import java.net.URI;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
+
+import com.danny.snaply_backend.config.CacheConstants;
+import com.danny.snaply_backend.dto.AuthLoginRequest;
+import com.danny.snaply_backend.dto.AuthRegisterRequest;
+import com.danny.snaply_backend.dto.AuthResponse;
+import com.danny.snaply_backend.entity.User;
+import com.danny.snaply_backend.service.AuthService;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,6 +39,9 @@ public class AuthController {
 
     @Value("${app.frontend.url:}")
     private String frontendUrl;
+
+    @Value("${app.cookie.secure:false}")
+    private boolean forceSecureCookie;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody AuthRegisterRequest request) {
@@ -45,6 +59,7 @@ public class AuthController {
                     .build();
         }
 
+        String safeEmail = HtmlUtils.htmlEscape(user.getEmail());
         String htmlSuccess = """
                 <!DOCTYPE html>
                 <html lang="en">
@@ -68,7 +83,7 @@ public class AuthController {
                     </div>
                 </body>
                 </html>
-                """.formatted(user.getEmail());
+                """.formatted(safeEmail);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_HTML)
@@ -78,6 +93,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
             @Valid @RequestBody AuthLoginRequest request,
+            HttpServletRequest httpRequest,
             HttpServletResponse response
     ) {
         AuthResponse authResponse = authService.login(request);
@@ -85,13 +101,13 @@ public class AuthController {
         if (authResponse.token() != null) {
             ResponseCookie cookie = ResponseCookie.from(CacheConstants.AUTH_COOKIE, authResponse.token())
                     .httpOnly(true)
-                    .secure(false)
+                    .secure(isSecure(httpRequest))
                     .path("/")
                     .sameSite("Lax")
                     .maxAge(60 * 60 * 24 * 7)
                     .build();
 
-            response.addHeader("Set-Cookie", cookie.toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         }
 
         return ResponseEntity.ok(authResponse);
@@ -101,6 +117,7 @@ public class AuthController {
     public ResponseEntity<AuthResponse> devLogin(
             @RequestParam String email,
             @RequestParam(defaultValue = "Dev User") String name,
+            HttpServletRequest httpRequest,
             HttpServletResponse response
     ) {
         AuthResponse authResponse = authService.devLogin(name, email);
@@ -108,13 +125,13 @@ public class AuthController {
         if (authResponse.token() != null) {
             ResponseCookie cookie = ResponseCookie.from(CacheConstants.AUTH_COOKIE, authResponse.token())
                     .httpOnly(true)
-                    .secure(false)
+                    .secure(isSecure(httpRequest))
                     .path("/")
                     .sameSite("Lax")
                     .maxAge(60 * 60 * 24 * 7)
                     .build();
 
-            response.addHeader("Set-Cookie", cookie.toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         }
 
         return ResponseEntity.ok(authResponse);
@@ -132,11 +149,33 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
             @RequestHeader(value = "Authorization", required = false) String authorization,
-            HttpServletRequest request
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
         String token = resolveToken(authorization, request);
         authService.logout(token);
+
+        ResponseCookie expiredCookie = ResponseCookie.from(CacheConstants.AUTH_COOKIE, "")
+                .httpOnly(true)
+                .secure(isSecure(request))
+                .path("/")
+                .sameSite("Lax")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, expiredCookie.toString());
+
         return ResponseEntity.noContent().build();
+    }
+
+    private boolean isSecure(HttpServletRequest request) {
+        if (forceSecureCookie) {
+            return true;
+        }
+        if (request == null) {
+            return false;
+        }
+        String proto = request.getHeader("X-Forwarded-Proto");
+        return request.isSecure() || "https".equalsIgnoreCase(proto);
     }
 
     private String resolveToken(String authorization, HttpServletRequest request) {

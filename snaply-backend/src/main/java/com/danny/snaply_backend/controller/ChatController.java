@@ -49,7 +49,9 @@ public class ChatController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size
     ) {
-        Page<ChatMessageResponseDTO> messages = chatMessageService.getGroupMessagesPaginated(groupId, page, size);
+        int boundedPage = Math.max(page, 0);
+        int boundedSize = Math.min(Math.max(size, 1), 100);
+        Page<ChatMessageResponseDTO> messages = chatMessageService.getGroupMessagesPaginated(groupId, boundedPage, boundedSize);
         return ResponseEntity.ok(messages);
     }
 

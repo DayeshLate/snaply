@@ -51,6 +51,21 @@ public class JoinRequestService {
 
     @Cacheable(value = CacheConstants.JOIN_REQUEST_BY_GROUP, key = "#groupId")
     public List<JoinRequestDTO> getRequestByGroupId(String groupId){
+        User currentUser = userService.getCurrentUser();
+        Long gId = Long.parseLong(groupId);
+        Group group = groupRepository.findById(gId)
+                .orElseThrow(() -> new RuntimeException("Group not found with ID: " + groupId));
+
+        boolean isOwner = group.getUser() != null && group.getUser().getId().equals(currentUser.getId());
+        GroupMembersDTO member = groupMembersService.existByUserAndGroup(currentUser.getId(), gId)
+                ? groupMembersService.getByUserAndGroup(currentUser.getId(), gId)
+                : null;
+        boolean isAdmin = member != null && member.isAccepted() && member.getRole() == Role.ADMIN;
+
+        if (!isOwner && !isAdmin) {
+            throw new RuntimeException("Access Denied: Only group owner or admin can view join requests");
+        }
+
         Optional<List<JoinRequest>> joinRequestByGroup = joinRequestRepository.findByGroupId(groupId);
         if(joinRequestByGroup.isEmpty()){
             return Collections.emptyList();
@@ -62,6 +77,23 @@ public class JoinRequestService {
     public JoinRequestDTO getRequestById(String id){
         JoinRequest request = joinRequestRepository.findById(id)
             .orElseThrow(()-> new RuntimeException("Request not found"));
+
+        User currentUser = userService.getCurrentUser();
+        Long currentUserId = currentUser.getId();
+        boolean isRequester = request.getUserId().equals(String.valueOf(currentUserId));
+
+        Long gId = Long.parseLong(request.getGroupId());
+        Group group = groupRepository.findById(gId).orElse(null);
+        boolean isOwner = group != null && group.getUser() != null && group.getUser().getId().equals(currentUserId);
+        GroupMembersDTO member = groupMembersService.existByUserAndGroup(currentUserId, gId)
+                ? groupMembersService.getByUserAndGroup(currentUserId, gId)
+                : null;
+        boolean isAdmin = member != null && member.isAccepted() && member.getRole() == Role.ADMIN;
+
+        if (!isRequester && !isOwner && !isAdmin) {
+            throw new RuntimeException("Access Denied: You do not have permission to view this join request");
+        }
+
         return toDTO(request);
     }
 
@@ -83,10 +115,14 @@ public class JoinRequestService {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));
 
-        Long creatorId = userService.getCurrentUser().getId();
+        Long currentUserId = userService.getCurrentUser().getId();
+        GroupMembers currentMember = groupMembersRepository.findByUserIdAndGroupId(currentUserId, groupId);
+        boolean isOwner = (group.getUser() != null && group.getUser().getId().equals(currentUserId))
+                || (currentMember != null && currentMember.isAccepted() && currentMember.getRole() == Role.OWNER);
+        boolean isAdmin = currentMember != null && currentMember.isAccepted() && currentMember.getRole() == Role.ADMIN;
 
-        if (!group.getUser().getId().equals(creatorId)) {
-            throw new RuntimeException("Only group creator can accept request");
+        if (!isOwner && !isAdmin) {
+            throw new RuntimeException("Access Denied: Only group owner or admin can accept requests");
         }
 
         if (request.getStatus() != JoinRequest.Status.PENDING) {
@@ -130,10 +166,14 @@ public class JoinRequestService {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));
 
-        Long creatorId = userService.getCurrentUser().getId();
+        Long currentUserId = userService.getCurrentUser().getId();
+        GroupMembers currentMember = groupMembersRepository.findByUserIdAndGroupId(currentUserId, groupId);
+        boolean isOwner = (group.getUser() != null && group.getUser().getId().equals(currentUserId))
+                || (currentMember != null && currentMember.isAccepted() && currentMember.getRole() == Role.OWNER);
+        boolean isAdmin = currentMember != null && currentMember.isAccepted() && currentMember.getRole() == Role.ADMIN;
 
-        if (!group.getUser().getId().equals(creatorId)) {
-            throw new RuntimeException("Only group creator can reject requests");
+        if (!isOwner && !isAdmin) {
+            throw new RuntimeException("Access Denied: Only group owner or admin can reject requests");
         }
 
         if (request.getStatus() != JoinRequest.Status.PENDING) {

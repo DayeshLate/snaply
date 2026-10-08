@@ -2,7 +2,6 @@ package com.danny.snaply_backend.controller;
 
 import java.util.List;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,15 +40,15 @@ public class JoinRequestController {
         return ResponseEntity.ok(request);
     }
 
-    @PostMapping("/{RequestId}/accept")
-    public ResponseEntity<GroupMembersDTO> acceptRequestById(@PathVariable String id){
-        GroupMembersDTO member = joinRequestService.acceptJoinRequest(id);
+    @PostMapping("/{requestId}/accept")
+    public ResponseEntity<GroupMembersDTO> acceptRequestById(@PathVariable("requestId") String requestId){
+        GroupMembersDTO member = joinRequestService.acceptJoinRequest(requestId);
         return ResponseEntity.ok(member);
     }
 
-    @PostMapping("/{Requestid}/reject")
-    public ResponseEntity<JoinRequestDTO> rejectRequestById(@PathVariable String RequestId){
-        JoinRequest request = joinRequestService.rejectRequest(RequestId);
+    @PostMapping("/{requestId}/reject")
+    public ResponseEntity<JoinRequestDTO> rejectRequestById(@PathVariable("requestId") String requestId){
+        JoinRequest request = joinRequestService.rejectRequest(requestId);
         return ResponseEntity.ok(joinRequestService.toDTO(request));
     }
 }

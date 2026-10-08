@@ -149,6 +149,10 @@ public class MediaService {
         CacheConstants.GROUPS_ALL
     }, allEntries = true)
     public String createMedia(Media media){
+        if (media == null || media.getFolder() == null || media.getFolder().getId() == null) {
+            throw new RuntimeException("Valid folder is required for media");
+        }
+        media.setId(null);
         Folder folder = folderReposiory.findById(media.getFolder().getId())
                 .orElseThrow(() -> new RuntimeException("Folder not found"));
 
