@@ -42,7 +42,7 @@ public class UserService {
         return userRepository.findByGoogleId(googleId);
     }
 
-    @CachePut(value = CacheConstants.USERS_BY_EMAIL, key = "#user.email")
+    @CacheEvict(value = {CacheConstants.USERS_BY_EMAIL, CacheConstants.USERS_BY_GOOGLE_ID}, allEntries = true)
     public User save(User user) {
         return userRepository.save(user);
     }
@@ -86,7 +86,7 @@ public class UserService {
         return userRepository.existsByGoogleId(googleId);
     }
 
-    @CachePut(value = CacheConstants.USERS_BY_EMAIL, key = "#email")
+    @CacheEvict(value = {CacheConstants.USERS_BY_EMAIL, CacheConstants.USERS_BY_GOOGLE_ID}, allEntries = true)
     public User createGoogleUser(
             String googleId,
             String name,
@@ -117,7 +117,7 @@ public class UserService {
                         .build()));
     }
 
-    @CachePut(value = CacheConstants.USERS_BY_EMAIL, key = "#email")
+    @CacheEvict(value = {CacheConstants.USERS_BY_EMAIL, CacheConstants.USERS_BY_GOOGLE_ID}, allEntries = true)
     public User createOrGetMagicLinkUser(String email) {
         return userRepository.findByEmail(email)
                 .orElseGet(() -> {
@@ -134,7 +134,7 @@ public class UserService {
                 });
     }
 
-    @CacheEvict(value = CacheConstants.USERS_BY_EMAIL, key = "#email")
+    @CacheEvict(value = {CacheConstants.USERS_BY_EMAIL, CacheConstants.USERS_BY_GOOGLE_ID}, allEntries = true)
     public void evictUserCache(String email) {
     }
 }

@@ -19,6 +19,12 @@ public final class CacheConstants {
     public static final String JOIN_REQUEST_BY_GROUP = "joinRequestByGroup";
     public static final String MEDIA_BY_FOLDER = "mediaByFolder";
     public static final String MEDIA_COUNT_BY_FOLDER = "mediaCountByFolder";
+    public static final String MEDIA_BY_ID = "mediaById";
+    public static final String MEDIA_BY_GROUP = "mediaByGroup";
+    public static final String CHAT_MESSAGES_BY_GROUP = "chatMessagesByGroup";
+    public static final String NOTIFICATIONS_BY_USER = "notificationsByUser";
+    public static final String NOTIFICATIONS_UNREAD_BY_USER = "notificationsUnreadByUser";
+    public static final String NOTIFICATIONS_COUNT_BY_USER = "notificationsCountByUser";
     public static final String AUTH_VERIFICATION = "auth:verification:";
     public static final String AUTH_SESSION = "auth:session:";
     public static final String AUTH_COOKIE = "snaply_access_token";

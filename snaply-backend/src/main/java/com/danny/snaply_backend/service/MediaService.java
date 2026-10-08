@@ -40,6 +40,8 @@ public class MediaService {
     @CacheEvict(value = {
         CacheConstants.MEDIA_BY_FOLDER,
         CacheConstants.MEDIA_COUNT_BY_FOLDER,
+        CacheConstants.MEDIA_BY_ID,
+        CacheConstants.MEDIA_BY_GROUP,
         CacheConstants.FOLDERS_BY_ID,
         CacheConstants.FOLDERS_ALL,
         CacheConstants.GROUP_BY_ID,
@@ -126,6 +128,7 @@ public class MediaService {
         return new MediaDownloadDTO(media.getFileName(), media.getMimeType(), fileBytes);
     }
 
+    @Cacheable(value = CacheConstants.MEDIA_BY_ID, key = "#mediaId")
     public MediaDTO getMediaById(Long mediaId) {
         Media media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new RuntimeException("Media not found with ID: " + mediaId));
@@ -138,6 +141,8 @@ public class MediaService {
     @CacheEvict(value = {
         CacheConstants.MEDIA_BY_FOLDER,
         CacheConstants.MEDIA_COUNT_BY_FOLDER,
+        CacheConstants.MEDIA_BY_ID,
+        CacheConstants.MEDIA_BY_GROUP,
         CacheConstants.FOLDERS_BY_ID,
         CacheConstants.FOLDERS_ALL,
         CacheConstants.GROUP_BY_ID,
@@ -175,6 +180,8 @@ public class MediaService {
     @CacheEvict(value = {
         CacheConstants.MEDIA_BY_FOLDER,
         CacheConstants.MEDIA_COUNT_BY_FOLDER,
+        CacheConstants.MEDIA_BY_ID,
+        CacheConstants.MEDIA_BY_GROUP,
         CacheConstants.FOLDERS_BY_ID,
         CacheConstants.FOLDERS_ALL,
         CacheConstants.GROUP_BY_ID,
@@ -237,6 +244,7 @@ public class MediaService {
         return medias.stream().map(this::toDTO).toList();
     }
 
+    @Cacheable(value = CacheConstants.MEDIA_BY_GROUP, key = "#groupId")
     public List<MediaDTO> getAllMediaByGroup(Long groupId){
         validateMemberAccess(groupId);
         List<Media> medias = mediaRepository.findAllByGroupId(groupId);

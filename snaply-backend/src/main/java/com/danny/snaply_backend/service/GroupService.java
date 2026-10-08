@@ -104,6 +104,14 @@ public class GroupService {
     }
 
 
+    @CacheEvict(value = {
+        CacheConstants.GROUP_BY_ID,
+        CacheConstants.GROUPS_ALL,
+        CacheConstants.GROUP_MEMBERS_BY_GROUP,
+        CacheConstants.GROUP_MEMBERS_BY_ROLE,
+        CacheConstants.GROUP_MEMBERS_BY_USER_AND_GROUP,
+        CacheConstants.GROUP_MEMBER_EXISTS_BY_USER_AND_GROUP
+    }, allEntries = true)
     public String removeGroupMember(long groupMemberId, long groupId) {
         Long currentUserId = userService.getCurrentUser().getId();
         Group group = groupRepository.findById(groupId)
@@ -164,6 +172,10 @@ public class GroupService {
     }
 
         @Transactional
+        @CacheEvict(value = {
+                CacheConstants.JOIN_REQUEST_BY_USER,
+                CacheConstants.JOIN_REQUEST_BY_GROUP
+        }, allEntries = true)
         public JoinRequest requestToJoin(String inviteCode) {
 
         Group group = groupRepository
@@ -296,7 +308,8 @@ public class GroupService {
         return "Member role updated to " + role + " successfully";
     }
 
-@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
+    @Cacheable(value = CacheConstants.GROUPS_ALL, key = "@userService.getCurrentUser().id")
     public List<GroupDTO> getAllGroups() {
 
         Long currentUserId = userService.getCurrentUser().getId();

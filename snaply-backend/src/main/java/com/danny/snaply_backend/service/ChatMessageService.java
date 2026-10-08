@@ -2,12 +2,15 @@ package com.danny.snaply_backend.service;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.danny.snaply_backend.config.CacheConstants;
 import com.danny.snaply_backend.dto.ChatMessageRequestDTO;
 import com.danny.snaply_backend.dto.ChatMessageResponseDTO;
 import com.danny.snaply_backend.entity.ChatMessage;
@@ -36,6 +39,7 @@ public class ChatMessageService {
     private final MediaRepository mediaRepository;
     private final UserService userService;
 
+    @CacheEvict(value = CacheConstants.CHAT_MESSAGES_BY_GROUP, key = "#groupId")
     public ChatMessageResponseDTO sendMessage(Long groupId, ChatMessageRequestDTO request) {
         User currentUser = userService.getCurrentUser();
         Group group = groupRepository.findById(groupId)
@@ -74,6 +78,7 @@ public class ChatMessageService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheConstants.CHAT_MESSAGES_BY_GROUP, key = "#groupId")
     public List<ChatMessageResponseDTO> getGroupMessages(Long groupId) {
         User currentUser = userService.getCurrentUser();
         validateMemberAccess(groupId, currentUser);
@@ -92,6 +97,7 @@ public class ChatMessageService {
                 .map(this::toDTO);
     }
 
+    @CacheEvict(value = CacheConstants.CHAT_MESSAGES_BY_GROUP, allEntries = true)
     public String deleteMessage(Long messageId) {
         User currentUser = userService.getCurrentUser();
         ChatMessage message = chatMessageRepository.findById(messageId)
