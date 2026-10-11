@@ -1,12 +1,20 @@
 import { apiClient } from './apiClient';
+import { mockStore, isDemoMode } from '../mock/mockStore';
 
 export const messageService = {
   async getGroupMessages(groupId) {
+    if (isDemoMode()) {
+      return mockStore.getMessages(groupId);
+    }
     const response = await apiClient.get(`/chat/${groupId}/messages`);
     return response.data; // List<ChatMessageResponseDTO>
   },
 
   async getGroupMessagesPaged(groupId, page = 0, size = 50) {
+    if (isDemoMode()) {
+      const all = mockStore.getMessages(groupId);
+      return { content: all, totalElements: all.length };
+    }
     const response = await apiClient.get(`/chat/${groupId}/messages/paged`, {
       params: { page, size },
     });
@@ -14,6 +22,9 @@ export const messageService = {
   },
 
   async sendMessage(groupId, { message, mediaId }) {
+    if (isDemoMode()) {
+      return mockStore.sendMessage(groupId, { message, mediaId });
+    }
     const response = await apiClient.post(`/chat/${groupId}/send`, {
       message,
       mediaId,
@@ -22,6 +33,9 @@ export const messageService = {
   },
 
   async deleteMessage(messageId) {
+    if (isDemoMode()) {
+      return mockStore.deleteMessage(messageId);
+    }
     const response = await apiClient.delete(`/chat/messages/${messageId}`);
     return response.data;
   },

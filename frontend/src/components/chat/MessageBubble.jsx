@@ -42,13 +42,13 @@ export default function MessageBubble({
           {message.mediaId && (
             <div className="mb-2 rounded overflow-hidden border border-white/20 bg-black/10">
               <a
-                href={`/media/stream/${message.mediaId}`}
+                href={message.media?.fileUrl || `/media/stream/${message.mediaId}`}
                 target="_blank"
                 rel="noreferrer"
                 className="block hover:opacity-95 transition-opacity"
               >
                 <img
-                  src={`/media/stream/${message.mediaId}`}
+                  src={message.media?.fileUrl || `/media/stream/${message.mediaId}`}
                   alt={message.mediaFileName || 'Attachment'}
                   className="max-h-48 w-full object-cover rounded"
                   onError={(e) => {

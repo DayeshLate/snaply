@@ -64,7 +64,7 @@ export default function MessageComposer({
                   }`}
                 >
                   <img
-                    src={`/media/stream/${m.id}`}
+                    src={m.fileUrl || `/media/stream/${m.id}`}
                     alt={m.fileName}
                     className="w-full h-full object-cover"
                   />

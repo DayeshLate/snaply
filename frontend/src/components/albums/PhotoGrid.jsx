@@ -12,7 +12,7 @@ export default function PhotoGrid({
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
       {photos.map((photo, index) => {
-        const streamUrl = `/media/stream/${photo.id}`;
+        const streamUrl = photo.fileUrl || `/media/stream/${photo.id}`;
         return (
           <div
             key={photo.id || index}

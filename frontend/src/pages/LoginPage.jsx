@@ -59,11 +59,11 @@ export default function LoginPage() {
     setDevLoading(true);
     setError('');
     try {
-      await devLogin('demo@snaply.com', 'Demo User');
-      success('Logged in with demo credentials!');
+      await devLogin();
+      success('Signed in to Demo Preview Mode! All features unlocked.');
       navigate('/dashboard');
     } catch (err) {
-      showError(err.message || 'Dev login is currently disabled on the backend.');
+      showError(err.message || 'Failed to enter demo mode.');
     } finally {
       setDevLoading(false);
     }

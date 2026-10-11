@@ -33,7 +33,7 @@ export default function PhotoViewer({
 
   if (!isOpen || !photo) return null;
 
-  const streamUrl = `/media/stream/${photo.id}`;
+  const streamUrl = photo.fileUrl || `/media/stream/${photo.id}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md animate-in fade-in select-none">

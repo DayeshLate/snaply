@@ -22,7 +22,7 @@ export default function AlbumCard({
             {album.media.slice(0, 4).map((m, idx) => (
               <div key={m.id || idx} className="h-full bg-slate-100 overflow-hidden relative">
                 <img
-                  src={`/media/stream/${m.id}`}
+                  src={m.fileUrl || `/media/stream/${m.id}`}
                   alt={m.fileName}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={(e) => {

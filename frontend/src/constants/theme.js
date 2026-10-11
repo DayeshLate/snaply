@@ -11,6 +11,18 @@ export const COLORS = {
   error: '#DC2626',
 };
 
+export const LANDING_COLORS = {
+  primary: '#2196F3',
+  dark: '#1854A3',
+  secondary: '#64B5F6',
+  light: '#90CAF9',
+  background: '#F5F9FF',
+  surface: '#FFFFFF',
+  primaryText: '#0D1B3E',
+  secondaryText: '#536784',
+  border: '#D9E7F5',
+};
+
 export const ROLES = {
   OWNER: 'OWNER',
   ADMIN: 'ADMIN',
