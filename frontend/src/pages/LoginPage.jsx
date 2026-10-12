@@ -60,10 +60,10 @@ export default function LoginPage() {
     setError('');
     try {
       await devLogin();
-      success('Signed in to Demo Preview Mode! All features unlocked.');
+      success('Signed in successfully!');
       navigate('/dashboard');
     } catch (err) {
-      showError(err.message || 'Failed to enter demo mode.');
+      showError(err.message || 'Failed to sign in.');
     } finally {
       setDevLoading(false);
     }
