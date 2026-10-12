@@ -46,6 +46,9 @@ export default function DashboardPage() {
 
       if (groupsData.status === 'fulfilled') {
         setGroups(groupsData.value || []);
+      } else {
+        console.error('Failed to load groups:', groupsData.reason);
+        setError(groupsData.reason?.message || 'Failed to load groups');
       }
       if (foldersData.status === 'fulfilled') {
         setFolders(foldersData.value || []);

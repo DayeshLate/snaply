@@ -55,12 +55,12 @@ export default function LoginPage() {
     }
   };
 
-  const handleDevLogin = async () => {
+  const handleDevLogin = async (emailToUse = 'dayeshlaptop@gmail.com', nameToUse = 'dayesh') => {
     setDevLoading(true);
     setError('');
     try {
-      await devLogin();
-      success('Signed in successfully!');
+      await devLogin(emailToUse, nameToUse);
+      success(`Signed in as ${emailToUse}!`);
       navigate('/dashboard');
     } catch (err) {
       showError(err.message || 'Failed to sign in.');
@@ -185,19 +185,31 @@ export default function LoginPage() {
               <div className="w-full border-t border-[#E2E8F0]" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-[#64748B]">Or test instantly</span>
+              <span className="bg-white px-2 text-[#64748B]">Quick Sign-In (Supabase Accounts)</span>
             </div>
           </div>
 
-          {/* Dev / Quick Demo Login Button */}
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleDevLogin}
-            loading={devLoading}
-          >
-            One-Click Demo Sign In (demo@snaply.com)
-          </Button>
+          <div className="space-y-2">
+            <Button
+              variant="outline"
+              className="w-full justify-between text-xs"
+              onClick={() => handleDevLogin('dayeshlaptop@gmail.com', 'dayesh')}
+              loading={devLoading}
+            >
+              <span className="font-medium text-[#0F172A]">dayeshlaptop@gmail.com</span>
+              <span className="text-[11px] bg-blue-50 text-[#2563EB] px-2 py-0.5 rounded font-semibold">4 Groups</span>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="w-full justify-between text-xs"
+              onClick={() => handleDevLogin('rob857210@gmail.com', 'rob')}
+              loading={devLoading}
+            >
+              <span className="font-medium text-[#0F172A]">rob857210@gmail.com</span>
+              <span className="text-[11px] bg-blue-50 text-[#2563EB] px-2 py-0.5 rounded font-semibold">2 Groups</span>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
