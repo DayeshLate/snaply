@@ -4,8 +4,9 @@ import { mockStore, isDemoMode } from '../mock/mockStore';
 const baseURL = import.meta.env.VITE_API_BASE_URL || '';
 
 export const mediaService = {
-  async uploadMedia(file, folderId) {
+  async uploadMedia(file, folderId, onProgress) {
     if (isDemoMode()) {
+      if (onProgress) onProgress(100);
       return mockStore.uploadMedia(file, folderId);
     }
     const formData = new FormData();
@@ -15,6 +16,12 @@ export const mediaService = {
     const response = await apiClient.post('/media/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (progressEvent) => {
+        if (onProgress && progressEvent.total) {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(percent);
+        }
       },
     });
     return response.data; // MediaDTO
@@ -59,6 +66,22 @@ export const mediaService = {
       return mockStore.deleteMedia(mediaId);
     }
     const response = await apiClient.delete(`/media/delete/${mediaId}`);
+    return response.data;
+  },
+
+  async updateMedia(mediaId, { fileName, folderId }) {
+    if (isDemoMode()) {
+      const found = mockStore.data.media.find((m) => m.id === Number(mediaId));
+      if (!found) throw new Error('Media not found');
+      if (fileName) found.fileName = fileName;
+      if (folderId) found.folderId = Number(folderId);
+      mockStore.save();
+      return found;
+    }
+    const response = await apiClient.put(`/media/update/${mediaId}`, {
+      fileName,
+      folderId: folderId ? Number(folderId) : undefined,
+    });
     return response.data;
   },
 

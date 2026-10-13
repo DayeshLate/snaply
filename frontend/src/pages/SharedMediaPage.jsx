@@ -16,6 +16,8 @@ import { useAuth } from '../context/AuthContext';
 import PhotoGrid from '../components/albums/PhotoGrid';
 import PhotoViewer from '../components/albums/PhotoViewer';
 import UploadPhotoModal from '../components/albums/UploadPhotoModal';
+import EditMediaModal from '../components/albums/EditMediaModal';
+import DragDropZoneOverlay from '../components/common/DragDropZoneOverlay';
 import Button from '../components/common/Button';
 import Loader from '../components/common/Loader';
 import EmptyState from '../components/common/EmptyState';
@@ -35,11 +37,19 @@ export default function SharedMediaPage() {
   // Viewer state
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
+  const [photoToEdit, setPhotoToEdit] = useState(null);
 
   // Upload modal state
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadGroupId, setUploadGroupId] = useState('');
   const [uploadFolderId, setUploadFolderId] = useState('');
+  const [droppedFiles, setDroppedFiles] = useState([]);
+
+  const handlePageDrop = (files) => {
+    if (!files || files.length === 0) return;
+    setDroppedFiles(files);
+    setUploadModalOpen(true);
+  };
 
   // Delete dialog state
   const [photoToDelete, setPhotoToDelete] = useState(null);
@@ -53,8 +63,9 @@ export default function SharedMediaPage() {
 
       if (fetchedGroups.length > 0) {
         if (!uploadGroupId) setUploadGroupId(fetchedGroups[0].id.toString());
-        if (fetchedGroups[0].folders && fetchedGroups[0].folders.length > 0) {
-          setUploadFolderId(fetchedGroups[0].folders[0].id.toString());
+        const firstGroupFolders = fetchedGroups[0].folders || fetchedGroups[0].folderDTOs || [];
+        if (firstGroupFolders.length > 0) {
+          setUploadFolderId(firstGroupFolders[0].id.toString());
         }
 
         // Fetch media for all groups in parallel
@@ -139,7 +150,7 @@ export default function SharedMediaPage() {
 
   // Find available folders for selected upload group
   const activeUploadGroup = groups.find((g) => g.id.toString() === uploadGroupId);
-  const availableUploadFolders = activeUploadGroup?.folders || [];
+  const availableUploadFolders = activeUploadGroup?.folders || activeUploadGroup?.folderDTOs || [];
 
   return (
     <div className="space-y-6">
@@ -236,6 +247,7 @@ export default function SharedMediaPage() {
           onViewPhoto={handleViewPhoto}
           onDownloadPhoto={handleDownload}
           onDeletePhoto={(p) => setPhotoToDelete(p)}
+          onEditPhoto={(p) => setPhotoToEdit(p)}
           canDelete={true}
         />
       )}
@@ -249,82 +261,60 @@ export default function SharedMediaPage() {
         onNavigate={setViewerIndex}
         onDownload={handleDownload}
         onDelete={(p) => setPhotoToDelete(p)}
+        onEdit={(p) => setPhotoToEdit(p)}
         canDelete={true}
       />
 
-      {/* Upload Photo Modal with Group/Folder selector */}
+      {/* Edit Media Modal */}
+      {photoToEdit && (
+        <EditMediaModal
+          isOpen={!!photoToEdit}
+          onClose={() => setPhotoToEdit(null)}
+          photo={photoToEdit}
+          folders={availableUploadFolders}
+          onSuccess={() => {
+            setPhotoToEdit(null);
+            fetchData();
+          }}
+        />
+      )}
+
+      {/* Page-level Drag and Drop Overlay */}
+      <DragDropZoneOverlay
+        onFilesDropped={handlePageDrop}
+        title="Drop media to upload to Shared Library"
+        subtitle="Release your photos & videos to upload directly into your shared album"
+      />
+
+      {/* Upload Media Modal */}
       {uploadModalOpen && (
-        <Modal
+        <UploadPhotoModal
           isOpen={uploadModalOpen}
-          onClose={() => setUploadModalOpen(false)}
-          title="Upload Photo to Library"
-          description="Choose destination group and album folder"
-        >
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
-                Target Group
-              </label>
-              <select
-                value={uploadGroupId}
-                onChange={(e) => {
-                  const gId = e.target.value;
-                  setUploadGroupId(gId);
-                  const grp = groups.find((g) => g.id.toString() === gId);
-                  if (grp?.folders && grp.folders.length > 0) {
-                    setUploadFolderId(grp.folders[0].id.toString());
-                  } else {
-                    setUploadFolderId('');
-                  }
-                }}
-                className="w-full px-3 py-2 bg-white border border-[#E2E8F0] rounded text-sm text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
-              >
-                {groups.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
-                Target Album Folder
-              </label>
-              {availableUploadFolders.length === 0 ? (
-                <p className="text-xs text-[#DC2626] py-1">
-                  This group has no album folders yet. Please create an album folder first in the group page.
-                </p>
-              ) : (
-                <select
-                  value={uploadFolderId}
-                  onChange={(e) => setUploadFolderId(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-[#E2E8F0] rounded text-sm text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
-                >
-                  {availableUploadFolders.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
-            {uploadFolderId && (
-              <div className="pt-2">
-                <UploadPhotoModal
-                  isOpen={true}
-                  onClose={() => setUploadModalOpen(false)}
-                  folderId={uploadFolderId}
-                  onSuccess={(newMedia) => {
-                    setUploadModalOpen(false);
-                    fetchData();
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        </Modal>
+          onClose={() => {
+            setUploadModalOpen(false);
+            setDroppedFiles([]);
+          }}
+          folderId={uploadFolderId}
+          folders={availableUploadFolders}
+          groups={groups}
+          selectedGroupId={uploadGroupId}
+          onGroupChange={(gId) => {
+            setUploadGroupId(gId);
+            const grp = groups.find((g) => g.id.toString() === gId);
+            const grpFolders = grp?.folders || grp?.folderDTOs || [];
+            if (grpFolders.length > 0) {
+              setUploadFolderId(grpFolders[0].id.toString());
+            } else {
+              setUploadFolderId('');
+            }
+          }}
+          initialFiles={droppedFiles}
+          onSuccess={() => {
+            setUploadModalOpen(false);
+            setDroppedFiles([]);
+            fetchData();
+          }}
+        />
       )}
 
       {/* Delete Confirmation */}

@@ -1,7 +1,15 @@
 package com.danny.snaply_backend.service;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -36,6 +44,17 @@ public class MediaService {
     private final MediaMapper mediaMapper;
     private final GoogleDriveService googleDriveService;
     private final GroupMembersService groupMembersService;
+
+    private final Path localUploadDir = Paths.get("uploads", "media");
+
+    @PostConstruct
+    public void init() {
+        try {
+            Files.createDirectories(localUploadDir);
+        } catch (IOException e) {
+            log.error("Could not create local upload directory: {}", e.getMessage());
+        }
+    }
 
     @CacheEvict(value = {
         CacheConstants.MEDIA_BY_FOLDER,
@@ -72,9 +91,6 @@ public class MediaService {
             if (member == null || !member.isAccepted()) {
                 throw new RuntimeException("Access Denied: You are not an active member of this group");
             }
-            if (member.getRole() == Role.VIEWER) {
-                throw new RuntimeException("Access Denied: Viewers do not have permission to push or upload files to this group");
-            }
         }
 
         // Determine which Google Drive account to store the file into (prefer group creator who has Snaply root folder)
@@ -83,32 +99,64 @@ public class MediaService {
                 : (folder.getOwner() != null && folder.getOwner().isDriveConnected() ? folder.getOwner()
                 : (currentUser.isDriveConnected() ? currentUser : null));
 
-        if (driveUser == null || !driveUser.isDriveConnected()) {
-            throw new RuntimeException("No connected Google Drive account found to store this file. The group owner must connect Google Drive.");
+        String driveFileId = null;
+        String fileUrl = null;
+        String mimeType = file.getContentType();
+        if (mimeType == null || mimeType.isBlank() || mimeType.equals("application/octet-stream")) {
+            mimeType = determineMimeType(file.getOriginalFilename());
         }
 
-        String targetDriveFolder = folder.getDriveFolderId();
-        if (targetDriveFolder == null || targetDriveFolder.isBlank()) {
-            targetDriveFolder = folder.getGroup().getDriveFolderId();
-        }
-        if (targetDriveFolder == null || targetDriveFolder.isBlank()) {
-            targetDriveFolder = googleDriveService.getOrCreateSnaplyRootFolder(driveUser);
+        // Try Google Drive if user has a connected account
+        if (driveUser != null && driveUser.isDriveConnected()) {
+            try {
+                String targetDriveFolder = folder.getDriveFolderId();
+                if (targetDriveFolder == null || targetDriveFolder.isBlank()) {
+                    targetDriveFolder = folder.getGroup().getDriveFolderId();
+                }
+                if (targetDriveFolder == null || targetDriveFolder.isBlank()) {
+                    targetDriveFolder = googleDriveService.getOrCreateSnaplyRootFolder(driveUser);
+                }
+
+                GoogleDriveFileDTO driveFile = googleDriveService.uploadFile(driveUser, file, targetDriveFolder);
+                driveFileId = driveFile.id();
+                fileUrl = driveFile.webViewLink();
+                if (driveFile.mimeType() != null && !driveFile.mimeType().isBlank()) {
+                    mimeType = driveFile.mimeType();
+                }
+                log.info("Media '{}' uploaded to Google Drive folder '{}' by user '{}'", file.getOriginalFilename(), targetDriveFolder, currentUser.getEmail());
+            } catch (Exception e) {
+                log.warn("Google Drive upload failed: {}. Falling back to resilient local storage.", e.getMessage());
+            }
         }
 
-        GoogleDriveFileDTO driveFile = googleDriveService.uploadFile(driveUser, file, targetDriveFolder);
+        // Resilient fallback to local storage
+        if (driveFileId == null) {
+            try {
+                Files.createDirectories(localUploadDir);
+                String cleanName = sanitizeFilename(file.getOriginalFilename());
+                String uniqueName = System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 8) + "_" + cleanName;
+                Path targetPath = localUploadDir.resolve(uniqueName);
+                Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+                driveFileId = "local:" + uniqueName;
+                log.info("Media '{}' stored locally at '{}'", cleanName, targetPath);
+            } catch (IOException e) {
+                log.error("Failed to store media locally", e);
+                throw new RuntimeException("Failed to store uploaded media: " + e.getMessage(), e);
+            }
+        }
 
         Media media = Media.builder()
-                .fileName(driveFile.name())
-                .mimeType(driveFile.mimeType())
-                .fileSize(driveFile.size())
-                .driveFileId(driveFile.id())
-                .fileUrl(driveFile.webViewLink())
+                .fileName(file.getOriginalFilename() != null ? sanitizeFilename(file.getOriginalFilename()) : "unnamed_file")
+                .mimeType(mimeType)
+                .fileSize(BigInteger.valueOf(file.getSize()))
+                .driveFileId(driveFileId)
+                .fileUrl(fileUrl)
                 .uplodedBy(currentUser)
                 .folder(folder)
                 .build();
 
         Media savedMedia = mediaRepository.save(media);
-        log.info("Media '{}' uploaded to Google Drive folder '{}' by user '{}'", savedMedia.getFileName(), targetDriveFolder, currentUser.getEmail());
+        log.info("Media record saved with ID '{}' in folder '{}'", savedMedia.getId(), folderId);
         return toDTO(savedMedia);
     }
 
@@ -119,7 +167,21 @@ public class MediaService {
         validateMemberAccess(media.getFolder().getGroup().getId());
 
         if (media.getDriveFileId() == null || media.getDriveFileId().isBlank()) {
-            throw new RuntimeException("Media does not have an associated Google Drive file ID");
+            throw new RuntimeException("Media does not have an associated file ID");
+        }
+
+        if (media.getDriveFileId().startsWith("local:")) {
+            String localFilename = media.getDriveFileId().substring("local:".length());
+            Path filePath = localUploadDir.resolve(localFilename);
+            if (!Files.exists(filePath)) {
+                throw new RuntimeException("Local media file not found on server: " + localFilename);
+            }
+            try {
+                byte[] fileBytes = Files.readAllBytes(filePath);
+                return new MediaDownloadDTO(media.getFileName(), media.getMimeType(), fileBytes);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to read local media file: " + e.getMessage(), e);
+            }
         }
 
         User driveUser = getDriveUserForMedia(media);
@@ -208,25 +270,93 @@ public class MediaService {
         boolean isAdmin = member != null && member.isAccepted() && member.getRole() == Role.ADMIN;
         boolean isUploader = media.getUplodedBy() != null && media.getUplodedBy().getId().equals(currentUser.getId());
 
-        if (member == null || !member.isAccepted() || member.getRole() == Role.VIEWER) {
-            return "Access Denied: You are not authorized to delete media in this group";
+        if (!isGroupOwner) {
+            if (member == null || !member.isAccepted()) {
+                throw new RuntimeException("Access Denied: You are not an active member of this group");
+            }
         }
 
         if (!isGroupOwner && !isAdmin && !isUploader) {
-            return "Access Denied: Only Group Owners, Admins, or the original uploader can delete this media";
+            throw new RuntimeException("Access Denied: Only Group Owners, Admins, or the original uploader can delete this media");
         }
 
         if (media.getDriveFileId() != null && !media.getDriveFileId().isBlank()) {
-            User driveUser = getDriveUserForMedia(media);
-            if (driveUser != null && driveUser.isDriveConnected()) {
+            if (media.getDriveFileId().startsWith("local:")) {
+                String localFilename = media.getDriveFileId().substring("local:".length());
                 try {
-                    googleDriveService.deleteFileOrFolder(driveUser, media.getDriveFileId());
+                    Files.deleteIfExists(localUploadDir.resolve(localFilename));
+                    log.info("Deleted local media file: {}", localFilename);
+                } catch (Exception e) {
+                    log.warn("Failed to delete local media file: {}", e.getMessage());
+                }
+            } else {
+                try {
+                    User driveUser = getDriveUserForMedia(media);
+                    if (driveUser != null && driveUser.isDriveConnected()) {
+                        googleDriveService.deleteFileOrFolder(driveUser, media.getDriveFileId());
+                    }
                 } catch (Exception ignored) {}
             }
         }
 
         mediaRepository.delete(media);
         return "Data deleted successfully";
+    }
+
+    @CacheEvict(value = {
+        CacheConstants.MEDIA_BY_FOLDER,
+        CacheConstants.MEDIA_COUNT_BY_FOLDER,
+        CacheConstants.MEDIA_BY_ID,
+        CacheConstants.MEDIA_BY_GROUP,
+        CacheConstants.FOLDERS_BY_ID,
+        CacheConstants.FOLDERS_ALL,
+        CacheConstants.GROUP_BY_ID,
+        CacheConstants.GROUPS_ALL
+    }, allEntries = true)
+    @Transactional
+    public MediaDTO updateMedia(Long mediaId, String newFileName, Long targetFolderId) {
+        Media media = mediaRepository.findById(mediaId)
+                .orElseThrow(() -> new RuntimeException("Media not found with ID: " + mediaId));
+
+        User currentUser = userService.getCurrentUser();
+        Long groupId = media.getFolder().getGroup().getId();
+
+        GroupMembersDTO member = null;
+        if (groupMembersService.existByUserAndGroup(currentUser.getId(), groupId)) {
+            member = groupMembersService.getByUserAndGroup(currentUser.getId(), groupId);
+        }
+
+        boolean isGroupOwner = (media.getFolder().getGroup().getUser() != null && media.getFolder().getGroup().getUser().getId().equals(currentUser.getId()))
+                || (member != null && member.isAccepted() && member.getRole() == Role.OWNER);
+        boolean isAdmin = member != null && member.isAccepted() && member.getRole() == Role.ADMIN;
+        boolean isUploader = media.getUplodedBy() != null && media.getUplodedBy().getId().equals(currentUser.getId());
+
+        if (!isGroupOwner) {
+            if (member == null || !member.isAccepted()) {
+                throw new RuntimeException("Access Denied: You are not an active member of this group");
+            }
+        }
+
+        if (!isGroupOwner && !isAdmin && !isUploader) {
+            throw new RuntimeException("Access Denied: Only Group Owners, Admins, or the original uploader can edit this media");
+        }
+
+        if (newFileName != null && !newFileName.trim().isBlank()) {
+            media.setFileName(newFileName.trim());
+        }
+
+        if (targetFolderId != null && !targetFolderId.equals(media.getFolder().getId())) {
+            Folder newFolder = folderReposiory.findById(targetFolderId)
+                    .orElseThrow(() -> new RuntimeException("Target folder not found with ID: " + targetFolderId));
+            if (!newFolder.getGroup().getId().equals(groupId)) {
+                throw new RuntimeException("Target folder belongs to a different group");
+            }
+            media.setFolder(newFolder);
+        }
+
+        Media savedMedia = mediaRepository.save(media);
+        log.info("Media record '{}' (ID {}) updated by user '{}'", savedMedia.getFileName(), savedMedia.getId(), currentUser.getEmail());
+        return toDTO(savedMedia);
     }
 
     @Cacheable(value = CacheConstants.MEDIA_COUNT_BY_FOLDER, key = "#folderId")
@@ -284,11 +414,38 @@ public class MediaService {
         throw new RuntimeException("No connected Google Drive account found to access media: " + media.getFileName());
     }
 
+    private String determineMimeType(String filename) {
+        if (filename == null) return "application/octet-stream";
+        String lower = filename.toLowerCase();
+        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+        if (lower.endsWith(".png")) return "image/png";
+        if (lower.endsWith(".webp")) return "image/webp";
+        if (lower.endsWith(".gif")) return "image/gif";
+        if (lower.endsWith(".svg")) return "image/svg+xml";
+        if (lower.endsWith(".mp4")) return "video/mp4";
+        if (lower.endsWith(".webm")) return "video/webm";
+        if (lower.endsWith(".mov")) return "video/quicktime";
+        if (lower.endsWith(".mkv")) return "video/x-matroska";
+        if (lower.endsWith(".avi")) return "video/x-msvideo";
+        return "application/octet-stream";
+    }
+
+    private String sanitizeFilename(String filename) {
+        if (filename == null || filename.isBlank()) {
+            return "file";
+        }
+        return filename.replaceAll("[^a-zA-Z0-9._-]", "_").trim();
+    }
+
     public Media toEntity(MediaDTO dto){
         return mediaMapper.toEntity(dto);
     }
 
     public MediaDTO toDTO(Media entity){
-        return mediaMapper.toDTO(entity);
+        MediaDTO dto = mediaMapper.toDTO(entity);
+        if (dto != null && (dto.getFileUrl() == null || dto.getFileUrl().contains("drive.google.com") || (dto.getDriveFileId() != null && dto.getDriveFileId().startsWith("local:")))) {
+            dto.setFileUrl("/media/stream/" + entity.getId());
+        }
+        return dto;
     }
 }

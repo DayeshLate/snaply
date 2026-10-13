@@ -322,6 +322,15 @@ public class GroupService {
     }
 
     public GroupDTO toDTO(Group group) {
+        if (group == null) return null;
+        Long oId = null;
+        String oName = null;
+        String oEmail = null;
+        if (group.getUser() != null) {
+            oId = group.getUser().getId();
+            oName = group.getUser().getName();
+            oEmail = group.getUser().getEmail();
+        }
 
         return GroupDTO.builder()
                 .id(group.getId())
@@ -329,6 +338,9 @@ public class GroupService {
                 .description(group.getDescription())
                 .createdAt(group.getCreatedAt())
                 .driveFolderId(group.getDriveFolderId())
+                .ownerId(oId)
+                .ownerName(oName)
+                .ownerEmail(oEmail)
                 .groupMembers(
                         group.getGroupMembers() == null
                                 ? List.of()

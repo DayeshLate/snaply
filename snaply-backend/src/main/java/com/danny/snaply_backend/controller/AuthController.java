@@ -53,7 +53,8 @@ public class AuthController {
         User user = authService.verifyEmail(token);
 
         if (frontendUrl != null && !frontendUrl.isBlank()) {
-            String target = frontendUrl + "/login?verified=true&email=" + user.getEmail();
+            String baseUrl = frontendUrl.split(",")[0].trim();
+            String target = baseUrl + "/login?verified=true&email=" + user.getEmail();
             return ResponseEntity.status(HttpStatus.FOUND)
                     .location(URI.create(target))
                     .build();

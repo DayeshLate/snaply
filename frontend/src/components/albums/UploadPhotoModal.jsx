@@ -1,123 +1,547 @@
-import React, { useState, useRef } from 'react';
-import { UploadCloud, File, X, CheckCircle } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  UploadCloud,
+  File,
+  X,
+  CheckCircle,
+  AlertCircle,
+  Film,
+  Image as ImageIcon,
+  Loader2,
+  Plus,
+  FolderOpen
+} from 'lucide-react';
 import Modal from '../common/Modal';
 import Button from '../common/Button';
 import { mediaService } from '../../services/mediaService';
 import { useToast } from '../../context/ToastContext';
 import { formatFileSize } from '../../utils/formatters';
 
+const MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024; // 100MB
+
+function isVideoFile(file) {
+  if (!file) return false;
+  if (file.type && file.type.startsWith('video/')) return true;
+  const name = file.name || '';
+  return /\.(mp4|webm|mov|mkv|avi|m4v)$/i.test(name);
+}
+
+function getFileTypeBadge(file) {
+  if (!file) return 'FILE';
+  const name = file.name || '';
+  const ext = name.split('.').pop();
+  return ext ? ext.toUpperCase() : (isVideoFile(file) ? 'VIDEO' : 'IMAGE');
+}
+
 export default function UploadPhotoModal({
   isOpen,
   onClose,
   folderId,
+  folders = [],
+  groups = [],
+  selectedGroupId,
+  onGroupChange,
   onSuccess,
+  initialFiles = [],
 }) {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [selectedFolderId, setSelectedFolderId] = useState(folderId || '');
+  const [fileQueue, setFileQueue] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentProgress, setCurrentProgress] = useState(0);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
   const { success, error: showError } = useToast();
 
+  // Keep selectedFolderId in sync with folderId prop or first folder in list
+  useEffect(() => {
+    if (folderId) {
+      setSelectedFolderId(folderId);
+    } else if (folders && folders.length > 0) {
+      // If current selectedFolderId is not in the folders list, pick first
+      const exists = folders.some((f) => f.id.toString() === selectedFolderId?.toString());
+      if (!exists) {
+        setSelectedFolderId(folders[0].id);
+      }
+    }
+  }, [folderId, folders]);
+
+  // Load initial files if passed from drag-and-drop on parent page
+  useEffect(() => {
+    if (initialFiles && initialFiles.length > 0) {
+      addFilesToQueue(initialFiles);
+    }
+  }, [initialFiles]);
+
+  // Clean up object URLs on unmount or reset
+  useEffect(() => {
+    return () => {
+      fileQueue.forEach((item) => {
+        if (item.previewUrl) {
+          URL.revokeObjectURL(item.previewUrl);
+        }
+      });
+    };
+  }, []);
+
+  const addFilesToQueue = (files) => {
+    const validList = [];
+    const oversized = [];
+
+    Array.from(files).forEach((file) => {
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        oversized.push(file.name);
+        return;
+      }
+
+      // Check if file is already queued by name and size
+      const exists = fileQueue.some(
+        (q) => q.file.name === file.name && q.file.size === file.size
+      );
+      if (exists) return;
+
+      const isVideo = isVideoFile(file);
+      const previewUrl = URL.createObjectURL(file);
+
+      validList.push({
+        id: `${file.name}-${file.size}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+        file,
+        isVideo,
+        previewUrl,
+        badge: getFileTypeBadge(file),
+        status: 'pending', // 'pending' | 'uploading' | 'completed' | 'error'
+        progress: 0,
+        errorMessage: null,
+      });
+    });
+
+    if (oversized.length > 0) {
+      showError(`Skipped ${oversized.length} file(s) larger than 100MB limit.`);
+    }
+
+    if (validList.length > 0) {
+      setFileQueue((prev) => [...prev, ...validList]);
+    }
+  };
+
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+    if (e.target.files && e.target.files.length > 0) {
+      addFilesToQueue(e.target.files);
+      // Reset input value so same files can be chosen again if needed
+      e.target.value = '';
     }
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     setDragOver(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setSelectedFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      addFilesToQueue(e.dataTransfer.files);
     }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile || !folderId) return;
+  const removeFileFromQueue = (indexToRemove) => {
+    setFileQueue((prev) => {
+      const removed = prev[indexToRemove];
+      if (removed?.previewUrl) {
+        URL.revokeObjectURL(removed.previewUrl);
+      }
+      return prev.filter((_, idx) => idx !== indexToRemove);
+    });
+  };
 
-    setLoading(true);
-    try {
-      const uploaded = await mediaService.uploadMedia(selectedFile, folderId);
-      success(`Photo "${selectedFile.name}" uploaded successfully!`);
-      setSelectedFile(null);
-      onClose();
-      if (onSuccess) onSuccess(uploaded);
-    } catch (err) {
-      showError(err.message || 'Failed to upload photo. Check Google Drive connection.');
-    } finally {
-      setLoading(false);
+  const clearQueue = () => {
+    fileQueue.forEach((item) => {
+      if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+    });
+    setFileQueue([]);
+  };
+
+  const handleUploadAll = async () => {
+    const targetFolder = selectedFolderId || folderId;
+    if (!targetFolder) {
+      showError('Please select a destination album folder first.');
+      return;
+    }
+
+    const pendingItems = fileQueue.filter((item) => item.status !== 'completed');
+    if (pendingItems.length === 0) {
+      showError('No new files to upload.');
+      return;
+    }
+
+    setUploading(true);
+    let successCount = 0;
+    const uploadedResults = [];
+
+    for (let i = 0; i < fileQueue.length; i++) {
+      const currentItem = fileQueue[i];
+      if (currentItem.status === 'completed') continue;
+
+      setCurrentIndex(i + 1);
+      setCurrentProgress(0);
+
+      // Update status to uploading
+      setFileQueue((prev) =>
+        prev.map((item, idx) =>
+          idx === i ? { ...item, status: 'uploading', progress: 0 } : item
+        )
+      );
+
+      try {
+        const uploaded = await mediaService.uploadMedia(
+          currentItem.file,
+          targetFolder,
+          (percent) => {
+            setCurrentProgress(percent);
+            setFileQueue((prev) =>
+              prev.map((item, idx) =>
+                idx === i ? { ...item, progress: percent } : item
+              )
+            );
+          }
+        );
+
+        successCount++;
+        uploadedResults.push(uploaded);
+
+        setFileQueue((prev) =>
+          prev.map((item, idx) =>
+            idx === i ? { ...item, status: 'completed', progress: 100 } : item
+          )
+        );
+      } catch (err) {
+        const message = err.message || 'Upload failed';
+        setFileQueue((prev) =>
+          prev.map((item, idx) =>
+            idx === i ? { ...item, status: 'error', errorMessage: message } : item
+          )
+        );
+      }
+    }
+
+    setUploading(false);
+
+    if (successCount > 0) {
+      success(`Successfully uploaded ${successCount} file(s)!`);
+      if (onSuccess) onSuccess(uploadedResults);
+      // Auto close after brief pause if all succeeded
+      const hasErrors = fileQueue.some((item) => item.status === 'error');
+      if (!hasErrors) {
+        setTimeout(() => {
+          clearQueue();
+          onClose();
+        }, 600);
+      }
+    } else {
+      showError('All uploads failed. Please check connection and try again.');
     }
   };
+
+  const completedCount = fileQueue.filter((item) => item.status === 'completed').length;
+  const targetFolder = selectedFolderId || folderId;
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
-      title="Upload Photo to Album"
-      description="Photos are synced to Google Drive and shared with group members"
+      onClose={() => {
+        if (!uploading) {
+          clearQueue();
+          onClose();
+        }
+      }}
+      title="Upload Photos & Videos"
+      description="Upload media to your shared group albums with automatic cloud backup"
     >
       <div className="space-y-4">
+        {/* Optional Group & Folder Pickers */}
+        {groups && groups.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+                Target Group
+              </label>
+              <select
+                value={selectedGroupId}
+                onChange={(e) => onGroupChange && onGroupChange(e.target.value)}
+                disabled={uploading}
+                className="w-full px-3 py-2 bg-white border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-colors"
+              >
+                {groups.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+                Destination Album
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedFolderId}
+                  onChange={(e) => setSelectedFolderId(e.target.value)}
+                  disabled={uploading || folders.length === 0}
+                  className="w-full px-3 py-2 pl-9 bg-white border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-colors"
+                >
+                  {folders.length === 0 ? (
+                    <option value="">No albums available</option>
+                  ) : (
+                    folders.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.name}
+                      </option>
+                    ))
+                  )}
+                </select>
+                <FolderOpen className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Folder picker if groups is not passed but multiple folders exist */}
+        {(!groups || groups.length === 0) && folders && folders.length > 1 && (
+          <div>
+            <label className="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+              Select Destination Album
+            </label>
+            <div className="relative">
+              <select
+                value={selectedFolderId}
+                onChange={(e) => setSelectedFolderId(e.target.value)}
+                disabled={uploading}
+                className="w-full px-3 py-2 pl-9 bg-white border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-colors"
+              >
+                {folders.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.name}
+                  </option>
+                ))}
+              </select>
+              <FolderOpen className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+        )}
+
         {/* Drag and Drop Zone */}
         <div
           onDragOver={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             setDragOver(true);
           }}
-          onDragLeave={() => setDragOver(false)}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setDragOver(false);
+          }}
           onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
-          className={`border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${
-            dragOver ? 'border-[#2563EB] bg-blue-50/50' : 'border-[#E2E8F0] hover:border-slate-400 bg-slate-50/50'
+          onClick={() => {
+            if (!uploading) fileInputRef.current?.click();
+          }}
+          className={`border-2 border-dashed rounded-xl p-7 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 ${
+            dragOver
+              ? 'border-[#2563EB] bg-blue-50/80 scale-[1.01] shadow-inner'
+              : 'border-[#CBD5E1] hover:border-[#2563EB] bg-slate-50/60 hover:bg-blue-50/30'
           }`}
         >
           <input
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept="image/*,video/*"
+            accept="image/*,video/*,.jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mov,.mkv"
+            multiple
             className="hidden"
           />
-          <div className="w-12 h-12 rounded-full bg-blue-50 text-[#2563EB] flex items-center justify-center mb-3">
-            <UploadCloud className="w-6 h-6" />
+
+          <div
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-colors ${
+              dragOver ? 'bg-[#2563EB] text-white shadow-md' : 'bg-blue-100/70 text-[#2563EB]'
+            }`}
+          >
+            <UploadCloud className="w-7 h-7" />
           </div>
+
           <p className="text-sm font-semibold text-[#0F172A]">
-            Click to upload or drag & drop
+            Drag & drop photos & videos here, or <span className="text-[#2563EB] underline">browse</span>
           </p>
-          <p className="text-xs text-[#64748B] mt-1">
-            PNG, JPG, JPEG, WEBP or MP4 up to 50MB
+          <p className="text-xs text-[#64748B] mt-1.5 max-w-sm">
+            High-res images (JPG, PNG, WEBP, GIF) and videos (MP4, WEBM, MOV) up to 100MB each
           </p>
+          <div className="flex items-center gap-2 mt-3">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-white border border-slate-200 text-slate-600">
+              <ImageIcon className="w-3 h-3 text-[#2563EB]" /> Photos
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-white border border-slate-200 text-slate-600">
+              <Film className="w-3 h-3 text-purple-600" /> Videos
+            </span>
+            <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-[#2563EB]">
+              Multi-file support
+            </span>
+          </div>
         </div>
 
-        {/* Selected file preview */}
-        {selectedFile && (
-          <div className="flex items-center justify-between p-3 rounded border border-[#E2E8F0] bg-white">
-            <div className="flex items-center gap-3 min-w-0">
-              <File className="w-5 h-5 text-[#2563EB] shrink-0" />
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-[#0F172A] truncate">
-                  {selectedFile.name}
-                </p>
-                <p className="text-xs text-[#64748B]">
-                  {formatFileSize(selectedFile.size)}
-                </p>
-              </div>
+        {/* Overall Upload Progress Bar */}
+        {uploading && (
+          <div className="bg-blue-50/70 border border-blue-200 rounded-lg p-3.5 space-y-2">
+            <div className="flex items-center justify-between text-xs font-semibold text-[#0F172A]">
+              <span className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin text-[#2563EB]" />
+                Uploading item {currentIndex} of {fileQueue.length}...
+              </span>
+              <span className="text-[#2563EB] font-mono">{currentProgress}%</span>
             </div>
-            <button
-              onClick={() => setSelectedFile(null)}
-              className="text-[#64748B] hover:text-[#DC2626] p-1 rounded cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="w-full bg-blue-100 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-[#2563EB] h-full rounded-full transition-all duration-200 ease-out"
+                style={{ width: `${currentProgress}%` }}
+              />
+            </div>
           </div>
         )}
 
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
-          <Button variant="outline" onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button onClick={handleUpload} disabled={!selectedFile} loading={loading}>
-            Upload Photo
-          </Button>
+        {/* Queued Files Preview List */}
+        {fileQueue.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs font-semibold text-[#0F172A] uppercase tracking-wider">
+                Files Queue ({fileQueue.length})
+                {completedCount > 0 && ` • ${completedCount} uploaded`}
+              </span>
+              {!uploading && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-xs text-[#2563EB] hover:underline font-medium inline-flex items-center gap-1 cursor-pointer"
+                  >
+                    <Plus className="w-3 h-3" /> Add more
+                  </button>
+                  <span className="text-slate-300">|</span>
+                  <button
+                    onClick={clearQueue}
+                    className="text-xs text-slate-500 hover:text-red-600 transition-colors cursor-pointer"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="max-h-60 overflow-y-auto space-y-2 pr-1 rounded-lg border border-slate-100 p-1">
+              {fileQueue.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-2.5 rounded-lg border border-[#E2E8F0] bg-white hover:bg-slate-50/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Thumbnail preview */}
+                    <div className="relative w-11 h-11 rounded-md overflow-hidden bg-slate-100 shrink-0 border border-slate-200 flex items-center justify-center">
+                      {item.isVideo ? (
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-purple-50 text-purple-600">
+                          <Film className="w-5 h-5" />
+                        </div>
+                      ) : (
+                        <img
+                          src={item.previewUrl}
+                          alt={item.file.name}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      <span className="absolute bottom-0 right-0 left-0 bg-black/60 text-white text-[9px] font-mono text-center truncate px-0.5 leading-tight">
+                        {item.badge}
+                      </span>
+                    </div>
+
+                    {/* File details */}
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-[#0F172A] truncate max-w-xs">
+                        {item.file.name}
+                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs text-[#64748B]">
+                          {formatFileSize(item.file.size)}
+                        </span>
+                        {item.status === 'completed' && (
+                          <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
+                            <CheckCircle className="w-3 h-3" /> Done
+                          </span>
+                        )}
+                        {item.status === 'uploading' && (
+                          <span className="inline-flex items-center gap-1 text-[11px] text-[#2563EB] font-medium">
+                            <Loader2 className="w-3 h-3 animate-spin" /> {item.progress}%
+                          </span>
+                        )}
+                        {item.status === 'error' && (
+                          <span className="inline-flex items-center gap-1 text-[11px] text-red-600 font-medium">
+                            <AlertCircle className="w-3 h-3" /> Failed
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions / Status */}
+                  <div className="flex items-center gap-1 shrink-0 ml-2">
+                    {item.status === 'completed' ? (
+                      <span className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <CheckCircle className="w-4 h-4" />
+                      </span>
+                    ) : item.status === 'uploading' ? (
+                      <span className="text-xs font-mono font-semibold text-[#2563EB]">
+                        {item.progress}%
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => removeFileFromQueue(index)}
+                        disabled={uploading}
+                        className="text-[#64748B] hover:text-[#DC2626] p-1.5 rounded-md hover:bg-slate-100 transition-colors cursor-pointer"
+                        title="Remove file"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Footer Actions */}
+        <div className="flex items-center justify-between pt-3 border-t border-[#E2E8F0]">
+          <span className="text-xs text-[#64748B]">
+            {fileQueue.length === 0
+              ? 'Select or drop files to begin'
+              : `${fileQueue.length} file(s) selected`}
+          </span>
+
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                clearQueue();
+                onClose();
+              }}
+              disabled={uploading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUploadAll}
+              disabled={fileQueue.length === 0 || !targetFolder}
+              loading={uploading}
+            >
+              {uploading
+                ? `Uploading (${currentIndex}/${fileQueue.length})...`
+                : fileQueue.length > 1
+                ? `Upload ${fileQueue.length} Files`
+                : 'Upload Media'}
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>

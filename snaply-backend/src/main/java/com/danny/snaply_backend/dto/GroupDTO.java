@@ -37,6 +37,12 @@ public class GroupDTO {
     @Builder.Default
     public List<FolderDTO> folderDTOs = new ArrayList<>();
     
+    public Long ownerId;
+
+    public String ownerName;
+
+    public String ownerEmail;
+
     @JsonIgnore
     public User user;
 

@@ -32,6 +32,16 @@ public class MediaDTO {
 
     public LocalDateTime createdAt;
 
+    public Long uploadedById;
+
+    public String uploadedByName;
+
+    public String uploadedByEmail;
+
+    public Long folderId;
+
+    public String folderName;
+
     @JsonIgnore
     public User uplodedBy;
 

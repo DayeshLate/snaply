@@ -56,9 +56,24 @@ public class GroupMembersService {
     }
 
     public GroupMembersDTO toDTO(GroupMembers groupMembers){
+        if (groupMembers == null) return null;
+        Long uId = null;
+        String uName = null;
+        String uEmail = null;
+        String uPic = null;
+        if (groupMembers.getUser() != null) {
+            uId = groupMembers.getUser().getId();
+            uName = groupMembers.getUser().getName();
+            uEmail = groupMembers.getUser().getEmail();
+            uPic = groupMembers.getUser().getProfilePicture();
+        }
         return GroupMembersDTO.builder()
             .id(groupMembers.getId())
             .role(groupMembers.getRole())
+            .userId(uId)
+            .userName(uName)
+            .userEmail(uEmail)
+            .profilePicture(uPic)
             .group(groupMembers.getGroup())
             .user(groupMembers.getUser())
             .joinedAt(groupMembers.getJoinedAt())

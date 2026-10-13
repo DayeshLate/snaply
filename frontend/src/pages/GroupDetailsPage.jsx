@@ -36,6 +36,8 @@ import PhotoGrid from '../components/albums/PhotoGrid';
 import PhotoViewer from '../components/albums/PhotoViewer';
 import UploadPhotoModal from '../components/albums/UploadPhotoModal';
 import CreateFolderModal from '../components/albums/CreateFolderModal';
+import EditMediaModal from '../components/albums/EditMediaModal';
+import DragDropZoneOverlay from '../components/common/DragDropZoneOverlay';
 
 import ChatHeader from '../components/chat/ChatHeader';
 import MessageList from '../components/chat/MessageList';
@@ -61,10 +63,18 @@ export default function GroupDetailsPage() {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [createAlbumModalOpen, setCreateAlbumModalOpen] = useState(false);
   const [selectedFolderForUpload, setSelectedFolderForUpload] = useState(null);
+  const [droppedFiles, setDroppedFiles] = useState([]);
+
+  const handlePageDrop = (files) => {
+    if (!files || files.length === 0) return;
+    setDroppedFiles(files);
+    setUploadModalOpen(true);
+  };
 
   // Photo viewer state
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
+  const [photoToEdit, setPhotoToEdit] = useState(null);
 
   // Delete dialogs
   const [deleteGroupOpen, setDeleteGroupOpen] = useState(false);
@@ -132,10 +142,35 @@ export default function GroupDetailsPage() {
   }, [activeTab, groupId]);
 
   // Current user's membership and role in this group
-  const currentMember = group?.groupMembers?.find((m) => (m.userId || m.user?.id) === user?.id);
-  const isOwner = group?.user?.id === user?.id || group?.ownerId === user?.id || currentMember?.role === ROLES.OWNER;
+  const currentMember = group?.groupMembers?.find(
+    (m) =>
+      m.userId === user?.id ||
+      m.user?.id === user?.id ||
+      (m.userEmail && user?.email && m.userEmail.toLowerCase() === user.email.toLowerCase()) ||
+      (m.user?.email && user?.email && m.user.email.toLowerCase() === user.email.toLowerCase())
+  );
+  const isOwner =
+    group?.ownerId === user?.id ||
+    (group?.ownerEmail && user?.email && group.ownerEmail.toLowerCase() === user.email.toLowerCase()) ||
+    group?.user?.id === user?.id ||
+    currentMember?.role === ROLES.OWNER;
   const isGroupAdmin = isOwner || currentMember?.role === ROLES.ADMIN;
-  const canUpload = isOwner || currentMember?.role === ROLES.ADMIN || currentMember?.role === ROLES.VIEWER;
+  // Any accepted member or owner of this group can upload
+  const canUpload = isOwner || isGroupAdmin || (currentMember ? (currentMember.isAccepted ?? true) : true);
+
+  const allGroupFolders = group?.folderDTOs || group?.folders || [];
+
+  const handleOpenUpload = (specificFolderId) => {
+    if (specificFolderId) {
+      setSelectedFolderForUpload(specificFolderId);
+    }
+    if (allGroupFolders.length === 0) {
+      showError('Please create an album first before uploading photos!');
+      setCreateAlbumModalOpen(true);
+      return;
+    }
+    setUploadModalOpen(true);
+  };
 
   const handleCopyInvite = () => {
     if (group?.inviteCode) {
@@ -243,7 +278,16 @@ export default function GroupDetailsPage() {
   if (error || !group) return <ErrorState message={error || 'Group not found'} onRetry={loadGroupDetails} />;
 
   // Default target folder for uploads: General folder or first available folder
-  const targetUploadFolderId = selectedFolderForUpload || group.folderDTOs?.[0]?.id;
+  const targetUploadFolderId = selectedFolderForUpload || allGroupFolders[0]?.id;
+  const selectedFolder = allGroupFolders.find((f) => f.id === selectedFolderForUpload);
+  const filteredPhotos = selectedFolderForUpload
+    ? groupMedia.filter(
+        (m) =>
+          m.folderId === selectedFolderForUpload ||
+          m.folder?.id === selectedFolderForUpload ||
+          m.folderId === Number(selectedFolderForUpload)
+      )
+    : groupMedia;
 
   return (
     <div className="space-y-6">
@@ -283,16 +327,13 @@ export default function GroupDetailsPage() {
               </Button>
             )}
 
-            {canUpload && group.folderDTOs?.length > 0 && (
+            {canUpload && (
               <Button
                 size="sm"
                 icon={Upload}
-                onClick={() => {
-                  setSelectedFolderForUpload(group.folderDTOs[0].id);
-                  setUploadModalOpen(true);
-                }}
+                onClick={() => handleOpenUpload()}
               >
-                Upload Photo
+                Upload Media
               </Button>
             )}
           </div>
@@ -344,19 +385,34 @@ export default function GroupDetailsPage() {
       {activeTab === 'albums' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-[#0F172A]">Albums & Folders</h3>
-            {canUpload && (
-              <Button
-                size="sm"
-                icon={Plus}
-                onClick={() => setCreateAlbumModalOpen(true)}
-              >
-                New Album
-              </Button>
-            )}
+            <div>
+              <h3 className="text-base font-bold text-[#0F172A]">Albums & Folders</h3>
+              <p className="text-xs text-[#64748B]">Organize group memories into dedicated albums</p>
+            </div>
+            <div className="flex items-center gap-2">
+              {canUpload && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  icon={Upload}
+                  onClick={() => handleOpenUpload()}
+                >
+                  Upload Media
+                </Button>
+              )}
+              {canUpload && (
+                <Button
+                  size="sm"
+                  icon={Plus}
+                  onClick={() => setCreateAlbumModalOpen(true)}
+                >
+                  New Album
+                </Button>
+              )}
+            </div>
           </div>
 
-          {group.folderDTOs?.length === 0 ? (
+          {allGroupFolders.length === 0 ? (
             <div className="p-8 bg-white border border-[#E2E8F0] rounded-lg text-center">
               <p className="text-sm text-[#64748B]">No custom albums in this group yet.</p>
               {canUpload && (
@@ -371,7 +427,7 @@ export default function GroupDetailsPage() {
             </div>
           ) : (
             <AlbumGrid
-              albums={group.folderDTOs}
+              albums={allGroupFolders}
               onSelectAlbum={(album) => {
                 setSelectedFolderForUpload(album.id);
                 setSearchParams({ tab: 'photos' });
@@ -386,46 +442,89 @@ export default function GroupDetailsPage() {
       {/* 2. PHOTOS TAB */}
       {activeTab === 'photos' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-base font-bold text-[#0F172A]">Group Photos</h3>
-              <p className="text-xs text-[#64748B]">All images uploaded across group albums</p>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-[#0F172A]">Group Photos</h3>
+                {selectedFolder && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-semibold bg-blue-50 text-[#2563EB] border border-blue-200">
+                    Album: {selectedFolder.name}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedFolderForUpload(null)}
+                      className="hover:text-red-500 font-bold ml-1 cursor-pointer"
+                      title="Clear album filter"
+                    >
+                      ×
+                    </button>
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-[#64748B]">
+                {selectedFolder
+                  ? `Showing photos inside "${selectedFolder.name}".`
+                  : 'All photos and videos uploaded across group albums.'}
+              </p>
             </div>
-            {canUpload && targetUploadFolderId && (
-              <Button
-                size="sm"
-                icon={Upload}
-                onClick={() => setUploadModalOpen(true)}
-              >
-                Upload Photo
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {allGroupFolders.length > 1 && (
+                <select
+                  value={selectedFolderForUpload || ''}
+                  onChange={(e) => setSelectedFolderForUpload(e.target.value ? Number(e.target.value) : null)}
+                  className="px-2.5 py-1.5 bg-white border border-[#E2E8F0] rounded text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
+                >
+                  <option value="">All Albums ({groupMedia.length})</option>
+                  {allGroupFolders.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {canUpload && (
+                <Button
+                  size="sm"
+                  icon={Upload}
+                  onClick={() => handleOpenUpload(selectedFolderForUpload)}
+                >
+                  Upload Media
+                </Button>
+              )}
+            </div>
           </div>
 
-          {groupMedia.length === 0 ? (
+          {filteredPhotos.length === 0 ? (
             <div className="p-12 bg-white border border-dashed border-[#E2E8F0] rounded-lg text-center">
               <ImageIcon className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm font-semibold text-[#0F172A]">No photos in this group yet</p>
-              <p className="text-xs text-[#64748B] mt-1">Upload the first photo to begin sharing.</p>
-              {canUpload && targetUploadFolderId && (
+              <p className="text-sm font-semibold text-[#0F172A]">
+                {selectedFolder ? `No photos in "${selectedFolder.name}"` : 'No photos in this group yet'}
+              </p>
+              <p className="text-xs text-[#64748B] mt-1">
+                {selectedFolder
+                  ? 'Upload photos or videos directly to this album.'
+                  : 'Upload the first photo to begin sharing.'}
+              </p>
+              {canUpload && (
                 <Button
                   size="sm"
                   className="mt-4"
-                  onClick={() => setUploadModalOpen(true)}
+                  icon={Upload}
+                  onClick={() => handleOpenUpload(selectedFolderForUpload)}
                 >
-                  Upload Photo
+                  Upload Media
                 </Button>
               )}
             </div>
           ) : (
             <PhotoGrid
-              photos={groupMedia}
+              photos={filteredPhotos}
               onViewPhoto={(photo, idx) => {
                 setViewerIndex(idx);
                 setViewerOpen(true);
               }}
               onDownloadPhoto={handleDownloadPhoto}
               onDeletePhoto={(photo) => setPhotoToDelete(photo)}
+              onEditPhoto={(photo) => setPhotoToEdit(photo)}
               canDelete={isGroupAdmin}
             />
           )}
@@ -519,23 +618,51 @@ export default function GroupDetailsPage() {
       <PhotoViewer
         isOpen={viewerOpen}
         onClose={() => setViewerOpen(false)}
-        photos={groupMedia}
+        photos={activeTab === 'photos' ? filteredPhotos : groupMedia}
         currentIndex={viewerIndex}
         onNavigate={setViewerIndex}
         onDownload={handleDownloadPhoto}
         onDelete={(photo) => setPhotoToDelete(photo)}
+        onEdit={(photo) => setPhotoToEdit(photo)}
         canDelete={isGroupAdmin}
       />
 
-      {/* Upload Photo Modal */}
-      {targetUploadFolderId && (
-        <UploadPhotoModal
-          isOpen={uploadModalOpen}
-          onClose={() => setUploadModalOpen(false)}
-          folderId={targetUploadFolderId}
-          onSuccess={() => loadGroupDetails()}
+      {/* Edit Media Modal */}
+      {photoToEdit && (
+        <EditMediaModal
+          isOpen={!!photoToEdit}
+          onClose={() => setPhotoToEdit(null)}
+          photo={photoToEdit}
+          folders={allGroupFolders}
+          onSuccess={() => {
+            setPhotoToEdit(null);
+            loadGroupDetails();
+          }}
         />
       )}
+
+      {/* Page-level Drag and Drop Overlay */}
+      <DragDropZoneOverlay
+        onFilesDropped={handlePageDrop}
+        title={`Drop media into ${group?.name || 'this group'}`}
+        subtitle="Release to upload photos and videos to this album"
+      />
+
+      {/* Upload Photo Modal */}
+      <UploadPhotoModal
+        isOpen={uploadModalOpen}
+        onClose={() => {
+          setUploadModalOpen(false);
+          setDroppedFiles([]);
+        }}
+        folderId={targetUploadFolderId}
+        folders={allGroupFolders}
+        initialFiles={droppedFiles}
+        onSuccess={() => {
+          setDroppedFiles([]);
+          loadGroupDetails();
+        }}
+      />
 
       {/* Create Album Modal */}
       <CreateFolderModal

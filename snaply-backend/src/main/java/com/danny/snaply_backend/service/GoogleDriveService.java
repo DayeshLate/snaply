@@ -80,7 +80,6 @@ public class GoogleDriveService {
             throw new RuntimeException("Invalid or expired OAuth state parameter");
         }
 
-        redisTemplate.delete(key);
         Long userId = Long.valueOf(userIdStr);
 
         User user = userRepository.findById(userId)
@@ -156,6 +155,7 @@ public class GoogleDriveService {
         User savedUser = userRepository.save(user);
         userService.evictUserCache(savedUser.getEmail());
 
+        redisTemplate.delete(key);
         log.info("Google Drive successfully connected for user: {} ({})", savedUser.getEmail(), googleEmail);
         return savedUser;
     }

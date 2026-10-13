@@ -28,6 +28,14 @@ public class GroupMembersDTO {
     @JsonIgnore
     public User user;
 
+    public Long userId;
+
+    public String userName;
+
+    public String userEmail;
+
+    public String profilePicture;
+
     public LocalDateTime joinedAt;
 
     public boolean isAccepted;
