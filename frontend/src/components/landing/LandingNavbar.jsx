@@ -1,16 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Camera, Menu, X, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+
+      // Enhance blur/specular styling when scrolled away from top
+      setScrolled(currentScrollY > 15);
+
+      // Always show when near the top
+      if (currentScrollY <= 25) {
+        setVisible(true);
+      } else {
+        const delta = currentScrollY - lastScrollY.current;
+        // Scrolling down -> hide navbar smoothly
+        if (delta > 6) {
+          setVisible(false);
+          setMobileOpen(false);
+        }
+        // Scrolling up -> reveal navbar smoothly
+        else if (delta < -8) {
+          setVisible(true);
+        }
+      }
+
+      lastScrollY.current = currentScrollY;
     };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -28,7 +52,7 @@ export default function LandingNavbar() {
     setMobileOpen(false);
     const target = document.querySelector(href);
     if (target) {
-      const topOffset = 80;
+      const topOffset = 95;
       const elementPosition = target.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - topOffset;
       window.scrollTo({
@@ -40,40 +64,45 @@ export default function LandingNavbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-white/95 backdrop-blur-md border-b border-[#D9E7F5] shadow-xs py-3'
-          : 'bg-transparent border-b border-transparent py-5'
+      className={`fixed top-3 sm:top-5 left-0 right-0 z-50 px-3 sm:px-6 lg:px-8 pointer-events-none transition-all duration-300 ease-in-out ${
+        visible ? 'translate-y-0 opacity-100' : '-translate-y-28 opacity-0'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
+      <div className={`max-w-7xl mx-auto w-full ${visible ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+        {/* Continuous Glassy Row from Logo to Get Started */}
+        <div
+          className={`flex items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-3 rounded-2xl transition-all duration-300 ${
+            scrolled
+              ? 'bg-white/80 dark:bg-[#070D16]/85 backdrop-blur-2xl backdrop-saturate-200 border border-white/85 dark:border-white/15 shadow-[0_12px_40px_-10px_rgba(33,150,243,0.18),0_4px_16px_-2px_rgba(0,0,0,0.06),inset_0_1px_1px_0_rgba(255,255,255,0.9)]'
+              : 'bg-white/65 dark:bg-[#070D16]/70 backdrop-blur-2xl backdrop-saturate-180 border border-white/80 dark:border-white/12 shadow-[0_8px_32px_0_rgba(15,23,42,0.08),inset_0_1px_1px_0_rgba(255,255,255,0.85)]'
+          }`}
+        >
+          {/* Logo on Left */}
           <Link
             to="/"
-            className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2196F3] rounded-md"
+            className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2196F3] rounded-lg shrink-0"
           >
-            <div className="w-9 h-9 rounded-md bg-[#2196F3] flex items-center justify-center text-white shadow-xs group-hover:bg-[#1854A3] transition-colors">
+            <div className="w-9 h-9 rounded-xl bg-[#2196F3] flex items-center justify-center text-white shadow-xs group-hover:bg-[#1854A3] transition-colors border border-[#64B5F6]/40">
               <Camera className="w-5 h-5 transition-transform group-hover:scale-105 duration-200" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold tracking-tight text-[#0D1B3E] leading-none">
+              <span className="text-xl font-extrabold tracking-tight text-[#0D1B3E] dark:text-[#F1F5F9] leading-none">
                 Snaply
               </span>
-              <span className="text-[10px] tracking-wider uppercase font-semibold text-[#536784] mt-0.5">
+              <span className="text-[10px] tracking-wider uppercase font-semibold text-[#536784] dark:text-[#94A3B8] mt-0.5">
                 Shared Albums
               </span>
             </div>
           </Link>
 
-          {/* Desktop Center Links */}
-          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+          {/* Desktop Center Links Styled as Buttons with Background */}
+          <nav className="hidden md:flex items-center gap-1 lg:gap-1.5 p-1 rounded-xl bg-slate-100/60 dark:bg-white/5 border border-slate-200/50 dark:border-white/10 backdrop-blur-md">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleSmoothScroll(e, link.href)}
-                className="px-3 py-1.5 rounded-md text-sm font-medium text-[#536784] hover:text-[#0D1B3E] hover:bg-blue-50/60 transition-colors"
+                className="px-3 lg:px-3.5 py-1.5 rounded-lg text-xs lg:text-sm font-semibold text-[#0D1B3E] dark:text-[#E2E8F0] bg-white/80 dark:bg-white/10 hover:bg-[#2196F3] hover:text-white dark:hover:bg-[#2196F3] dark:hover:text-white border border-white/80 dark:border-white/10 shadow-2xs hover:shadow-xs hover:border-[#2196F3] transition-all active:scale-95 cursor-pointer whitespace-nowrap"
               >
                 {link.name}
               </a>
@@ -81,16 +110,16 @@ export default function LandingNavbar() {
           </nav>
 
           {/* Desktop Right CTAs */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2 lg:gap-2.5 shrink-0">
             <Link
               to="/login"
-              className="px-4 py-2 text-sm font-semibold text-[#0D1B3E] hover:text-[#2196F3] transition-colors"
+              className="px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-[#0D1B3E] dark:text-[#E2E8F0] bg-white/70 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 rounded-xl border border-white/80 dark:border-white/15 shadow-2xs hover:border-[#2196F3] hover:text-[#2196F3] dark:hover:text-[#38BDF8] transition-all cursor-pointer whitespace-nowrap"
             >
               Sign In
             </Link>
             <Link
               to="/login?tab=register"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#2196F3] text-white text-sm font-semibold hover:bg-[#1854A3] active:translate-y-px transition-all shadow-xs"
+              className="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 rounded-xl bg-[#2196F3] text-white text-xs sm:text-sm font-bold hover:bg-[#1854A3] active:translate-y-px transition-all shadow-sm hover:shadow hover:shadow-[#2196F3]/30 border border-[#64B5F6]/40 cursor-pointer whitespace-nowrap"
             >
               <span>Get Started</span>
               <ArrowRight className="w-4 h-4" />
@@ -100,56 +129,54 @@ export default function LandingNavbar() {
           {/* Mobile Hamburger Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 text-[#536784] hover:text-[#0D1B3E] hover:bg-blue-50/60 rounded-md transition-colors"
+            className="md:hidden p-2 text-[#536784] dark:text-[#94A3B8] hover:text-[#0D1B3E] dark:hover:text-white bg-white/70 dark:bg-white/10 border border-white/80 dark:border-white/15 rounded-xl transition-colors cursor-pointer"
             aria-label="Toggle navigation menu"
           >
-            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
-      </div>
 
-      {/* Mobile Drawer Menu */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="md:hidden bg-white border-b border-[#D9E7F5] shadow-lg overflow-hidden"
-          >
-            <div className="px-4 pt-3 pb-6 space-y-2">
+        {/* Mobile Drawer Menu (Floating Glass Island) */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="md:hidden mt-2.5 p-4 rounded-2xl bg-white/90 dark:bg-[#0E1724]/95 backdrop-blur-2xl border border-white/80 dark:border-white/15 shadow-2xl overflow-hidden space-y-2 pointer-events-auto"
+            >
               {navLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleSmoothScroll(e, link.href)}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-[#536784] hover:text-[#0D1B3E] hover:bg-[#F5F9FF] transition-colors"
+                  className="block w-full py-2.5 px-4 rounded-xl bg-white/80 dark:bg-[#121D2C] hover:bg-[#2196F3] hover:text-white dark:hover:bg-[#2196F3] dark:hover:text-white border border-[#D9E7F5]/80 dark:border-[#1F2D40] text-sm font-semibold text-[#0D1B3E] dark:text-[#E2E8F0] text-center shadow-2xs transition-all active:scale-98"
                 >
                   {link.name}
                 </a>
               ))}
-              <div className="pt-4 mt-2 border-t border-[#D9E7F5] flex flex-col gap-2.5">
+              <div className="pt-3 mt-2 border-t border-[#D9E7F5]/80 dark:border-[#1F2D40] flex flex-col gap-2.5">
                 <Link
                   to="/login"
                   onClick={() => setMobileOpen(false)}
-                  className="w-full text-center py-2.5 rounded-md border border-[#D9E7F5] text-sm font-semibold text-[#0D1B3E] hover:bg-slate-50 transition-colors"
+                  className="w-full text-center py-2.5 rounded-xl bg-white/80 dark:bg-[#121D2C] border border-[#D9E7F5]/80 dark:border-[#1F2D40] text-sm font-semibold text-[#0D1B3E] dark:text-[#E2E8F0] hover:bg-slate-50 transition-colors shadow-2xs"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/login?tab=register"
                   onClick={() => setMobileOpen(false)}
-                  className="w-full text-center py-2.5 rounded-md bg-[#2196F3] text-white text-sm font-semibold hover:bg-[#1854A3] transition-colors flex items-center justify-center gap-2"
+                  className="w-full text-center py-2.5 rounded-xl bg-[#2196F3] text-white text-sm font-bold hover:bg-[#1854A3] transition-colors flex items-center justify-center gap-2 shadow-sm"
                 >
                   <span>Get Started for Free</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </header>
   );
 }

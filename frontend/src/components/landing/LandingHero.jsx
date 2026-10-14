@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { HERO_PHOTOS, SOCIAL_AVATARS } from './landingData';
+import AntigravityDotsBackground from './AntigravityDotsBackground';
 
 export default function LandingHero() {
   const containerRef = useRef(null);
@@ -50,6 +51,9 @@ export default function LandingHero() {
 
   return (
     <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden bg-[#F5F9FF]">
+      {/* Antigravity floating dots */}
+      <AntigravityDotsBackground className="opacity-40 pointer-events-none" />
+
       {/* Background Subtle Ambience */}
       <div className="absolute top-0 inset-x-0 h-96 bg-linear-to-b from-blue-100/60 to-transparent pointer-events-none" />
       <div className="absolute -top-32 right-1/4 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl pointer-events-none" />
@@ -110,11 +114,11 @@ export default function LandingHero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3, ease: 'easeOut' }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2"
           >
             <Link
               to="/login?tab=register"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-md bg-[#2196F3] hover:bg-[#1854A3] text-white text-base font-semibold shadow-sm hover:shadow-md transition-all active:translate-y-px"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-md bg-[#2196F3] hover:bg-[#1854A3] text-white text-sm sm:text-base font-semibold shadow-sm hover:shadow-md transition-all active:translate-y-px"
             >
               <span>Start Sharing</span>
               <ArrowRight className="w-4 h-4" />
@@ -123,9 +127,26 @@ export default function LandingHero() {
             <a
               href="#features"
               onClick={scrollToFeatures}
-              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-md bg-white hover:bg-slate-50 text-[#0D1B3E] text-base font-semibold border border-[#D9E7F5] shadow-2xs hover:border-[#64B5F6] transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3.5 rounded-md bg-white hover:bg-slate-50 text-[#0D1B3E] text-sm sm:text-base font-semibold border border-[#D9E7F5] shadow-2xs hover:border-[#2196F3] hover:text-[#2196F3] transition-all cursor-pointer"
             >
               Explore Features
+            </a>
+
+            <a
+              href="#how-it-works"
+              onClick={(e) => {
+                e.preventDefault();
+                const target = document.querySelector('#how-it-works');
+                if (target) {
+                  const topOffset = 85;
+                  const elementPosition = target.getBoundingClientRect().top;
+                  const offsetPosition = elementPosition + window.pageYOffset - topOffset;
+                  window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                }
+              }}
+              className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3.5 rounded-md bg-blue-50/80 hover:bg-blue-100/90 text-[#1854A3] text-sm sm:text-base font-semibold border border-[#BFDBFE] shadow-2xs hover:border-[#2196F3] transition-all cursor-pointer"
+            >
+              How It Works
             </a>
           </motion.div>
 
