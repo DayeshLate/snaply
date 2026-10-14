@@ -12,6 +12,10 @@ import java.util.UUID;
 import jakarta.annotation.PostConstruct;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -383,6 +387,53 @@ public class MediaService {
         validateMemberAccess(groupId);
         List<Media> medias = mediaRepository.findAllByGroupId(groupId);
         return medias.stream().map(this::toDTO).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<MediaDTO> getMediaByFolderPaginated(Long folderId, int page, int size, String sortBy, String sortDir) {
+        Folder folder = folderReposiory.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("Folder not found with ID: " + folderId));
+
+        validateMemberAccess(folder.getGroup().getId());
+
+        String safeSort = sanitizeMediaSortProperty(sortBy);
+        Sort sort = "asc".equalsIgnoreCase(sortDir) ? Sort.by(safeSort).ascending() : Sort.by(safeSort).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Media> mediaPage = mediaRepository.findByFolderId(folderId, pageable);
+        return mediaPage.map(this::toDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<MediaDTO> getMediaByGroupPaginated(Long groupId, int page, int size, String sortBy, String sortDir) {
+        validateMemberAccess(groupId);
+
+        String safeSort = sanitizeMediaSortProperty(sortBy);
+        Sort sort = "asc".equalsIgnoreCase(sortDir) ? Sort.by(safeSort).ascending() : Sort.by(safeSort).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Media> mediaPage = mediaRepository.findAllByGroupId(groupId, pageable);
+        return mediaPage.map(this::toDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<MediaDTO> getMediaByUserPaginated(int page, int size, String sortBy, String sortDir) {
+        User currentUser = userService.getCurrentUser();
+
+        String safeSort = sanitizeMediaSortProperty(sortBy);
+        Sort sort = "asc".equalsIgnoreCase(sortDir) ? Sort.by(safeSort).ascending() : Sort.by(safeSort).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Media> mediaPage = mediaRepository.findAllByUploadedByUserId(currentUser.getId(), pageable);
+        return mediaPage.map(this::toDTO);
+    }
+
+    private String sanitizeMediaSortProperty(String sortBy) {
+        if (sortBy == null || sortBy.isBlank()) return "createdAt";
+        return switch (sortBy) {
+            case "id", "fileName", "createdAt", "fileSize" -> sortBy;
+            default -> "createdAt";
+        };
     }
 
     private void validateMemberAccess(Long groupId) {

@@ -2,6 +2,7 @@ package com.danny.snaply_backend.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -181,6 +182,47 @@ public class MediaController {
     @GetMapping("/group/{groupId}")
     public ResponseEntity<List<MediaDTO>> getAllMediaByGroup(@PathVariable Long groupId) {
         List<MediaDTO> media = mediaService.getAllMediaByGroup(groupId);
+        return ResponseEntity.ok(media);
+    }
+
+    @GetMapping({"/getAllMedia/{folderId}/paged", "/folder/{folderId}/paged"})
+    public ResponseEntity<Page<MediaDTO>> getMediaByFolderPaged(
+            @PathVariable Long folderId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ) {
+        int boundedPage = Math.max(page, 0);
+        int boundedSize = Math.min(Math.max(size, 1), 100);
+        Page<MediaDTO> media = mediaService.getMediaByFolderPaginated(folderId, boundedPage, boundedSize, sortBy, sortDir);
+        return ResponseEntity.ok(media);
+    }
+
+    @GetMapping("/group/{groupId}/paged")
+    public ResponseEntity<Page<MediaDTO>> getMediaByGroupPaged(
+            @PathVariable Long groupId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ) {
+        int boundedPage = Math.max(page, 0);
+        int boundedSize = Math.min(Math.max(size, 1), 100);
+        Page<MediaDTO> media = mediaService.getMediaByGroupPaginated(groupId, boundedPage, boundedSize, sortBy, sortDir);
+        return ResponseEntity.ok(media);
+    }
+
+    @GetMapping("/user/paged")
+    public ResponseEntity<Page<MediaDTO>> getMyMediaPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ) {
+        int boundedPage = Math.max(page, 0);
+        int boundedSize = Math.min(Math.max(size, 1), 100);
+        Page<MediaDTO> media = mediaService.getMediaByUserPaginated(boundedPage, boundedSize, sortBy, sortDir);
         return ResponseEntity.ok(media);
     }
 

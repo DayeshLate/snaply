@@ -45,12 +45,69 @@ export const mediaService = {
     return response.data; // List<MediaDTO>
   },
 
+  async getMediaByFolderPaginated(folderId, { page = 0, size = 20, sortBy = 'createdAt', sortDir = 'desc' } = {}) {
+    if (isDemoMode()) {
+      const all = mockStore.getMediaByFolder(folderId);
+      const start = page * size;
+      const content = all.slice(start, start + size);
+      return {
+        content,
+        totalPages: Math.ceil(all.length / size),
+        totalElements: all.length,
+        number: page,
+        size,
+      };
+    }
+    const response = await apiClient.get(`/media/folder/${folderId}/paged`, {
+      params: { page, size, sortBy, sortDir },
+    });
+    return response.data; // Page<MediaDTO>
+  },
+
   async getAllMediaByGroup(groupId) {
     if (isDemoMode()) {
       return mockStore.getMediaByGroup(groupId);
     }
     const response = await apiClient.get(`/media/group/${groupId}`);
     return response.data; // List<MediaDTO>
+  },
+
+  async getMediaByGroupPaginated(groupId, { page = 0, size = 20, sortBy = 'createdAt', sortDir = 'desc' } = {}) {
+    if (isDemoMode()) {
+      const all = mockStore.getMediaByGroup(groupId);
+      const start = page * size;
+      const content = all.slice(start, start + size);
+      return {
+        content,
+        totalPages: Math.ceil(all.length / size),
+        totalElements: all.length,
+        number: page,
+        size,
+      };
+    }
+    const response = await apiClient.get(`/media/group/${groupId}/paged`, {
+      params: { page, size, sortBy, sortDir },
+    });
+    return response.data; // Page<MediaDTO>
+  },
+
+  async getMyMediaPaginated({ page = 0, size = 20, sortBy = 'createdAt', sortDir = 'desc' } = {}) {
+    if (isDemoMode()) {
+      const all = mockStore.data.media;
+      const start = page * size;
+      const content = all.slice(start, start + size);
+      return {
+        content,
+        totalPages: Math.ceil(all.length / size),
+        totalElements: all.length,
+        number: page,
+        size,
+      };
+    }
+    const response = await apiClient.get('/media/user/paged', {
+      params: { page, size, sortBy, sortDir },
+    });
+    return response.data; // Page<MediaDTO>
   },
 
   async getMediaCountByFolder(folderId) {

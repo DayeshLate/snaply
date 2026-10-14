@@ -5,7 +5,12 @@ import java.util.Optional;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.danny.snaply_backend.config.CacheConstants;
 import com.danny.snaply_backend.dto.FolderDTO;
@@ -64,6 +69,60 @@ public class FolderService {
             folders = folderReposiory.findByGroupIdIn(groupIds);
         }
         return folders.stream().map(this::toDTO).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FolderDTO> getAllFoldersPaginated(int page, int size, String sortBy, String sortDir) {
+        User currentUser = userService.getCurrentUser();
+        List<GroupMembers> myMemberships = groupMembersRepository.findByUserId(currentUser.getId());
+        List<Long> groupIds = myMemberships.stream()
+                .filter(GroupMembers::isAccepted)
+                .map(m -> m.getGroup().getId())
+                .distinct()
+                .toList();
+
+        String safeSort = sanitizeFolderSortProperty(sortBy);
+        Sort sort = "asc".equalsIgnoreCase(sortDir) ? Sort.by(safeSort).ascending() : Sort.by(safeSort).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Folder> folders;
+        if (groupIds.isEmpty()) {
+            folders = folderReposiory.findByOwnerId(currentUser.getId(), pageable);
+        } else {
+            folders = folderReposiory.findByGroupIdIn(groupIds, pageable);
+        }
+        return folders.map(this::toDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FolderDTO> getFoldersByGroupPaginated(Long groupId, int page, int size, String sortBy, String sortDir) {
+        if (!groupService.existGroupById(groupId)) {
+            throw new RuntimeException("Group does not exist with ID: " + groupId);
+        }
+        User currentUser = userService.getCurrentUser();
+        Group group = groupService.getGroupById(groupId);
+        boolean isOwner = group.getUser() != null && group.getUser().getId().equals(currentUser.getId());
+        if (!isOwner) {
+            GroupMembersDTO member = groupMembersService.getByUserAndGroup(currentUser.getId(), groupId);
+            if (member == null || !member.isAccepted()) {
+                throw new RuntimeException("Access Denied: You are not an active member of this group");
+            }
+        }
+
+        String safeSort = sanitizeFolderSortProperty(sortBy);
+        Sort sort = "asc".equalsIgnoreCase(sortDir) ? Sort.by(safeSort).ascending() : Sort.by(safeSort).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Folder> folders = folderReposiory.findByGroupId(groupId, pageable);
+        return folders.map(this::toDTO);
+    }
+
+    private String sanitizeFolderSortProperty(String sortBy) {
+        if (sortBy == null || sortBy.isBlank()) return "createdAt";
+        return switch (sortBy) {
+            case "id", "name", "createdAt" -> sortBy;
+            default -> "createdAt";
+        };
     }
 
     @CacheEvict(value = {CacheConstants.FOLDERS_BY_ID, CacheConstants.FOLDERS_ALL, CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
