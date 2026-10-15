@@ -36,6 +36,10 @@ public class GroupDTO {
 
     @Builder.Default
     public List<FolderDTO> folderDTOs = new ArrayList<>();
+
+    public List<FolderDTO> getFolders() {
+        return folderDTOs;
+    }
     
     public Long ownerId;
 

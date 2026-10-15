@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class ChatMessageService {
 
@@ -38,6 +37,20 @@ public class ChatMessageService {
     private final GroupMembersRepository groupMembersRepository;
     private final MediaRepository mediaRepository;
     private final UserService userService;
+
+    public ChatMessageService(
+            ChatMessageRepository chatMessageRepository,
+            GroupRepository groupRepository,
+            GroupMembersRepository groupMembersRepository,
+            MediaRepository mediaRepository,
+            UserService userService
+    ) {
+        this.chatMessageRepository = chatMessageRepository;
+        this.groupRepository = groupRepository;
+        this.groupMembersRepository = groupMembersRepository;
+        this.mediaRepository = mediaRepository;
+        this.userService = userService;
+    }
 
     @CacheEvict(value = CacheConstants.CHAT_MESSAGES_BY_GROUP, key = "#groupId")
     public ChatMessageResponseDTO sendMessage(Long groupId, ChatMessageRequestDTO request) {

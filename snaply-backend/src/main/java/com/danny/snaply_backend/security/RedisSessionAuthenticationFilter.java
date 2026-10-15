@@ -16,9 +16,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 @Component
 public class RedisSessionAuthenticationFilter extends OncePerRequestFilter {
 
@@ -62,16 +64,26 @@ public class RedisSessionAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
+        String queryToken = request.getParameter("token");
+        if (queryToken != null && !queryToken.isBlank()) {
+            return Optional.of(queryToken.trim());
+        }
+
         return Optional.empty();
     }
 
     private Optional<User> resolveUser(String token) {
-        String emailValue = redisTemplate.opsForValue().get(CacheConstants.AUTH_SESSION + token);
-        if (emailValue == null) {
+        try {
+            String emailValue = redisTemplate.opsForValue().get(CacheConstants.AUTH_SESSION + token);
+            if (emailValue == null) {
+                return Optional.empty();
+            }
+
+            return userService.findByEmailDirect(emailValue);
+        } catch (Exception e) {
+            log.warn("Failed to resolve user session from Redis: {}", e.getMessage());
             return Optional.empty();
         }
-
-        return userService.findByEmailDirect(emailValue);
     }
 
     private void setAuthentication(User user, HttpServletRequest request) {

@@ -27,6 +27,16 @@ public class FolderDTO {
 
     public String driveFolderId;
 
+    public Long groupId;
+
+    public String groupName;
+
+    public Long ownerId;
+
+    public String ownerName;
+
+    public Long mediaCount;
+
     @JsonIgnore
     public Group group;
 

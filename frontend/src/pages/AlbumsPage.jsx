@@ -54,17 +54,22 @@ export default function AlbumsPage() {
       // Map folder to its group if possible
       const groupFolderMap = {};
       fetchedGroups.forEach((g) => {
-        if (g.folders && Array.isArray(g.folders)) {
-          g.folders.forEach((f) => {
+        const groupFolders = g.folderDTOs || g.folders || [];
+        if (Array.isArray(groupFolders)) {
+          groupFolders.forEach((f) => {
             groupFolderMap[f.id] = g;
           });
         }
       });
 
-      const enrichedAlbums = (fetchedAlbums || []).map((album) => ({
-        ...album,
-        group: groupFolderMap[album.id] || null,
-      }));
+      const enrichedAlbums = (fetchedAlbums || []).map((album) => {
+        const matchingGroup = groupFolderMap[album.id] || fetchedGroups.find((g) => g.id === album.groupId);
+        return {
+          ...album,
+          groupId: album.groupId || matchingGroup?.id,
+          group: matchingGroup || (album.groupName ? { id: album.groupId, name: album.groupName } : null),
+        };
+      });
 
       setAlbums(enrichedAlbums);
       setGroups(fetchedGroups || []);
@@ -212,6 +217,7 @@ export default function AlbumsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filteredAlbums.map((album) => {
+            const targetGroupId = album.groupId || album.group?.id;
             const isGroupOwnerOrAdmin =
               album.group?.user?.id === user?.id ||
               album.group?.role === ROLES.OWNER ||
@@ -222,11 +228,11 @@ export default function AlbumsPage() {
                 key={album.id}
                 album={album}
                 onClick={() => {
-                  if (album.group?.id) {
-                    navigate(`/groups/${album.group.id}?tab=albums`);
+                  if (targetGroupId) {
+                    navigate(`/groups/${targetGroupId}?tab=photos&folderId=${album.id}`);
                   }
                 }}
-                canDelete={isGroupOwnerOrAdmin && !!album.group?.id}
+                canDelete={isGroupOwnerOrAdmin && !!targetGroupId}
                 onDelete={(alb) => setAlbumToDelete(alb)}
               />
             );

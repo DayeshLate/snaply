@@ -33,15 +33,25 @@ public class MediaMapper {
         String uName = null;
         String uEmail = null;
         if (entity.getUplodedBy() != null) {
-            uId = entity.getUplodedBy().getId();
-            uName = entity.getUplodedBy().getName();
-            uEmail = entity.getUplodedBy().getEmail();
+            try {
+                uId = entity.getUplodedBy().getId();
+                uName = entity.getUplodedBy().getName();
+                uEmail = entity.getUplodedBy().getEmail();
+            } catch (Exception ignored) {}
         }
         Long fId = null;
         String fName = null;
+        Long gId = null;
+        String gName = null;
         if (entity.getFolder() != null) {
-            fId = entity.getFolder().getId();
-            fName = entity.getFolder().getName();
+            try {
+                fId = entity.getFolder().getId();
+                fName = entity.getFolder().getName();
+                if (entity.getFolder().getGroup() != null) {
+                    gId = entity.getFolder().getGroup().getId();
+                    gName = entity.getFolder().getGroup().getName();
+                }
+            } catch (Exception ignored) {}
         }
         return MediaDTO.builder()
             .id(entity.getId())
@@ -56,6 +66,8 @@ public class MediaMapper {
             .uploadedByEmail(uEmail)
             .folderId(fId)
             .folderName(fName)
+            .groupId(gId)
+            .groupName(gName)
             .uplodedBy(entity.getUplodedBy())
             .folder(entity.getFolder())
             .build();

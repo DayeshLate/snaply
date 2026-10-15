@@ -1,6 +1,7 @@
 import React from 'react';
 import { Folder, Image as ImageIcon, Trash2, Calendar } from 'lucide-react';
 import { formatDate } from '../../utils/formatters';
+import { mediaService } from '../../services/mediaService';
 
 export default function AlbumCard({
   album,
@@ -8,7 +9,7 @@ export default function AlbumCard({
   onDelete,
   canDelete = false,
 }) {
-  const photoCount = album.media?.length || 0;
+  const photoCount = album.mediaCount ?? (album.media?.length || 0);
 
   return (
     <div
@@ -22,7 +23,7 @@ export default function AlbumCard({
             {album.media.slice(0, 4).map((m, idx) => (
               <div key={m.id || idx} className="h-full bg-slate-100 dark:bg-slate-900 overflow-hidden relative">
                 <img
-                  src={m.fileUrl || `/media/stream/${m.id}`}
+                  src={m.id ? mediaService.getStreamUrl(m.id) : (m.fileUrl || '')}
                   alt={m.fileName}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={(e) => {

@@ -24,13 +24,14 @@ public interface MediaRepository extends JpaRepository<Media,Long>{
 
     boolean existsByDriveFileId(String driveFileId);
 
-    List<Media> findAllByFolderId(Long folderId);
+    @Query("SELECT m FROM Media m LEFT JOIN FETCH m.folder f LEFT JOIN FETCH f.group g LEFT JOIN FETCH m.uplodedBy u WHERE m.folder.id = :folderId")
+    List<Media> findAllByFolderId(@Param("folderId") Long folderId);
 
     Page<Media> findAllByFolderId(Long folderId, Pageable pageable);
 
     Long countByFolderId(Long folderId);
 
-    @Query("SELECT m FROM Media m WHERE m.folder.group.id = :groupId")
+    @Query("SELECT m FROM Media m LEFT JOIN FETCH m.folder f LEFT JOIN FETCH f.group g LEFT JOIN FETCH m.uplodedBy u WHERE m.folder.group.id = :groupId")
     List<Media> findAllByGroupId(@Param("groupId") Long groupId);
 
     @Query("SELECT m FROM Media m WHERE m.folder.group.id = :groupId")

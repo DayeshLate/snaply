@@ -21,10 +21,13 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/chat")
-@RequiredArgsConstructor
 public class ChatController {
 
     private final ChatMessageService chatMessageService;
+
+    public ChatController(ChatMessageService chatMessageService) {
+        this.chatMessageService = chatMessageService;
+    }
 
     @PostMapping("/{groupId}/send")
     public ResponseEntity<ChatMessageResponseDTO> sendMessage(

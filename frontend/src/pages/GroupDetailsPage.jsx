@@ -48,6 +48,7 @@ export default function GroupDetailsPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'albums';
+  const folderParam = searchParams.get('folderId');
 
   const { user } = useAuth();
   const { success, error: showError } = useToast();
@@ -62,8 +63,36 @@ export default function GroupDetailsPage() {
   const [copied, setCopied] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [createAlbumModalOpen, setCreateAlbumModalOpen] = useState(false);
-  const [selectedFolderForUpload, setSelectedFolderForUpload] = useState(null);
+  const [selectedFolderForUpload, setSelectedFolderForUpload] = useState(
+    folderParam ? Number(folderParam) : null
+  );
   const [droppedFiles, setDroppedFiles] = useState([]);
+
+  // Sync selected folder from URL params
+  useEffect(() => {
+    const fId = searchParams.get('folderId');
+    if (fId) {
+      setSelectedFolderForUpload(Number(fId));
+    }
+  }, [searchParams]);
+
+  // Load media directly for selected folder whenever it changes
+  useEffect(() => {
+    if (selectedFolderForUpload) {
+      mediaService
+        .getAllMediaByFolder(selectedFolderForUpload)
+        .then((folderMedia) => {
+          if (folderMedia && Array.isArray(folderMedia)) {
+            setGroupMedia((prev) => {
+              const existingIds = new Set(prev.map((m) => m.id));
+              const newItems = folderMedia.filter((m) => !existingIds.has(m.id));
+              return [...prev, ...newItems];
+            });
+          }
+        })
+        .catch(() => {});
+    }
+  }, [selectedFolderForUpload]);
 
   const handlePageDrop = (files) => {
     if (!files || files.length === 0) return;
@@ -91,8 +120,16 @@ export default function GroupDetailsPage() {
       try {
         const media = await mediaService.getAllMediaByGroup(groupId);
         setGroupMedia(media || []);
-      } catch {
-        // ignore
+      } catch (err) {
+        console.warn('Failed to load media by group, attempting folder-by-folder fallback:', err);
+        const folders = data?.folderDTOs || data?.folders || [];
+        if (folders.length > 0) {
+          const folderPromises = folders.map((f) =>
+            mediaService.getAllMediaByFolder(f.id).catch(() => [])
+          );
+          const results = await Promise.all(folderPromises);
+          setGroupMedia(results.flat());
+        }
       }
 
       // Load messages
@@ -279,13 +316,16 @@ export default function GroupDetailsPage() {
 
   // Default target folder for uploads: General folder or first available folder
   const targetUploadFolderId = selectedFolderForUpload || allGroupFolders[0]?.id;
-  const selectedFolder = allGroupFolders.find((f) => f.id === selectedFolderForUpload);
+  const selectedFolder = allGroupFolders.find(
+    (f) => Number(f.id) === Number(selectedFolderForUpload)
+  );
   const filteredPhotos = selectedFolderForUpload
     ? groupMedia.filter(
         (m) =>
-          m.folderId === selectedFolderForUpload ||
-          m.folder?.id === selectedFolderForUpload ||
-          m.folderId === Number(selectedFolderForUpload)
+          Number(m.folderId) === Number(selectedFolderForUpload) ||
+          Number(m.folder?.id) === Number(selectedFolderForUpload) ||
+          String(m.folderId) === String(selectedFolderForUpload) ||
+          String(m.folder?.id) === String(selectedFolderForUpload)
       )
     : groupMedia;
 
@@ -430,7 +470,7 @@ export default function GroupDetailsPage() {
               albums={allGroupFolders}
               onSelectAlbum={(album) => {
                 setSelectedFolderForUpload(album.id);
-                setSearchParams({ tab: 'photos' });
+                setSearchParams({ tab: 'photos', folderId: album.id });
               }}
               onDeleteAlbum={(album) => setAlbumToDelete(album)}
               canDelete={isGroupAdmin}
@@ -451,7 +491,10 @@ export default function GroupDetailsPage() {
                     Album: {selectedFolder.name}
                     <button
                       type="button"
-                      onClick={() => setSelectedFolderForUpload(null)}
+                      onClick={() => {
+                        setSelectedFolderForUpload(null);
+                        setSearchParams({ tab: 'photos' });
+                      }}
                       className="hover:text-red-500 font-bold ml-1 cursor-pointer"
                       title="Clear album filter"
                     >
@@ -470,7 +513,15 @@ export default function GroupDetailsPage() {
               {allGroupFolders.length > 1 && (
                 <select
                   value={selectedFolderForUpload || ''}
-                  onChange={(e) => setSelectedFolderForUpload(e.target.value ? Number(e.target.value) : null)}
+                  onChange={(e) => {
+                    const val = e.target.value ? Number(e.target.value) : null;
+                    setSelectedFolderForUpload(val);
+                    if (val) {
+                      setSearchParams({ tab: 'photos', folderId: val });
+                    } else {
+                      setSearchParams({ tab: 'photos' });
+                    }
+                  }}
                   className="px-2.5 py-1.5 bg-white border border-[#E2E8F0] rounded text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
                 >
                   <option value="">All Albums ({groupMedia.length})</option>

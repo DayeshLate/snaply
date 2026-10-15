@@ -13,4 +13,6 @@ public interface GroupRepository extends JpaRepository<Group,Long>{
     Optional<Group> findByInviteCode(String inviteCode);
 
     boolean existsByInviteCode(String inviteCode);
+
+    boolean existsByIdAndUserId(Long id, Long userId);
 }

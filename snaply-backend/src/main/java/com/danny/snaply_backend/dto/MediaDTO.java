@@ -42,6 +42,10 @@ public class MediaDTO {
 
     public String folderName;
 
+    public Long groupId;
+
+    public String groupName;
+
     @JsonIgnore
     public User uplodedBy;
 

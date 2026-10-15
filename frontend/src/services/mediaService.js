@@ -147,7 +147,9 @@ export const mediaService = {
       const found = mockStore.data.media.find((m) => m.id === Number(mediaId));
       return found?.fileUrl || '#';
     }
-    return `${baseURL}/media/download/${mediaId}`;
+    const token = localStorage.getItem('snaply_token');
+    const authQuery = token ? `?token=${encodeURIComponent(token)}` : '';
+    return `${baseURL}/media/download/${mediaId}${authQuery}`;
   },
 
   getStreamUrl(mediaId) {
@@ -155,7 +157,9 @@ export const mediaService = {
       const found = mockStore.data.media.find((m) => m.id === Number(mediaId));
       return found?.fileUrl || `/media/stream/${mediaId}`;
     }
-    return `${baseURL}/media/stream/${mediaId}`;
+    const token = localStorage.getItem('snaply_token');
+    const authQuery = token ? `?token=${encodeURIComponent(token)}` : '';
+    return `${baseURL}/media/stream/${mediaId}${authQuery}`;
   },
 
   async searchSemantic({ query, groupId, folderId, minSimilarity, limit, startDate, endDate } = {}) {

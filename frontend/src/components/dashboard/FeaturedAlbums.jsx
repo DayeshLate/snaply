@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { formatDate } from '../../utils/formatters';
+import { mediaService } from '../../services/mediaService';
 
 const FALLBACK_COVERS = [
   'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80',
@@ -25,7 +26,10 @@ const FALLBACK_COVERS = [
 function resolveAlbumCover(album, index = 0) {
   if (album?.media && album.media.length > 0) {
     const firstMedia = album.media[0];
-    return firstMedia.fileUrl || `/media/stream/${firstMedia.id}`;
+    if (firstMedia?.id) {
+      return mediaService.getStreamUrl(firstMedia.id);
+    }
+    return firstMedia?.fileUrl || '';
   }
   return FALLBACK_COVERS[index % FALLBACK_COVERS.length];
 }
@@ -38,8 +42,9 @@ export default function FeaturedAlbums({
   const navigate = useNavigate();
 
   const handleOpenAlbum = (album) => {
-    if (album.groupId || album.group?.id) {
-      navigate(`/groups/${album.groupId || album.group.id}?tab=albums`);
+    const targetGroupId = album.groupId || album.group?.id;
+    if (targetGroupId) {
+      navigate(`/groups/${targetGroupId}?tab=photos&folderId=${album.id}`);
     } else {
       navigate('/albums');
     }
@@ -116,7 +121,7 @@ export default function FeaturedAlbums({
           {albums.slice(0, 5).map((album, idx) => {
             const isSpotlight = idx === 0 && albums.length >= 3;
             const coverUrl = resolveAlbumCover(album, idx);
-            const photoCount = album.media?.length || 0;
+            const photoCount = album.mediaCount ?? (album.media?.length || 0);
             const groupName = album.group?.name || 'Shared Group';
 
             return (

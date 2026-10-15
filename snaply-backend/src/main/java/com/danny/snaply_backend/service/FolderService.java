@@ -31,6 +31,7 @@ public class FolderService {
 
     private final FolderReposiory folderReposiory;
     private final MediaMapper mediaMapper;
+    private final FolderMapper folderMapper;
     private final GroupService groupService;
     private final UserService userService;
     private final GroupMembersService groupMembersService;
@@ -42,6 +43,7 @@ public class FolderService {
         folderReposiory.save(folder);
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(value = CacheConstants.FOLDERS_BY_ID, key = "#folderId")
     public FolderDTO getFolderById(Long folderId){
         Folder folder = folderReposiory.findById(folderId)
@@ -52,6 +54,7 @@ public class FolderService {
         return toDTO(folder);
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(value = CacheConstants.FOLDERS_ALL, key = "@userService.getCurrentUser().id")
     public List<FolderDTO> getAllFolders(){
         User currentUser = userService.getCurrentUser();
@@ -219,29 +222,11 @@ public class FolderService {
     }
     
     public Folder toEntity(FolderDTO dto){
-        return Folder.builder()
-            .id(dto.getId())
-            .name(dto.getName())
-            .parentFolderId(dto.getParentFolderId())
-            .driveFolderId(dto.getDriveFolderId())
-            .group(dto.getGroup())
-            .owner(dto.getUser())
-            .createdAt(dto.getCreatedAt())
-            .media(dto.getMedia().stream().map(mediaMapper :: toEntity).toList())
-            .build();
+        return folderMapper.toEntity(dto);
     }
 
     public FolderDTO toDTO(Folder entity){
-        return FolderDTO.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .parentFolderId(entity.getParentFolderId())
-                .driveFolderId(entity.getDriveFolderId())
-                .group(entity.getGroup())
-                .user(entity.getOwner())
-                .createdAt(entity.getCreatedAt())
-                .media(entity.getMedia() != null ? entity.getMedia().stream().map(mediaMapper :: toDTO).toList() : List.of())
-                .build();
+        return folderMapper.toDTO(entity);
     }
 
     private void validateFolderAccess(Folder folder) {

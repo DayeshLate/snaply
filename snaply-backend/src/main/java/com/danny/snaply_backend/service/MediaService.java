@@ -32,6 +32,7 @@ import com.danny.snaply_backend.entity.Media;
 import com.danny.snaply_backend.entity.Role;
 import com.danny.snaply_backend.entity.User;
 import com.danny.snaply_backend.repository.FolderReposiory;
+import com.danny.snaply_backend.repository.GroupRepository;
 import com.danny.snaply_backend.repository.MediaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,7 @@ public class MediaService {
     private final UserService userService;
     private final FolderService folderService;
     private final FolderReposiory folderReposiory;
+    private final GroupRepository groupRepository;
     private final MediaMapper mediaMapper;
     private final GoogleDriveService googleDriveService;
     private final GroupMembersService groupMembersService;
@@ -382,6 +384,7 @@ public class MediaService {
         return toDTO(savedMedia);
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(value = CacheConstants.MEDIA_COUNT_BY_FOLDER, key = "#folderId")
     public Long getCountOfMediaInFolder(Long folderId){
         Folder folder = folderReposiory.findById(folderId)
@@ -390,6 +393,7 @@ public class MediaService {
         return mediaRepository.countByFolderId(folderId);
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(value = CacheConstants.MEDIA_BY_FOLDER, key = "#folderId")
     public List<MediaDTO> getAllMediaByFolder(Long folderId){
         Folder folder = folderReposiory.findById(folderId)
@@ -401,6 +405,7 @@ public class MediaService {
         return medias.stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(value = CacheConstants.MEDIA_BY_GROUP, key = "#groupId")
     public List<MediaDTO> getAllMediaByGroup(Long groupId){
         validateMemberAccess(groupId);
@@ -457,6 +462,10 @@ public class MediaService {
 
     private void validateMemberAccess(Long groupId) {
         User currentUser = userService.getCurrentUser();
+        if (groupRepository.existsByIdAndUserId(groupId, currentUser.getId())) {
+            return;
+        }
+
         GroupMembersDTO member = null;
         if (groupMembersService.existByUserAndGroup(currentUser.getId(), groupId)) {
             member = groupMembersService.getByUserAndGroup(currentUser.getId(), groupId);
