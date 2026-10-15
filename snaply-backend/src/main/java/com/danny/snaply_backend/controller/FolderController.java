@@ -20,13 +20,13 @@ import com.danny.snaply_backend.service.FolderService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/folder")
+@RequestMapping({"/folder", "/folders", "/api/folder", "/api/folders"})
 @RequiredArgsConstructor
 public class FolderController {
 
     public final FolderService folderService;
     
-    @GetMapping("/getAllFolders")
+    @GetMapping({"/getAllFolders", "/getAll", ""})
     public ResponseEntity<List<FolderDTO>> getAllFolders(){
         return ResponseEntity.ok(folderService.getAllFolders());
     }
@@ -58,21 +58,21 @@ public class FolderController {
         return ResponseEntity.ok(folders);
     }
 
-    @PostMapping("/addFolder/{groupId}")
+    @PostMapping({"/addFolder/{groupId}", "/add/{groupId}", "/create/{groupId}"})
     public ResponseEntity<String> addFolderInGroup(@RequestBody Folder folder, @PathVariable Long groupId){
         String result = folderService.addFolderInGroup(groupId, folder);
         return ResponseEntity.ok(result);
     }
 
         
-    @DeleteMapping("/deleteFolderByAdmin/{groupId}/{folderId}")
+    @DeleteMapping({"/deleteFolderByAdmin/{groupId}/{folderId}", "/admin/{groupId}/{folderId}"})
     public ResponseEntity<String> deleteFolderByAdmin(@PathVariable Long groupId,@PathVariable Long folderId){
         String result = folderService.deleteFolderByAdmin(groupId, folderId);
         return ResponseEntity.ok(result);
     }
 
 
-    @DeleteMapping("/deleteFolderByOwner/{groupId}/{folderId}")
+    @DeleteMapping({"/deleteFolderByOwner/{groupId}/{folderId}", "/owner/{groupId}/{folderId}", "/{groupId}/{folderId}"})
     public ResponseEntity<String> deleteFolderByOwner(@PathVariable Long groupId,@PathVariable Long folderId){
         String result = folderService.deleteFolderByOwner(groupId, folderId);
         return ResponseEntity.ok(result);

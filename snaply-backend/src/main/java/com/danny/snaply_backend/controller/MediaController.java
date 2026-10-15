@@ -28,7 +28,7 @@ import com.danny.snaply_backend.service.MediaService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/media")
+@RequestMapping({"/media", "/api/media"})
 @RequiredArgsConstructor
 public class MediaController {
 

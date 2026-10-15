@@ -17,12 +17,12 @@ import com.danny.snaply_backend.service.JoinRequestService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/JoinRequest")
+@RequestMapping({"/JoinRequest", "/joinRequest", "/join-request", "/join-requests", "/api/JoinRequest", "/api/join-requests"})
 @RequiredArgsConstructor
 public class JoinRequestController {
     private final JoinRequestService joinRequestService;
 
-    @GetMapping("/getAll")
+    @GetMapping({"/getAll", ""})
     public ResponseEntity<List<JoinRequestDTO>> getAllByUser(){
         List<JoinRequestDTO> list = joinRequestService.getRequestByUserId();
         return ResponseEntity.ok(list);

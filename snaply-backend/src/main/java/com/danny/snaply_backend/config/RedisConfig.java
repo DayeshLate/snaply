@@ -51,7 +51,7 @@ public class RedisConfig implements CachingConfigurer {
                 JsonTypeInfo.As.PROPERTY
         );
 
-        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(cacheMapper);
+        org.springframework.data.redis.serializer.RedisSerializer<Object> serializer = org.springframework.data.redis.serializer.RedisSerializer.json();
 
         RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration
                 .defaultCacheConfig()

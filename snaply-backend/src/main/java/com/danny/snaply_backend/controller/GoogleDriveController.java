@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/drive")
+@RequestMapping({"/api/drive", "/drive"})
 @RequiredArgsConstructor
 public class GoogleDriveController {
 

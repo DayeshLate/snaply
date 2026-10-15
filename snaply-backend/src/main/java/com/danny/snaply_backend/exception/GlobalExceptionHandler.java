@@ -44,9 +44,44 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthenticationException(org.springframework.security.core.AuthenticationException ex) {
+        log.warn("Authentication failed: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNoResourceFound(org.springframework.web.servlet.resource.NoResourceFoundException ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, Object>> handleMethodNotSupported(org.springframework.web.HttpRequestMethodNotSupportedException ex) {
+        log.warn("Method not supported: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.METHOD_NOT_ALLOWED, ex.getMessage());
+    }
+
+    @ExceptionHandler(org.springframework.web.bind.MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingParam(org.springframework.web.bind.MissingServletRequestParameterException ex) {
+        log.warn("Missing parameter: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, Object>> handleMaxSizeExceeded(org.springframework.web.multipart.MaxUploadSizeExceededException ex) {
+        log.warn("Max upload size exceeded: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.PAYLOAD_TOO_LARGE, "Uploaded file exceeds the maximum allowed size (100MB)");
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
         String message = ex.getMessage() != null ? ex.getMessage() : "Operation failed";
+
+        if (message.contains("not authenticated") || message.contains("Unauthenticated") || message.contains("Invalid token") || message.contains("token expired")) {
+            log.warn("Unauthorized: {}", message);
+            return buildErrorResponse(HttpStatus.UNAUTHORIZED, message);
+        }
 
         if (message.contains("Access Denied") || message.contains("not allowed") || message.contains("permission")) {
             log.warn("Access denied: {}", message);

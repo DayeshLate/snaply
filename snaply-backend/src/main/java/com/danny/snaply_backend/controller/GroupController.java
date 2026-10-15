@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/group")
+@RequestMapping({"/group", "/groups", "/api/group", "/api/groups"})
 @RequiredArgsConstructor
 public class GroupController {
 
@@ -75,7 +75,7 @@ public class GroupController {
     }
 
 
-    @GetMapping("/get/{id}")
+    @GetMapping({"/get/{id}", "/{id}"})
     public ResponseEntity<GroupDTO> getGroup(
             @PathVariable long id
     ) {
@@ -87,7 +87,7 @@ public class GroupController {
     }
 
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping({"/delete/{id}", "/{id}"})
     public ResponseEntity<String> deleteGroup(@PathVariable long id) {
 
         String result =groupService.deleteGroup(id);
@@ -96,7 +96,7 @@ public class GroupController {
     }
 
 
-    @GetMapping("/getAll")
+    @GetMapping({"/getAll", "/getAllGroups", ""})
     public ResponseEntity<List<GroupDTO>> getAllGroups() {
 
         return ResponseEntity.ok(

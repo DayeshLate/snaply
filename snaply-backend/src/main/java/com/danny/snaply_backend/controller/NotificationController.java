@@ -16,7 +16,7 @@ import com.danny.snaply_backend.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/notifications")
+@RequestMapping({"/api/notifications", "/notifications"})
 @RequiredArgsConstructor
 public class NotificationController {
 

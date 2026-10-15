@@ -52,7 +52,12 @@ public class SecurityConfig {
                     "/api/auth/login",
                     "/api/auth/verify",
                     "/api/auth/dev-login",
-                    "/api/drive/callback"
+                    "/auth/register",
+                    "/auth/login",
+                    "/auth/verify",
+                    "/auth/dev-login",
+                    "/api/drive/callback",
+                    "/drive/callback"
                 ).permitAll()
 
                 .anyRequest()
