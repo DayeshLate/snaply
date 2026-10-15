@@ -1,0 +1,20 @@
+meta {
+  name: Process Embedding Batch
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/media/embeddings/process-batch?limit=10
+  body: none
+  auth: bearer
+}
+
+params:query {
+  limit: 10
+}
+
+auth:bearer {
+  token: {{token}}
+}
+

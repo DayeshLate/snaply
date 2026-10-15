@@ -1,0 +1,16 @@
+meta {
+  name: Index All Missing Media
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/media/embeddings/index-all
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+

@@ -1,0 +1,24 @@
+meta {
+  name: Semantic Search
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/media/search
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "query": "golden sunset over beach with ocean waves",
+    "minSimilarity": 0.25,
+    "limit": 20
+  }
+}
+

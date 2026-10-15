@@ -38,4 +38,18 @@ public interface MediaRepository extends JpaRepository<Media,Long>{
 
     @Query("SELECT m FROM Media m WHERE m.uplodedBy.id = :userId")
     Page<Media> findAllByUploadedByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("SELECT m FROM Media m " +
+           "JOIN FETCH m.folder f " +
+           "JOIN FETCH f.group g " +
+           "JOIN FETCH m.uplodedBy u " +
+           "WHERE m.id = :id")
+    Optional<Media> findByIdWithDetails(@Param("id") Long id);
+
+    @Query("SELECT m FROM Media m " +
+           "JOIN FETCH m.folder f " +
+           "JOIN FETCH f.group g " +
+           "JOIN FETCH m.uplodedBy u " +
+           "WHERE m.id IN :ids")
+    List<Media> findAllWithDetailsByIdIn(@Param("ids") List<Long> ids);
 }

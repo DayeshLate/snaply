@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.ObjectProvider;
 import jakarta.annotation.PostConstruct;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -48,6 +49,7 @@ public class MediaService {
     private final MediaMapper mediaMapper;
     private final GoogleDriveService googleDriveService;
     private final GroupMembersService groupMembersService;
+    private final ObjectProvider<MediaEmbeddingService> mediaEmbeddingServiceProvider;
 
     private final Path localUploadDir = Paths.get("uploads", "media");
 
@@ -161,6 +163,13 @@ public class MediaService {
 
         Media savedMedia = mediaRepository.save(media);
         log.info("Media record saved with ID '{}' in folder '{}'", savedMedia.getId(), folderId);
+
+        try {
+            mediaEmbeddingServiceProvider.ifAvailable(svc -> svc.enqueueMedia(savedMedia));
+        } catch (Exception e) {
+            log.warn("Failed to auto-enqueue media {} for embedding: {}", savedMedia.getId(), e.getMessage());
+        }
+
         return toDTO(savedMedia);
     }
 
@@ -169,7 +178,10 @@ public class MediaService {
                 .orElseThrow(() -> new RuntimeException("Media not found with ID: " + mediaId));
 
         validateMemberAccess(media.getFolder().getGroup().getId());
+        return downloadMediaInternal(media);
+    }
 
+    public MediaDownloadDTO downloadMediaInternal(Media media) {
         if (media.getDriveFileId() == null || media.getDriveFileId().isBlank()) {
             throw new RuntimeException("Media does not have an associated file ID");
         }
@@ -243,7 +255,14 @@ public class MediaService {
         }
 
         media.setUplodedBy(currentUser);
-        mediaRepository.save(media);
+        Media savedMedia = mediaRepository.save(media);
+
+        try {
+            mediaEmbeddingServiceProvider.ifAvailable(svc -> svc.enqueueMedia(savedMedia));
+        } catch (Exception e) {
+            log.warn("Failed to auto-enqueue media {} for embedding: {}", savedMedia.getId(), e.getMessage());
+        }
+
         return "data uploded successfully";
     }
 

@@ -1,0 +1,16 @@
+meta {
+  name: Get Embedding Status
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/media/embeddings/status
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+

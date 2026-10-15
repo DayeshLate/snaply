@@ -1,0 +1,16 @@
+meta {
+  name: Retry Failed Embeddings
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/media/embeddings/retry-failed
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
