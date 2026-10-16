@@ -41,7 +41,7 @@ export default function PhotoViewer({
   onDownload,
   onDelete,
   onEdit,
-  canDelete = false, // If group owner/admin, this is true
+  canDelete = false,
 }) {
   const { user } = useAuth();
   const photo = photos[currentIndex];
@@ -68,7 +68,6 @@ export default function PhotoViewer({
   const streamUrl = resolveStreamUrl(photo);
   const isVideo = isVideoPhoto(photo);
 
-  // Check if current user is the uploader of this specific photo
   const isUploader = Boolean(
     photo &&
       user &&
@@ -79,26 +78,25 @@ export default function PhotoViewer({
         photo.uplodedBy === user.id)
   );
 
-  // Group Admin, Group Owner, or the original uploader can edit/delete
   const canManage = Boolean(canDelete || isUploader);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-md animate-in fade-in select-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-xl animate-in fade-in select-none">
       {/* Top action bar */}
-      <div className="absolute top-0 left-0 right-0 h-16 px-6 flex items-center justify-between text-white z-20 bg-linear-to-b from-black/80 to-transparent">
-        <div className="min-w-0 pr-4 flex items-center gap-3">
+      <div className="absolute top-0 left-0 right-0 h-20 px-6 sm:px-8 flex items-center justify-between text-white z-20 bg-gradient-to-b from-black/80 via-black/40 to-transparent">
+        <div className="min-w-0 pr-4 flex items-center gap-3.5">
           {isVideo ? (
-            <span className="p-1.5 rounded-lg bg-purple-500/20 text-purple-400">
-              <Film className="w-4 h-4" />
+            <span className="p-2.5 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30">
+              <Film className="w-5 h-5" />
             </span>
           ) : (
-            <span className="p-1.5 rounded-lg bg-blue-500/20 text-blue-400">
-              <ImageIcon className="w-4 h-4" />
+            <span className="p-2.5 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              <ImageIcon className="w-5 h-5" />
             </span>
           )}
           <div className="min-w-0">
-            <h4 className="text-sm font-semibold truncate max-w-md">{photo.fileName}</h4>
-            <div className="flex items-center gap-2 text-xs text-slate-400">
+            <h4 className="text-base font-bold truncate max-w-md">{photo.fileName}</h4>
+            <div className="flex items-center gap-2 text-xs text-slate-400 font-medium mt-0.5">
               <span>
                 {currentIndex + 1} of {photos.length}
               </span>
@@ -117,7 +115,7 @@ export default function PhotoViewer({
           {canManage && onEdit && (
             <button
               onClick={() => onEdit(photo)}
-              className="p-2 rounded-lg hover:bg-white/10 text-slate-200 hover:text-white transition-colors cursor-pointer"
+              className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-all cursor-pointer backdrop-blur-md"
               title="Edit media details / rename"
             >
               <Pencil className="w-5 h-5" />
@@ -127,7 +125,7 @@ export default function PhotoViewer({
           {/* Download Button */}
           <button
             onClick={() => onDownload && onDownload(photo)}
-            className="p-2 rounded-lg hover:bg-white/10 text-slate-200 hover:text-white transition-colors cursor-pointer"
+            className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-all cursor-pointer backdrop-blur-md"
             title="Download media"
           >
             <Download className="w-5 h-5" />
@@ -137,8 +135,8 @@ export default function PhotoViewer({
           {canManage && (
             <button
               onClick={() => onDelete && onDelete(photo)}
-              className="p-2 rounded-lg hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-colors cursor-pointer"
-              title={isUploader ? 'Delete your upload' : 'Delete media (Admin/Owner)'}
+              className="p-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/40 text-rose-400 hover:text-rose-200 transition-all cursor-pointer backdrop-blur-md border border-rose-500/30"
+              title={isUploader ? 'Delete your upload' : 'Delete media'}
             >
               <Trash2 className="w-5 h-5" />
             </button>
@@ -147,7 +145,7 @@ export default function PhotoViewer({
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-white/10 text-white transition-colors cursor-pointer ml-2"
+            className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer ml-2"
             title="Close viewer"
           >
             <X className="w-6 h-6" />
@@ -159,7 +157,7 @@ export default function PhotoViewer({
       {currentIndex > 0 && (
         <button
           onClick={() => onNavigate(currentIndex - 1)}
-          className="absolute left-4 p-3 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors z-20 cursor-pointer border border-white/10"
+          className="absolute left-6 p-3.5 rounded-2xl bg-black/60 hover:bg-black/90 text-white transition-all z-20 cursor-pointer border border-white/15 backdrop-blur-md shadow-2xl hover:scale-105"
           title="Previous (Arrow Left)"
         >
           <ChevronLeft className="w-6 h-6" />
@@ -169,7 +167,7 @@ export default function PhotoViewer({
       {currentIndex < photos.length - 1 && (
         <button
           onClick={() => onNavigate(currentIndex + 1)}
-          className="absolute right-4 p-3 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors z-20 cursor-pointer border border-white/10"
+          className="absolute right-6 p-3.5 rounded-2xl bg-black/60 hover:bg-black/90 text-white transition-all z-20 cursor-pointer border border-white/15 backdrop-blur-md shadow-2xl hover:scale-105"
           title="Next (Arrow Right)"
         >
           <ChevronRight className="w-6 h-6" />
@@ -177,7 +175,7 @@ export default function PhotoViewer({
       )}
 
       {/* Main Media Container */}
-      <div className="w-full h-full p-16 flex items-center justify-center">
+      <div className="w-full h-full p-16 sm:p-20 flex items-center justify-center">
         {isVideo ? (
           <video
             key={photo.id || streamUrl}
@@ -185,44 +183,44 @@ export default function PhotoViewer({
             controls
             autoPlay
             playsInline
-            className="max-w-full max-h-full rounded-lg shadow-2xl outline-none border border-white/10 bg-black"
+            className="max-w-full max-h-full rounded-2xl shadow-2xl outline-none border border-white/15 bg-black"
           />
         ) : (
           <img
             src={streamUrl}
             alt={photo.fileName}
-            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl transition-all"
+            className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl transition-all"
           />
         )}
       </div>
 
       {/* Bottom Info Bar */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/75 backdrop-blur-md text-white px-5 py-2.5 rounded-full text-xs flex items-center gap-4 z-20 border border-white/10 shadow-lg">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/85 backdrop-blur-xl text-white px-6 py-3 rounded-full text-xs flex items-center gap-5 z-20 border border-white/15 shadow-2xl font-medium">
         {photo.uploadedByName && (
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <User className="w-3.5 h-3.5 text-blue-400" />
+          <div className="flex items-center gap-2 text-slate-300">
+            <User className="w-4 h-4 text-cyan-400" />
             <span>{isUploader ? 'Uploaded by You' : photo.uploadedByName}</span>
           </div>
         )}
         {photo.folderName && (
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <FolderOpen className="w-3.5 h-3.5 text-blue-400" />
+          <div className="flex items-center gap-2 text-slate-300">
+            <FolderOpen className="w-4 h-4 text-blue-400" />
             <span>{photo.folderName}</span>
           </div>
         )}
         {photo.createdAt && (
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <Calendar className="w-3.5 h-3.5 text-blue-400" />
+          <div className="flex items-center gap-2 text-slate-300">
+            <Calendar className="w-4 h-4 text-indigo-400" />
             <span>{formatDateTime(photo.createdAt)}</span>
           </div>
         )}
         {photo.fileSize && (
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <HardDrive className="w-3.5 h-3.5 text-blue-400" />
+          <div className="flex items-center gap-2 text-slate-300">
+            <HardDrive className="w-4 h-4 text-emerald-400" />
             <span>{formatFileSize(photo.fileSize)}</span>
           </div>
         )}
-        <span className="uppercase text-[10px] bg-white/20 px-2 py-0.5 rounded font-mono font-semibold">
+        <span className="uppercase text-[10px] bg-white/20 px-2.5 py-0.5 rounded-full font-bold">
           {photo.mimeType ? photo.mimeType.split('/')[1] || photo.mimeType : isVideo ? 'MP4' : 'IMAGE'}
         </span>
       </div>

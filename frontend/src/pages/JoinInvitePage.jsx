@@ -41,37 +41,37 @@ export default function JoinInvitePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0F17] flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors">
       {/* Brand Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link to="/" className="inline-flex items-center gap-2 mb-4">
-          <div className="w-10 h-10 rounded bg-[#2563EB] flex items-center justify-center text-white shadow-xs">
+        <Link to="/" className="inline-flex items-center gap-2.5 mb-5 group">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-blue-500/25 transition-transform group-hover:scale-105">
             <Camera className="w-6 h-6" />
           </div>
-          <span className="text-2xl font-bold tracking-tight text-[#0F172A]">
+          <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-white dark:via-blue-200 dark:to-cyan-200 bg-clip-text text-transparent">
             Snaply
           </span>
         </Link>
-        <h2 className="text-xl font-bold tracking-tight text-[#0F172A]">
+        <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
           Group Invitation
         </h2>
-        <p className="mt-1 text-xs text-[#64748B]">
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
           You have been invited to collaborate in a private photo group
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div className="bg-white py-8 px-6 shadow-sm border border-[#E2E8F0] rounded-xl sm:px-10">
+        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl py-8 px-6 shadow-xl border border-slate-200/80 dark:border-slate-800 rounded-3xl sm:px-10">
           {!isAuthenticated ? (
             /* User not logged in prompt */
             <div className="text-center space-y-4">
-              <div className="w-12 h-12 rounded-full bg-blue-50 text-[#2563EB] mx-auto flex items-center justify-center">
-                <Users className="w-6 h-6" />
+              <div className="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-cyan-400 mx-auto flex items-center justify-center ring-1 ring-blue-500/20">
+                <Users className="w-7 h-7" />
               </div>
-              <h3 className="text-base font-bold text-[#0F172A]">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
                 Sign in to Accept Invitation
               </h3>
-              <p className="text-xs text-[#64748B] leading-relaxed">
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                 You need a Snaply account to join this photo group and share memories. Please sign in or register to proceed.
               </p>
               <div className="pt-2">
@@ -79,6 +79,7 @@ export default function JoinInvitePage() {
                   onClick={() =>
                     navigate(`/login?redirect=/invite/${inviteCode}`)
                   }
+                  variant="primary"
                   className="w-full justify-center flex items-center gap-2"
                 >
                   <LogIn className="w-4 h-4" />
@@ -89,18 +90,19 @@ export default function JoinInvitePage() {
           ) : requested ? (
             /* Success confirmation */
             <div className="text-center space-y-4">
-              <div className="w-12 h-12 rounded-full bg-green-50 text-[#16A34A] mx-auto flex items-center justify-center">
-                <CheckCircle2 className="w-7 h-7" />
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 mx-auto flex items-center justify-center ring-1 ring-emerald-500/20">
+                <CheckCircle2 className="w-8 h-8" />
               </div>
-              <h3 className="text-base font-bold text-[#0F172A]">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
                 Request Sent!
               </h3>
-              <p className="text-xs text-[#64748B] leading-relaxed">
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                 Your join request has been sent to the group owner. Once approved, this group and its shared albums will appear on your dashboard.
               </p>
-              <div className="pt-3 flex flex-col gap-2">
+              <div className="pt-3 flex flex-col gap-2.5">
                 <Button
                   onClick={() => navigate('/dashboard')}
+                  variant="primary"
                   className="w-full justify-center"
                 >
                   Go to Dashboard
@@ -117,29 +119,29 @@ export default function JoinInvitePage() {
           ) : (
             /* Ready to join form */
             <div className="space-y-6">
-              <div className="flex items-center gap-3 p-3 bg-slate-50 border border-[#E2E8F0] rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-[#1E3A8A] text-white flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-3.5 p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 rounded-2xl">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
                   <Users className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs text-[#64748B]">Invite Code</p>
-                  <p className="text-sm font-mono font-bold text-[#0F172A] truncate">
+                  <p className="text-xs text-slate-400 font-medium">Invite Code</p>
+                  <p className="text-sm font-mono font-bold text-slate-900 dark:text-white truncate">
                     {inviteCode}
                   </p>
                 </div>
               </div>
 
               {errorMsg && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2.5 text-xs text-[#DC2626]">
+                <div className="p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-2xl flex items-start gap-2.5 text-xs text-rose-600 dark:text-rose-400">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <span>{errorMsg}</span>
                 </div>
               )}
 
               <div className="space-y-3">
-                <p className="text-xs text-[#64748B] text-center leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-slate-400 text-center leading-relaxed">
                   Click below to submit your join request as{' '}
-                  <span className="font-semibold text-[#0F172A]">
+                  <span className="font-bold text-slate-900 dark:text-white">
                     {user?.name || user?.email}
                   </span>
                   .
@@ -148,6 +150,7 @@ export default function JoinInvitePage() {
                 <Button
                   onClick={handleJoinRequest}
                   loading={loading}
+                  variant="primary"
                   className="w-full justify-center flex items-center gap-2"
                 >
                   <span>Request to Join Group</span>

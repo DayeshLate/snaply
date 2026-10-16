@@ -5,29 +5,31 @@ import Button from '../common/Button';
 
 export default function PublicLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 transition-colors">
       {/* Public Navbar */}
-      <header className="h-16 border-b border-[#E2E8F0] bg-white sticky top-0 z-40">
+      <header className="h-18 border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-full flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded bg-[#2563EB] flex items-center justify-center text-white">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-blue-500/25 transition-transform group-hover:scale-105">
               <Camera className="w-5 h-5" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-[#0F172A]">Snaply</span>
+            <span className="text-xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-white dark:via-blue-200 dark:to-cyan-200 bg-clip-text text-transparent">
+              Snaply
+            </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6">
-            <NavLink to="/" className="text-sm font-medium text-[#64748B] hover:text-[#0F172A]">
+          <nav className="hidden md:flex items-center gap-8">
+            <NavLink to="/" className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-400 transition-colors">
               Home
             </NavLink>
-            <a href="#features" className="text-sm font-medium text-[#64748B] hover:text-[#0F172A]">
+            <a href="#features" className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-400 transition-colors">
               Features
             </a>
-            <a href="#how-it-works" className="text-sm font-medium text-[#64748B] hover:text-[#0F172A]">
+            <a href="#how-it-works" className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-400 transition-colors">
               How it Works
             </a>
-            <a href="#privacy" className="text-sm font-medium text-[#64748B] hover:text-[#0F172A]">
-              Security & Privacy
+            <a href="#privacy" className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-400 transition-colors">
+              Security
             </a>
           </nav>
 
@@ -52,21 +54,21 @@ export default function PublicLayout() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-[#E2E8F0] bg-white py-12 px-4 md:px-8">
+      <footer className="border-t border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-[#111827]/60 py-12 px-4 md:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-[#2563EB] flex items-center justify-center text-white">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-xs">
               <Camera className="w-4 h-4" />
             </div>
-            <span className="text-lg font-bold text-[#0F172A]">Snaply</span>
-            <span className="text-xs text-[#64748B] ml-2">Your Memories. Your People. One Place.</span>
+            <span className="text-lg font-black text-slate-900 dark:text-white">Snaply</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 ml-2 font-medium">Your Memories. Your People. One Place.</span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-[#64748B]">
-            <Link to="/login" className="hover:text-[#0F172A]">Sign In</Link>
-            <a href="#features" className="hover:text-[#0F172A]">Features</a>
-            <a href="#privacy" className="hover:text-[#0F172A]">Privacy Policy</a>
+          <div className="flex items-center gap-6 text-sm font-semibold text-slate-500 dark:text-slate-400">
+            <Link to="/login" className="hover:text-blue-600 dark:hover:text-white transition-colors">Sign In</Link>
+            <a href="#features" className="hover:text-blue-600 dark:hover:text-white transition-colors">Features</a>
+            <a href="#privacy" className="hover:text-blue-600 dark:hover:text-white transition-colors">Privacy Policy</a>
           </div>
-          <p className="text-xs text-[#64748B]">
+          <p className="text-xs text-slate-400 dark:text-slate-500">
             &copy; {new Date().getFullYear()} Snaply Inc. All rights reserved.
           </p>
         </div>

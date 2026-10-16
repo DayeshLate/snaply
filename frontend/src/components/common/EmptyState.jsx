@@ -10,16 +10,18 @@ export default function EmptyState({
   className = '',
 }) {
   return (
-    <div className={`flex flex-col items-center justify-center p-10 text-center rounded-lg border border-dashed border-[#E2E8F0] bg-white ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center p-12 text-center rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 backdrop-blur-sm transition-all ${className}`}
+    >
       {Icon && (
-        <div className="p-3 bg-slate-100 rounded-full text-[#64748B] mb-4">
+        <div className="p-4 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-cyan-500/10 dark:from-blue-500/20 dark:to-purple-500/20 rounded-2xl text-blue-600 dark:text-cyan-400 mb-4 ring-1 ring-blue-500/20 shadow-sm">
           <Icon className="w-8 h-8" />
         </div>
       )}
-      <h3 className="text-base font-semibold text-[#0F172A] mb-1">{title}</h3>
-      {description && <p className="text-sm text-[#64748B] max-w-sm mb-6 leading-relaxed">{description}</p>}
+      <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1.5">{title}</h3>
+      {description && <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6 leading-relaxed">{description}</p>}
       {actionText && onAction && (
-        <Button onClick={onAction}>
+        <Button onClick={onAction} variant="primary" size="md">
           {actionText}
         </Button>
       )}

@@ -16,7 +16,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F5F9FF] text-[#0D1B3E] selection:bg-[#90CAF9] selection:text-[#0D1B3E]">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-blue-500 selection:text-white transition-colors duration-200">
       {/* Navigation */}
       <LandingNavbar />
 

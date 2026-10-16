@@ -27,29 +27,29 @@ export default function MessageComposer({
   const selectedMediaObj = availableMedia.find((m) => m.id === selectedMediaId);
 
   return (
-    <div className="border-t border-[#E2E8F0] bg-white p-3">
+    <div className="border-t border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-4">
       {/* Selected media badge */}
       {selectedMediaObj && (
-        <div className="mb-2 flex items-center justify-between bg-blue-50 border border-blue-200 px-3 py-1.5 rounded text-xs text-[#1E3A8A]">
+        <div className="mb-3 flex items-center justify-between bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 px-3.5 py-2 rounded-xl text-xs text-blue-700 dark:text-blue-300">
           <div className="flex items-center gap-2 truncate">
-            <span className="font-semibold">Attached photo:</span>
+            <span className="font-bold">Attached photo:</span>
             <span className="truncate">{selectedMediaObj.fileName}</span>
           </div>
           <button
             onClick={() => setSelectedMediaId(null)}
-            className="text-slate-500 hover:text-red-500 p-0.5 cursor-pointer"
+            className="text-slate-400 hover:text-rose-500 p-0.5 cursor-pointer transition-colors"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
       {/* Media Picker Dropdown / Selector */}
       {showMediaPicker && (
-        <div className="mb-2 p-2 border border-[#E2E8F0] rounded bg-slate-50 max-h-36 overflow-y-auto">
-          <p className="text-xs font-semibold text-[#0F172A] mb-1.5 px-1">Attach a group photo:</p>
+        <div className="mb-3 p-3 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-800/60 max-h-40 overflow-y-auto">
+          <p className="text-xs font-bold text-slate-900 dark:text-white mb-2 px-1">Attach a group photo:</p>
           {availableMedia.length === 0 ? (
-            <p className="text-xs text-[#64748B] px-1">No group photos uploaded yet.</p>
+            <p className="text-xs text-slate-400 px-1">No group photos uploaded yet.</p>
           ) : (
             <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
               {availableMedia.map((m) => (
@@ -59,8 +59,8 @@ export default function MessageComposer({
                     setSelectedMediaId(m.id);
                     setShowMediaPicker(false);
                   }}
-                  className={`aspect-square rounded border overflow-hidden cursor-pointer hover:border-[#2563EB] transition-colors ${
-                    selectedMediaId === m.id ? 'border-[#2563EB] ring-2 ring-[#2563EB]' : 'border-[#E2E8F0]'
+                  className={`aspect-square rounded-xl border overflow-hidden cursor-pointer hover:border-blue-500 transition-all ${
+                    selectedMediaId === m.id ? 'border-blue-500 ring-2 ring-blue-500' : 'border-slate-200 dark:border-slate-700'
                   }`}
                 >
                   <img
@@ -76,14 +76,14 @@ export default function MessageComposer({
       )}
 
       {/* Input bar */}
-      <form onSubmit={handleSubmit} className="flex items-center gap-2">
+      <form onSubmit={handleSubmit} className="flex items-center gap-2.5">
         {availableMedia.length > 0 && (
           <button
             type="button"
             onClick={() => setShowMediaPicker(!showMediaPicker)}
             title="Attach group photo"
-            className={`p-2 rounded text-[#64748B] hover:text-[#0F172A] hover:bg-slate-100 transition-colors cursor-pointer ${
-              selectedMediaId ? 'text-[#2563EB] bg-blue-50' : ''
+            className={`p-2.5 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer ${
+              selectedMediaId ? 'text-blue-600 dark:text-cyan-400 bg-blue-50 dark:bg-blue-950/40' : ''
             }`}
           >
             <Paperclip className="w-5 h-5" />
@@ -95,7 +95,7 @@ export default function MessageComposer({
           placeholder="Type a message..."
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="flex-1 rounded border border-[#E2E8F0] px-3.5 py-2 text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+          className="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-500/20 transition-all font-medium"
         />
 
         <Button
@@ -104,6 +104,7 @@ export default function MessageComposer({
           icon={Send}
           disabled={loading || (!text.trim() && !selectedMediaId)}
           loading={loading}
+          variant="primary"
         >
           Send
         </Button>

@@ -25,12 +25,12 @@ export default function PhotoGrid({
   onDownloadPhoto,
   onDeletePhoto,
   onEditPhoto,
-  canDelete = false, // If group owner/admin, this is true
+  canDelete = false,
 }) {
   const { user } = useAuth();
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5">
       {photos.map((photo, index) => {
         const streamUrl = resolveStreamUrl(photo);
         const isVideo = isVideoPhoto(photo);
@@ -51,7 +51,7 @@ export default function PhotoGrid({
           <div
             key={photo.id || index}
             onClick={() => onViewPhoto(photo, index)}
-            className="group relative aspect-square bg-slate-100 rounded-xl overflow-hidden border border-[#E2E8F0] hover:shadow-lg transition-all duration-300 cursor-pointer"
+            className="group relative aspect-square bg-slate-900 rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 hover:border-blue-500 dark:hover:border-cyan-400 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer shadow-xs"
           >
             {isVideo ? (
               <div className="relative w-full h-full bg-slate-900 overflow-hidden flex items-center justify-center">
@@ -60,19 +60,19 @@ export default function PhotoGrid({
                   preload="metadata"
                   muted
                   playsInline
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 pointer-events-none"
+                  className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 pointer-events-none"
                 />
                 {/* Center Play Button Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover:scale-110 transition-transform">
-                  <div className="w-11 h-11 rounded-full bg-black/60 backdrop-blur-xs flex items-center justify-center text-white shadow-lg border border-white/20">
+                  <div className="w-12 h-12 rounded-full bg-slate-950/70 backdrop-blur-md flex items-center justify-center text-white shadow-xl border border-white/20">
                     <Play className="w-5 h-5 fill-white translate-x-0.5" />
                   </div>
                 </div>
 
                 {/* Video Badge */}
-                <div className="absolute top-2 left-2 z-10">
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-black/60 backdrop-blur-xs text-white uppercase tracking-wider">
-                    <Film className="w-2.5 h-2.5 text-purple-400" /> Video
+                <div className="absolute top-2.5 left-2.5 z-10">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-950/70 backdrop-blur-md text-white uppercase tracking-wider border border-white/20 shadow-xs">
+                    <Film className="w-3 h-3 text-purple-400" /> Video
                   </span>
                 </div>
               </div>
@@ -81,7 +81,7 @@ export default function PhotoGrid({
                 src={streamUrl}
                 alt={photo.fileName}
                 loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
                 onError={(e) => {
                   e.currentTarget.src =
                     'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>';
@@ -90,7 +90,7 @@ export default function PhotoGrid({
             )}
 
             {/* Hover Actions & Details Overlay */}
-            <div className="absolute inset-0 bg-linear-to-t from-slate-950/85 via-slate-950/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-between text-white z-20">
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3.5 flex flex-col justify-between text-white z-20">
               <div className="flex items-center justify-end gap-1.5">
                 {/* Edit Button */}
                 {canManage && onEditPhoto && (
@@ -100,7 +100,7 @@ export default function PhotoGrid({
                       onEditPhoto(photo);
                     }}
                     title="Edit media / rename"
-                    className="p-1.5 rounded-lg bg-white/20 hover:bg-white/40 text-white transition-colors cursor-pointer backdrop-blur-xs"
+                    className="p-2 rounded-xl bg-white/20 hover:bg-white/40 text-white transition-colors cursor-pointer backdrop-blur-md shadow-xs"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
@@ -113,7 +113,7 @@ export default function PhotoGrid({
                     if (onDownloadPhoto) onDownloadPhoto(photo);
                   }}
                   title="Download media"
-                  className="p-1.5 rounded-lg bg-white/20 hover:bg-white/40 text-white transition-colors cursor-pointer backdrop-blur-xs"
+                  className="p-2 rounded-xl bg-white/20 hover:bg-white/40 text-white transition-colors cursor-pointer backdrop-blur-md shadow-xs"
                 >
                   <Download className="w-3.5 h-3.5" />
                 </button>
@@ -125,8 +125,8 @@ export default function PhotoGrid({
                       e.stopPropagation();
                       if (onDeletePhoto) onDeletePhoto(photo);
                     }}
-                    title={isUploader ? 'Delete your upload' : 'Delete media (Admin/Owner)'}
-                    className="p-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white transition-colors cursor-pointer backdrop-blur-xs"
+                    title={isUploader ? 'Delete your upload' : 'Delete media'}
+                    className="p-2 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white transition-colors cursor-pointer backdrop-blur-md shadow-xs"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -134,13 +134,13 @@ export default function PhotoGrid({
               </div>
 
               <div>
-                <p className="text-xs font-semibold truncate leading-tight">{photo.fileName}</p>
-                <div className="flex items-center gap-1.5 text-[10px] text-slate-300 mt-1">
+                <p className="text-xs font-bold truncate leading-tight">{photo.fileName}</p>
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-300 mt-1 font-medium">
                   <span>{formatFileSize(photo.fileSize)}</span>
                   {isVideo && (
                     <>
                       <span>•</span>
-                      <span className="uppercase text-purple-300 font-semibold">Video</span>
+                      <span className="uppercase text-purple-300 font-bold">Video</span>
                     </>
                   )}
                   {photo.uploadedByName && (

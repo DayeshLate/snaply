@@ -18,11 +18,11 @@ export default function ConfirmDialog({
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="flex items-start gap-4 mb-6">
         {isDanger && (
-          <div className="p-2 bg-red-100 text-[#DC2626] rounded shrink-0">
+          <div className="p-3 bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 rounded-xl shrink-0 shadow-xs">
             <AlertTriangle className="w-6 h-6" />
           </div>
         )}
-        <p className="text-sm text-[#64748B] leading-relaxed pt-1">{message}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed pt-1">{message}</p>
       </div>
       <div className="flex items-center justify-end gap-3">
         <Button variant="outline" onClick={onClose} disabled={loading}>

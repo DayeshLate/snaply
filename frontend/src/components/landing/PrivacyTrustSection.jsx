@@ -31,18 +31,18 @@ export default function PrivacyTrustSection() {
   ];
 
   return (
-    <section id="privacy" className="py-24 md:py-32 bg-[#F5F9FF] border-t border-[#D9E7F5]">
+    <section id="privacy" className="py-24 md:py-32 bg-slate-50 dark:bg-slate-950 border-t border-slate-200/80 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#D9E7F5] text-xs font-semibold text-[#1854A3] shadow-2xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#2196F3]" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 text-xs font-bold text-blue-700 dark:text-blue-300 shadow-xs">
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
             <span>Privacy & Ownership</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#0D1B3E]">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
             Your memories deserve a space you trust.
           </h2>
-          <p className="text-base text-[#536784] leading-relaxed">
+          <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
             Designed for intimate circles of friends, families, and creative teams
             who value control over their personal photography.
           </p>
@@ -59,16 +59,16 @@ export default function PrivacyTrustSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.5, delay: idx * 0.1, ease: 'easeOut' }}
-                className="bg-white p-7 rounded-xl border border-[#D9E7F5] shadow-xs flex flex-col justify-between"
+                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none hover:shadow-2xl hover:border-blue-500/40 transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
-                  <div className="w-11 h-11 rounded-lg bg-blue-50 text-[#2196F3] flex items-center justify-center mb-5">
-                    <Icon className="w-5 h-5" />
+                  <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-950/70 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 shadow-xs">
+                    <Icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-base font-bold text-[#0D1B3E] mb-2">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2.5">
                     {pillar.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#536784] leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                     {pillar.description}
                   </p>
                 </div>

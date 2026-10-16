@@ -14,18 +14,18 @@ export default function AlbumCard({
   return (
     <div
       onClick={onClick}
-      className="bg-white dark:bg-[#0E1724] rounded-sm border border-[#CBD5E1] dark:border-[#1F2D40] hover:border-[#2563EB] dark:hover:border-[#38BDF8] hover:shadow-md transition-all cursor-pointer overflow-hidden flex flex-col group shadow-2xs"
+      className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-blue-500 dark:hover:border-cyan-400 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col group shadow-sm"
     >
       {/* Cover / Thumbnail Preview */}
-      <div className="h-36 bg-slate-100 dark:bg-[#121D2C] flex items-center justify-center relative overflow-hidden border-b border-[#E2E8F0] dark:border-[#1F2D40]">
+      <div className="h-44 bg-slate-100 dark:bg-slate-850 dark:bg-slate-800/60 flex items-center justify-center relative overflow-hidden border-b border-slate-100 dark:border-slate-800/80">
         {album.media && album.media.length > 0 ? (
-          <div className="w-full h-full grid grid-cols-2 gap-0.5 bg-slate-200 dark:bg-[#1F2D40]">
+          <div className="w-full h-full grid grid-cols-2 gap-1 bg-slate-200 dark:bg-slate-800">
             {album.media.slice(0, 4).map((m, idx) => (
-              <div key={m.id || idx} className="h-full bg-slate-100 dark:bg-slate-900 overflow-hidden relative">
+              <div key={m.id || idx} className="h-full bg-slate-900 overflow-hidden relative">
                 <img
                   src={m.id ? mediaService.getStreamUrl(m.id) : (m.fileUrl || '')}
                   alt={m.fileName}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
@@ -34,34 +34,36 @@ export default function AlbumCard({
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center text-[#64748B] dark:text-[#94A3B8] gap-2">
-            <Folder className="w-10 h-10 text-blue-500/70" />
-            <span className="text-xs font-mono">EMPTY ARCHIVE</span>
+          <div className="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 gap-2">
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-cyan-400 flex items-center justify-center ring-1 ring-blue-500/20">
+              <Folder className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-400">Empty Album</span>
           </div>
         )}
 
-        <div className="absolute top-2 right-2 bg-slate-900/80 text-white text-[10px] font-mono font-medium px-2 py-0.5 rounded-xs backdrop-blur-xs flex items-center gap-1 border border-white/20">
-          <ImageIcon className="w-3 h-3 text-[#38BDF8]" />
+        <div className="absolute top-2.5 right-2.5 bg-slate-950/70 text-white text-[11px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1.5 border border-white/20 shadow-xs">
+          <ImageIcon className="w-3.5 h-3.5 text-cyan-400" />
           <span>{photoCount}</span>
         </div>
       </div>
 
       {/* Info */}
-      <div className="p-4 flex-1 flex flex-col justify-between">
+      <div className="p-5 flex-1 flex flex-col justify-between">
         <div>
-          <h4 className="text-sm font-bold text-[#0F172A] dark:text-[#F1F5F9] group-hover:text-[#2563EB] dark:group-hover:text-[#38BDF8] transition-colors truncate">
+          <h4 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors truncate">
             {album.name}
           </h4>
           {album.group?.name && (
-            <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-0.5 truncate font-mono text-[11px]">
-              Group: {album.group.name}
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate font-medium">
+              Group: <span className="font-semibold text-slate-700 dark:text-slate-300">{album.group.name}</span>
             </p>
           )}
         </div>
 
-        <div className="flex items-center justify-between pt-3 mt-3 border-t border-[#F1F5F9] dark:border-[#162233] text-xs text-[#64748B] dark:text-[#94A3B8]">
-          <div className="flex items-center gap-1.5 font-mono text-[11px]">
-            <Calendar className="w-3.5 h-3.5" />
+        <div className="flex items-center justify-between pt-3.5 mt-4 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 font-medium">
+            <Calendar className="w-3.5 h-3.5 text-slate-400" />
             <span>{formatDate(album.createdAt)}</span>
           </div>
 
@@ -72,9 +74,9 @@ export default function AlbumCard({
                 if (onDelete) onDelete(album);
               }}
               title="Delete album"
-              className="p-1 hover:text-[#DC2626] dark:hover:text-[#F87171] hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xs transition-colors cursor-pointer"
+              className="p-1.5 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-4 h-4" />
             </button>
           )}
         </div>

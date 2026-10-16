@@ -43,12 +43,12 @@ export default function CreateFolderModal({
       isOpen={isOpen}
       onClose={onClose}
       title="Create New Album"
-      description="Create a sub-folder to organize specific memories in this group"
+      description="Create a dedicated album folder to organize memories"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <Input
           label="Album Name"
-          placeholder="e.g. Day 1 - Arrival & Beach"
+          placeholder="e.g. Day 1 - Arrival & Beach Sunset"
           value={name}
           onChange={(e) => setName(e.target.value)}
           error={error}
@@ -56,11 +56,11 @@ export default function CreateFolderModal({
           autoFocus
         />
 
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button type="submit" loading={loading}>
+          <Button type="submit" loading={loading} variant="primary">
             Create Album
           </Button>
         </div>

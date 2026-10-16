@@ -14,9 +14,6 @@ import {
   Camera,
   Plus,
   Sparkles,
-  Search,
-  Activity,
-  Layers,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -61,7 +58,7 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
   const navItems = [
     { name: 'Overview', path: '/dashboard', icon: LayoutDashboard },
     { name: 'My Albums', path: '/albums', icon: FolderLock },
-    { name: 'Shared With Me', path: '/shared', icon: ImageIcon },
+    { name: 'Shared Vault', path: '/shared', icon: ImageIcon },
     { name: 'Groups', path: '/groups', icon: Users },
     { name: 'AI Search', path: '/dashboard?tab=search', icon: Sparkles, badgeText: 'AI' },
     { name: 'Messages', path: '/messages', icon: MessageSquare },
@@ -84,28 +81,28 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
     <aside
       className={`${
         isCollapsed ? 'w-20' : 'w-64'
-      } bg-white dark:bg-[#0E1724] border-r border-[#E2E8F0] dark:border-[#1F2D40] flex flex-col h-full select-none transition-all duration-300 relative z-20`}
+      } bg-white/95 dark:bg-[#111827]/95 backdrop-blur-md border-r border-slate-200/80 dark:border-slate-800 flex flex-col h-full select-none transition-all duration-300 relative z-20 shadow-xs`}
     >
       {/* Brand Header */}
-      <div className="h-16 flex items-center justify-between px-5 border-b border-[#E2E8F0] dark:border-[#1F2D40]">
+      <div className="h-18 flex items-center justify-between px-5 border-b border-slate-100 dark:border-slate-800/80">
         <NavLink
           to="/dashboard"
           onClick={onCloseMobile}
-          className="flex items-center gap-3 min-w-0"
+          className="flex items-center gap-3 min-w-0 group"
         >
-          <div className="w-9 h-9 rounded-sm bg-[#2563EB] flex items-center justify-center text-white shadow-xs shrink-0 border border-[#1D4ED8]">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-blue-500/25 shrink-0 transition-transform group-hover:scale-105 duration-200">
             <Camera className="w-5 h-5" />
           </div>
           {!isCollapsed && (
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="text-base font-extrabold tracking-tight text-[#0F172A] dark:text-[#F1F5F9]">
+                <span className="text-lg font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-950 dark:from-white dark:via-blue-200 dark:to-cyan-200 bg-clip-text text-transparent">
                   Snaply
                 </span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20 animate-pulse" />
               </div>
-              <span className="block text-[9px] text-[#64748B] dark:text-[#94A3B8] font-mono tracking-widest uppercase">
-                SHARED ALBUMS
+              <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-semibold tracking-wider uppercase">
+                Photo Workspace
               </span>
             </div>
           )}
@@ -114,27 +111,27 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
         {/* Desktop Collapse Toggle */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden md:flex p-1 rounded-sm text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#182638] transition-colors cursor-pointer"
+          className="hidden md:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
           title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
       </div>
 
-      {/* Prominent Sharp Rectangular Action Button */}
-      <div className="px-4 pt-4 pb-2">
+      {/* Prominent Action Button */}
+      <div className="px-3.5 pt-4 pb-2">
         <button
           onClick={() => {
             if (onCreateAlbum) onCreateAlbum();
             else navigate('/albums');
           }}
-          className={`w-full py-2.5 px-3 rounded-sm bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#1E40AF] text-white font-medium text-xs flex items-center ${
+          className={`w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-600 active:scale-[0.98] text-white font-bold text-xs flex items-center ${
             isCollapsed ? 'justify-center' : 'justify-center gap-2'
-          } transition-all shadow-sm hover:shadow hover:shadow-[#2563EB]/20 border border-[#1D4ED8] cursor-pointer`}
+          } transition-all duration-200 shadow-md hover:shadow-lg hover:shadow-blue-500/25 cursor-pointer`}
           title="Create Album"
         >
           <Plus className="w-4 h-4 shrink-0" />
-          {!isCollapsed && <span>Create Album</span>}
+          {!isCollapsed && <span>New Album</span>}
         </button>
       </div>
 
@@ -151,22 +148,17 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
               onClick={onCloseMobile}
               title={isCollapsed ? item.name : undefined}
               className={`relative flex items-center ${
-                isCollapsed ? 'justify-center px-2' : 'justify-between px-3'
-              } py-2 rounded-sm text-xs font-semibold transition-all group ${
+                isCollapsed ? 'justify-center px-2' : 'justify-between px-3.5'
+              } py-2.5 rounded-xl text-xs font-bold transition-all duration-200 group ${
                 isActive
-                  ? 'bg-[#EFF6FF] dark:bg-[#152338] text-[#2563EB] dark:text-[#38BDF8] border border-[#BFDBFE] dark:border-[#1E3A5F]'
-                  : 'text-[#64748B] dark:text-[#94A3B8] hover:bg-slate-100 dark:hover:bg-[#121D2C] hover:text-[#0F172A] dark:hover:text-[#F1F5F9]'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              {/* Left active line accent */}
-              {isActive && (
-                <span className="absolute left-0 top-1 bottom-1 w-1 bg-[#2563EB] dark:bg-[#38BDF8] rounded-r-xs" />
-              )}
-
               <div className="flex items-center gap-3">
                 <Icon
                   className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
-                    isActive ? 'text-[#2563EB] dark:text-[#38BDF8]' : ''
+                    isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-cyan-400'
                   }`}
                 />
                 {!isCollapsed && <span>{item.name}</span>}
@@ -175,12 +167,24 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
               {!isCollapsed && (
                 <div>
                   {item.badge && (
-                    <span className="px-1.5 py-0.2 text-[10px] font-mono font-bold bg-[#2563EB] text-white rounded-xs">
+                    <span
+                      className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${
+                        isActive
+                          ? 'bg-white/20 text-white'
+                          : 'bg-rose-500 text-white shadow-xs'
+                      }`}
+                    >
                       {item.badge}
                     </span>
                   )}
                   {item.badgeText && (
-                    <span className="px-1.5 py-0.2 text-[9px] font-mono font-bold bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 rounded-xs border border-cyan-300 dark:border-cyan-800">
+                    <span
+                      className={`px-2 py-0.5 text-[9px] font-extrabold rounded-full ${
+                        isActive
+                          ? 'bg-white/20 text-white'
+                          : 'bg-gradient-to-r from-cyan-500/15 to-blue-500/15 text-blue-600 dark:text-cyan-400 border border-blue-500/30'
+                      }`}
+                    >
                       {item.badgeText}
                     </span>
                   )}
@@ -193,53 +197,58 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
 
       {/* Google Drive Status Module */}
       {!isCollapsed && (
-        <div className="px-3 py-2 border-t border-[#E2E8F0] dark:border-[#1F2D40] bg-slate-50/50 dark:bg-[#121D2C]">
+        <div className="px-3.5 py-3 border-t border-slate-100 dark:border-slate-800/80">
           <NavLink
             to="/settings"
             onClick={onCloseMobile}
-            className="flex items-center justify-between p-2 rounded-sm text-xs hover:bg-slate-100 dark:hover:bg-[#182638] transition-colors border border-transparent hover:border-[#CBD5E1] dark:hover:border-[#2F4158]"
+            className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/60 hover:bg-blue-50/50 dark:hover:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 transition-all group"
           >
-            <div className="flex items-center gap-2 text-[#64748B] dark:text-[#94A3B8]">
-              <HardDrive className="w-4 h-4 text-[#2563EB] dark:text-[#38BDF8]" />
-              <span className="font-medium">Drive Backup</span>
+            <div className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
+              <div className="w-7 h-7 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-cyan-400">
+                <HardDrive className="w-3.5 h-3.5" />
+              </div>
+              <div>
+                <p className="text-xs font-bold leading-none">Drive Backup</p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                  {isDriveConnected ? 'Cloud synced' : 'Not linked'}
+                </p>
+              </div>
             </div>
             <span
-              className={`px-1.5 py-0.5 rounded-xs font-mono text-[9px] font-semibold uppercase ${
+              className={`w-2.5 h-2.5 rounded-full ${
                 isDriveConnected
-                  ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
-                  : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                  ? 'bg-emerald-500 ring-4 ring-emerald-500/20'
+                  : 'bg-amber-500 ring-4 ring-amber-500/20'
               }`}
-            >
-              {isDriveConnected ? 'Synced' : 'Link Drive'}
-            </span>
+            />
           </NavLink>
         </div>
       )}
 
       {/* User Info & Logout Footer */}
-      <div className="p-3 border-t border-[#E2E8F0] dark:border-[#1F2D40] flex items-center justify-between">
+      <div className="p-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
         <NavLink
           to="/profile"
           onClick={onCloseMobile}
-          className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-85 transition-opacity"
+          className="flex items-center gap-2.5 min-w-0 flex-1 p-1 rounded-xl hover:bg-slate-100/70 dark:hover:bg-slate-800/60 transition-colors"
         >
           {user?.profilePicture ? (
             <img
               src={user.profilePicture}
               alt={user.name}
-              className="w-8 h-8 rounded-sm object-cover border border-[#CBD5E1] dark:border-[#2F4158]"
+              className="w-9 h-9 rounded-xl object-cover ring-2 ring-blue-500/30"
             />
           ) : (
-            <div className="w-8 h-8 rounded-sm bg-[#1E3A8A] text-white text-xs font-bold flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white text-xs font-black flex items-center justify-center shrink-0 shadow-xs">
               {getInitials(user?.name)}
             </div>
           )}
           {!isCollapsed && (
             <div className="min-w-0">
-              <p className="text-xs font-bold text-[#0F172A] dark:text-[#F1F5F9] truncate leading-tight">
+              <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
                 {user?.name || 'Explorer'}
               </p>
-              <p className="text-[10px] text-[#64748B] dark:text-[#94A3B8] font-mono truncate">
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
                 {user?.email || 'Logged In'}
               </p>
             </div>
@@ -250,7 +259,7 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
           <button
             onClick={handleLogout}
             title="Log out"
-            className="p-1.5 rounded-sm text-[#64748B] dark:text-[#94A3B8] hover:text-[#DC2626] dark:hover:text-[#F87171] hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+            className="p-2 rounded-xl text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
           </button>

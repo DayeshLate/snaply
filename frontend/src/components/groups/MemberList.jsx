@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Crown, Shield, User, Trash2, MoreVertical } from 'lucide-react';
+import { Crown, Shield, User, Trash2 } from 'lucide-react';
 import { ROLES, ROLE_LABELS } from '../../constants/theme';
 import { getInitials, formatDate } from '../../utils/formatters';
-import Button from '../common/Button';
 import ConfirmDialog from '../common/ConfirmDialog';
 import { useToast } from '../../context/ToastContext';
 import { groupService } from '../../services/groupService';
@@ -49,12 +48,12 @@ export default function MemberList({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden">
-      <div className="p-4 border-b border-[#E2E8F0] flex items-center justify-between">
-        <h4 className="text-sm font-semibold text-[#0F172A]">Group Members ({members.length})</h4>
+    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm">
+      <div className="p-5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+        <h4 className="text-base font-bold text-slate-900 dark:text-white">Group Members ({members.length})</h4>
       </div>
 
-      <div className="divide-y divide-[#E2E8F0]">
+      <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
         {members.map((member) => {
           const memberUser = member.user || {};
           const displayName = member.userName || memberUser.name || 'Member';
@@ -63,31 +62,31 @@ export default function MemberList({
           const isSelf = (member.userId || memberUser.id) === currentUserId;
 
           return (
-            <div key={member.id} className="p-4 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-full bg-slate-100 border border-[#E2E8F0] flex items-center justify-center font-bold text-xs text-[#1E3A8A] shrink-0">
+            <div key={member.id} className="p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
                   {getInitials(displayName)}
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-[#0F172A] truncate">{displayName}</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{displayName}</p>
                     {isSelf && (
-                      <span className="text-[10px] bg-slate-100 text-[#64748B] px-1.5 py-0.5 rounded font-medium">
+                      <span className="text-[10px] bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-cyan-400 border border-blue-200/50 dark:border-blue-800/40 px-2 py-0.5 rounded-full font-bold">
                         You
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-[#64748B] truncate">{displayEmail}</p>
-                  <p className="text-[11px] text-[#64748B] mt-0.5">Joined {formatDate(member.joinedAt)}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{displayEmail}</p>
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Joined {formatDate(member.joinedAt)}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
                 {/* Role badge */}
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-slate-100 text-[#0F172A]">
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
                   {member.role === ROLES.OWNER && <Crown className="w-3.5 h-3.5 text-amber-500" />}
-                  {member.role === ROLES.ADMIN && <Shield className="w-3.5 h-3.5 text-[#2563EB]" />}
-                  {member.role === ROLES.VIEWER && <User className="w-3.5 h-3.5 text-[#64748B]" />}
+                  {member.role === ROLES.ADMIN && <Shield className="w-3.5 h-3.5 text-blue-500" />}
+                  {member.role === ROLES.VIEWER && <User className="w-3.5 h-3.5 text-slate-400" />}
                   <span>{ROLE_LABELS[member.role] || member.role}</span>
                 </div>
 
@@ -96,7 +95,7 @@ export default function MemberList({
                   <select
                     value={member.role}
                     onChange={(e) => handleRoleChange(member.id, e.target.value)}
-                    className="text-xs border border-[#E2E8F0] rounded px-2 py-1 bg-white text-[#0F172A] focus:outline-none focus:ring-1 focus:ring-[#2563EB] cursor-pointer"
+                    className="text-xs border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 cursor-pointer font-medium"
                   >
                     <option value={ROLES.VIEWER}>Member</option>
                     <option value={ROLES.ADMIN}>Admin</option>
@@ -111,7 +110,7 @@ export default function MemberList({
                       setConfirmOpen(true);
                     }}
                     title="Remove from group"
-                    className="p-1.5 text-[#64748B] hover:text-[#DC2626] hover:bg-red-50 rounded transition-colors cursor-pointer"
+                    className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -130,6 +129,7 @@ export default function MemberList({
         title="Remove Member"
         message={`Are you sure you want to remove this member from the group?`}
         confirmText="Remove"
+        isDanger={true}
       />
     </div>
   );

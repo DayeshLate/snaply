@@ -52,21 +52,23 @@ export default function GroupFormModal({ isOpen, onClose, onSuccess }) {
         />
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-[#0F172A]">Description</label>
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+            Description
+          </label>
           <textarea
             rows={3}
             placeholder="What is this group about?"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full rounded border border-[#E2E8F0] p-2.5 text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+            className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/80 p-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-500/20 transition-all font-medium"
           />
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button type="submit" loading={loading}>
+          <Button type="submit" loading={loading} variant="primary">
             Create Group
           </Button>
         </div>

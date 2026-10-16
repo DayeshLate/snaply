@@ -68,7 +68,7 @@ export default function AppLayout() {
   };
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] dark:bg-[#070D16] text-[#0F172A] dark:text-[#E2E8F0] overflow-hidden transition-colors duration-200">
+    <div className="flex h-screen bg-slate-50 dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 overflow-hidden transition-colors duration-200">
       {/* Desktop Sidebar */}
       <div className="hidden md:flex shrink-0">
         <Sidebar
@@ -93,13 +93,13 @@ export default function AppLayout() {
         />
 
         {isDemo && (
-          <div className="bg-[#2563EB] text-white text-xs px-4 py-1.5 flex items-center justify-between shadow-2xs z-10 shrink-0">
+          <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-xs px-4 py-2 flex items-center justify-between shadow-xs z-10 shrink-0">
             <div className="flex items-center gap-2 truncate">
-              <span className="font-bold bg-white/20 px-2 py-0.5 rounded-xs text-[10px] font-mono uppercase tracking-wide shrink-0">
+              <span className="font-extrabold bg-white/20 px-2.5 py-0.5 rounded-full text-[10px] tracking-wide shrink-0">
                 PREVIEW MODE
               </span>
-              <span className="truncate">
-                Interactive frontend review active — collaborative photo vaults, AI search, and cloud features are responsive.
+              <span className="truncate font-medium">
+                Interactive preview active — collaborative photo vaults, AI search, and cloud features are responsive.
               </span>
             </div>
             <button
@@ -107,7 +107,7 @@ export default function AppLayout() {
                 disableDemoMode();
                 window.location.href = '/login';
               }}
-              className="underline font-semibold text-blue-100 hover:text-white cursor-pointer ml-3 shrink-0"
+              className="underline font-bold text-blue-100 hover:text-white cursor-pointer ml-3 shrink-0"
             >
               Exit Demo
             </button>

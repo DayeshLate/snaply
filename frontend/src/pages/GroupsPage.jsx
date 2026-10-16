@@ -41,17 +41,26 @@ export default function GroupsPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#0F172A] tracking-tight">My Groups</h1>
-          <p className="text-sm text-[#64748B] mt-0.5">
-            Groups you have created or joined to collaborate on photos
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/25">
+              <Users className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                Group Workspaces
+              </h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+                Spaces where your circles collaborate on photos and albums
+              </p>
+            </div>
+          </div>
         </div>
 
-        <Button icon={Plus} onClick={() => setCreateModalOpen(true)}>
+        <Button icon={Plus} onClick={() => setCreateModalOpen(true)} variant="primary">
           Create Group
         </Button>
       </div>
@@ -69,10 +78,10 @@ export default function GroupsPage() {
       {/* Content */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          <Skeleton className="h-44 w-full" />
-          <Skeleton className="h-44 w-full" />
-          <Skeleton className="h-44 w-full" />
-          <Skeleton className="h-44 w-full" />
+          <Skeleton className="h-52 w-full" />
+          <Skeleton className="h-52 w-full" />
+          <Skeleton className="h-52 w-full" />
+          <Skeleton className="h-52 w-full" />
         </div>
       ) : error ? (
         <ErrorState message={error} onRetry={loadGroups} />

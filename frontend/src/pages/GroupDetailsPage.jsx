@@ -13,7 +13,6 @@ import {
   Upload,
   Trash2,
   Calendar,
-  AlertTriangle,
 } from 'lucide-react';
 import { groupService } from '../services/groupService';
 import { folderService } from '../services/folderService';
@@ -121,7 +120,7 @@ export default function GroupDetailsPage() {
         const media = await mediaService.getAllMediaByGroup(groupId);
         setGroupMedia(media || []);
       } catch (err) {
-        console.warn('Failed to load media by group, attempting folder-by-folder fallback:', err);
+        console.warn('Failed to load media by group, attempting folder fallback:', err);
         const folders = data?.folderDTOs || data?.folders || [];
         if (folders.length > 0) {
           const folderPromises = folders.map((f) =>
@@ -192,7 +191,6 @@ export default function GroupDetailsPage() {
     group?.user?.id === user?.id ||
     currentMember?.role === ROLES.OWNER;
   const isGroupAdmin = isOwner || currentMember?.role === ROLES.ADMIN;
-  // Any accepted member or owner of this group can upload
   const canUpload = isOwner || isGroupAdmin || (currentMember ? (currentMember.isAccepted ?? true) : true);
 
   const allGroupFolders = group?.folderDTOs || group?.folders || [];
@@ -279,10 +277,14 @@ export default function GroupDetailsPage() {
       if (isOwner) {
         await folderService.deleteFolderByOwner(groupId, albumToDelete.id);
       } else {
-        await folderService.deleteFolderByAdmin(groupId, albumToDelete.id);
+        await folderService.deleteFolder(albumToDelete.id);
       }
       success('Album deleted successfully');
       setAlbumToDelete(null);
+      if (selectedFolderForUpload === albumToDelete.id) {
+        setSelectedFolderForUpload(null);
+        setSearchParams({ tab: 'albums' });
+      }
       loadGroupDetails();
     } catch (err) {
       showError(err.message || 'Failed to delete album');
@@ -296,7 +298,8 @@ export default function GroupDetailsPage() {
     setDeleteActionLoading(true);
     try {
       await mediaService.deleteMedia(photoToDelete.id);
-      success('Photo deleted');
+      success('Photo deleted successfully');
+      setGroupMedia((prev) => prev.filter((m) => m.id !== photoToDelete.id));
       setPhotoToDelete(null);
       setViewerOpen(false);
       loadGroupDetails();
@@ -314,7 +317,6 @@ export default function GroupDetailsPage() {
   if (loading) return <Loader text="Loading group workspace..." className="py-24" />;
   if (error || !group) return <ErrorState message={error || 'Group not found'} onRetry={loadGroupDetails} />;
 
-  // Default target folder for uploads: General folder or first available folder
   const targetUploadFolderId = selectedFolderForUpload || allGroupFolders[0]?.id;
   const selectedFolder = allGroupFolders.find(
     (f) => Number(f.id) === Number(selectedFolderForUpload)
@@ -330,21 +332,21 @@ export default function GroupDetailsPage() {
     : groupMedia;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Top Header Card */}
-      <div className="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-2xs">
+      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 shadow-xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">{group.name}</h1>
-              <span className="px-2.5 py-0.5 rounded text-xs font-semibold bg-blue-50 text-[#2563EB]">
+              <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{group.name}</h1>
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-600 dark:text-cyan-400 border border-blue-500/20">
                 {isOwner ? 'Group Owner' : isGroupAdmin ? 'Admin' : 'Member'}
               </span>
             </div>
-            <p className="text-sm text-[#64748B] mt-1 max-w-2xl">{group.description || 'No description provided.'}</p>
-            <div className="flex items-center gap-4 text-xs text-[#64748B] mt-3">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl font-medium">{group.description || 'No description provided.'}</p>
+            <div className="flex items-center gap-4 text-xs text-slate-400 mt-3 font-semibold">
               <span className="flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-[#2563EB]" />
+                <Users className="w-3.5 h-3.5 text-blue-500" />
                 {group.groupMembers?.length || 1} members
               </span>
               <span>•</span>
@@ -372,6 +374,7 @@ export default function GroupDetailsPage() {
                 size="sm"
                 icon={Upload}
                 onClick={() => handleOpenUpload()}
+                variant="primary"
               >
                 Upload Media
               </Button>
@@ -380,7 +383,7 @@ export default function GroupDetailsPage() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 border-t border-[#E2E8F0] mt-6 pt-4 overflow-x-auto">
+        <div className="flex items-center gap-2 border-t border-slate-100 dark:border-slate-800/80 mt-6 pt-5 overflow-x-auto">
           {[
             { id: 'albums', label: 'Albums', icon: FolderLock, count: group.folderDTOs?.length },
             { id: 'photos', label: 'All Photos', icon: ImageIcon, count: groupMedia?.length },
@@ -397,18 +400,18 @@ export default function GroupDetailsPage() {
               <button
                 key={tab.id}
                 onClick={() => setSearchParams({ tab: tab.id })}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                   isActive
-                    ? 'bg-[#2563EB] text-white shadow-2xs'
-                    : 'text-[#64748B] hover:bg-slate-100 hover:text-[#0F172A]'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
                 <span>{tab.label}</span>
                 {typeof tab.count === 'number' && (
                   <span
-                    className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-slate-200 text-[#0F172A]'
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                     }`}
                   >
                     {tab.count}
@@ -423,13 +426,13 @@ export default function GroupDetailsPage() {
       {/* Tab Contents */}
       {/* 1. ALBUMS TAB */}
       {activeTab === 'albums' && (
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-[#0F172A]">Albums & Folders</h3>
-              <p className="text-xs text-[#64748B]">Organize group memories into dedicated albums</p>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">Albums & Folders</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Organize group memories into dedicated albums</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               {canUpload && (
                 <Button
                   size="sm"
@@ -445,6 +448,7 @@ export default function GroupDetailsPage() {
                   size="sm"
                   icon={Plus}
                   onClick={() => setCreateAlbumModalOpen(true)}
+                  variant="primary"
                 >
                   New Album
                 </Button>
@@ -453,13 +457,14 @@ export default function GroupDetailsPage() {
           </div>
 
           {allGroupFolders.length === 0 ? (
-            <div className="p-8 bg-white border border-[#E2E8F0] rounded-lg text-center">
-              <p className="text-sm text-[#64748B]">No custom albums in this group yet.</p>
+            <div className="p-12 bg-white/80 dark:bg-slate-900/80 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-center">
+              <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">No custom albums in this group yet.</p>
               {canUpload && (
                 <Button
                   size="sm"
                   className="mt-4"
                   onClick={() => setCreateAlbumModalOpen(true)}
+                  variant="primary"
                 >
                   Create First Album
                 </Button>
@@ -481,13 +486,13 @@ export default function GroupDetailsPage() {
 
       {/* 2. PHOTOS TAB */}
       {activeTab === 'photos' && (
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-[#0F172A]">Group Photos</h3>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white">Group Photos</h3>
                 {selectedFolder && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-semibold bg-blue-50 text-[#2563EB] border border-blue-200">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-600 dark:text-cyan-400 border border-blue-500/20">
                     Album: {selectedFolder.name}
                     <button
                       type="button"
@@ -495,7 +500,7 @@ export default function GroupDetailsPage() {
                         setSelectedFolderForUpload(null);
                         setSearchParams({ tab: 'photos' });
                       }}
-                      className="hover:text-red-500 font-bold ml-1 cursor-pointer"
+                      className="hover:text-rose-500 font-black ml-1 cursor-pointer"
                       title="Clear album filter"
                     >
                       ×
@@ -503,13 +508,13 @@ export default function GroupDetailsPage() {
                   </span>
                 )}
               </div>
-              <p className="text-xs text-[#64748B]">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                 {selectedFolder
                   ? `Showing photos inside "${selectedFolder.name}".`
                   : 'All photos and videos uploaded across group albums.'}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               {allGroupFolders.length > 1 && (
                 <select
                   value={selectedFolderForUpload || ''}
@@ -522,7 +527,7 @@ export default function GroupDetailsPage() {
                       setSearchParams({ tab: 'photos' });
                     }
                   }}
-                  className="px-2.5 py-1.5 bg-white border border-[#E2E8F0] rounded text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
+                  className="px-3.5 py-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white font-medium focus:outline-none focus:border-blue-500 shadow-xs"
                 >
                   <option value="">All Albums ({groupMedia.length})</option>
                   {allGroupFolders.map((f) => (
@@ -537,6 +542,7 @@ export default function GroupDetailsPage() {
                   size="sm"
                   icon={Upload}
                   onClick={() => handleOpenUpload(selectedFolderForUpload)}
+                  variant="primary"
                 >
                   Upload Media
                 </Button>
@@ -545,12 +551,12 @@ export default function GroupDetailsPage() {
           </div>
 
           {filteredPhotos.length === 0 ? (
-            <div className="p-12 bg-white border border-dashed border-[#E2E8F0] rounded-lg text-center">
-              <ImageIcon className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm font-semibold text-[#0F172A]">
+            <div className="p-16 bg-white/80 dark:bg-slate-900/80 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-center">
+              <ImageIcon className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+              <p className="text-sm font-bold text-slate-900 dark:text-white">
                 {selectedFolder ? `No photos in "${selectedFolder.name}"` : 'No photos in this group yet'}
               </p>
-              <p className="text-xs text-[#64748B] mt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 {selectedFolder
                   ? 'Upload photos or videos directly to this album.'
                   : 'Upload the first photo to begin sharing.'}
@@ -561,6 +567,7 @@ export default function GroupDetailsPage() {
                   className="mt-4"
                   icon={Upload}
                   onClick={() => handleOpenUpload(selectedFolderForUpload)}
+                  variant="primary"
                 >
                   Upload Media
                 </Button>
@@ -595,7 +602,7 @@ export default function GroupDetailsPage() {
 
       {/* 4. CHAT TAB */}
       {activeTab === 'chat' && (
-        <div className="bg-white rounded-xl border border-[#E2E8F0] flex flex-col h-[600px] overflow-hidden">
+        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl border border-slate-200/80 dark:border-slate-800 flex flex-col h-[650px] overflow-hidden shadow-xl">
           <ChatHeader
             group={group}
             memberCount={group.groupMembers?.length || 1}
@@ -616,11 +623,11 @@ export default function GroupDetailsPage() {
       {/* 5. JOIN REQUESTS TAB */}
       {activeTab === 'requests' && isGroupAdmin && (
         <div className="space-y-4">
-          <h3 className="text-base font-bold text-[#0F172A]">
+          <h3 className="text-xl font-black text-slate-900 dark:text-white">
             Pending Join Requests ({joinRequests.length})
           </h3>
           {joinRequests.length === 0 ? (
-            <div className="p-8 bg-white border border-[#E2E8F0] rounded-lg text-center text-sm text-[#64748B]">
+            <div className="p-10 bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-center text-xs text-slate-500 dark:text-slate-400 font-semibold">
               No pending join requests for this group.
             </div>
           ) : (
@@ -640,16 +647,16 @@ export default function GroupDetailsPage() {
 
       {/* 6. SETTINGS TAB */}
       {activeTab === 'settings' && isOwner && (
-        <div className="bg-white p-6 rounded-xl border border-[#E2E8F0] space-y-6">
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 space-y-6 shadow-xl">
           <div>
-            <h3 className="text-base font-bold text-[#0F172A]">Group Settings</h3>
-            <p className="text-xs text-[#64748B] mt-0.5">Manage destructive actions and ownership permissions</p>
+            <h3 className="text-xl font-black text-slate-900 dark:text-white">Group Settings</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Manage destructive actions and ownership permissions</p>
           </div>
 
-          <div className="p-4 rounded-lg bg-red-50 border border-red-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="p-6 rounded-2xl bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h4 className="text-sm font-bold text-[#DC2626]">Delete Group</h4>
-              <p className="text-xs text-red-700 mt-0.5">
+              <h4 className="text-sm font-bold text-rose-600 dark:text-rose-400">Delete Group</h4>
+              <p className="text-xs text-rose-700 dark:text-rose-300 mt-1 leading-relaxed">
                 Permanently delete this group, its albums, and associated cloud references. This action is irreversible.
               </p>
             </div>
@@ -732,6 +739,7 @@ export default function GroupDetailsPage() {
         title="Delete Group"
         message="Are you sure you want to delete this group? All shared albums and conversations will be removed."
         confirmText="Delete Permanently"
+        isDanger={true}
       />
 
       {/* Confirm Delete Album */}
@@ -743,6 +751,7 @@ export default function GroupDetailsPage() {
         title="Delete Album"
         message={`Are you sure you want to delete "${albumToDelete?.name}"? Any photos inside will also be deleted.`}
         confirmText="Delete Album"
+        isDanger={true}
       />
 
       {/* Confirm Delete Photo */}
@@ -754,6 +763,7 @@ export default function GroupDetailsPage() {
         title="Delete Photo"
         message="Are you sure you want to delete this photo from the group and Google Drive?"
         confirmText="Delete Photo"
+        isDanger={true}
       />
     </div>
   );

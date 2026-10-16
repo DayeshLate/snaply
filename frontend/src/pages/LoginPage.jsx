@@ -70,44 +70,62 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link to="/" className="inline-flex items-center gap-3">
-          <div className="w-10 h-10 rounded bg-[#2563EB] flex items-center justify-center text-white shadow-md">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0F17] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors">
+      {/* Ambient glowing radial backgrounds */}
+      <div
+        className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, rgba(124, 58, 237, 0.12) 40%, transparent 70%)',
+          transform: 'translateZ(0)',
+        }}
+      />
+      <div
+        className="absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%)',
+          transform: 'translateZ(0)',
+        }}
+      />
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center relative z-10">
+        <Link to="/" className="inline-flex items-center gap-3 group mb-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-blue-500/25 transition-transform group-hover:scale-105">
             <Camera className="w-6 h-6" />
           </div>
-          <span className="text-2xl font-bold tracking-tight text-[#0F172A]">Snaply</span>
+          <span className="text-3xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-white dark:via-blue-200 dark:to-cyan-200 bg-clip-text text-transparent">
+            Snaply
+          </span>
         </Link>
-        <h2 className="mt-4 text-2xl font-bold tracking-tight text-[#0F172A]">
+        <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
           {activeTab === 'login' ? 'Sign in to your account' : 'Create your Snaply account'}
         </h2>
-        <p className="mt-1 text-xs text-[#64748B]">
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
           Collaborative photo album and group sharing platform
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-sm rounded-lg border border-[#E2E8F0]">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl py-8 px-6 sm:px-10 shadow-2xl rounded-3xl border border-slate-200/80 dark:border-slate-800">
           {/* Verification Notice */}
           {isVerified && (
-            <div className="mb-6 p-3 rounded bg-green-50 border border-green-200 text-xs text-[#16A34A] flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <div className="mb-6 p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2 font-medium">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
               <span>Email verified successfully! You can now sign in below.</span>
             </div>
           )}
 
-          {/* Tab Switcher */}
-          <div className="flex border-b border-[#E2E8F0] mb-6">
+          {/* Tab Switcher Pills */}
+          <div className="flex p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-6">
             <button
               type="button"
               onClick={() => {
                 setActiveTab('login');
                 setError('');
               }}
-              className={`flex-1 py-2 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
+              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                 activeTab === 'login'
-                  ? 'border-[#2563EB] text-[#2563EB]'
-                  : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Sign In
@@ -118,10 +136,10 @@ export default function LoginPage() {
                 setActiveTab('register');
                 setError('');
               }}
-              className={`flex-1 py-2 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
+              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                 activeTab === 'register'
-                  ? 'border-[#2563EB] text-[#2563EB]'
-                  : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Register
@@ -130,7 +148,7 @@ export default function LoginPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-3 rounded bg-red-50 border border-red-200 text-xs text-[#DC2626] flex items-center gap-2">
+            <div className="mb-4 p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-600 dark:text-rose-400 flex items-center gap-2 font-medium">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -174,6 +192,8 @@ export default function LoginPage() {
               className="w-full mt-2"
               loading={loading}
               icon={ArrowRight}
+              variant="primary"
+              size="lg"
             >
               {activeTab === 'login' ? 'Sign In' : 'Create Account'}
             </Button>
@@ -182,32 +202,32 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#E2E8F0]" />
+              <div className="w-full border-t border-slate-200 dark:border-slate-800" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-[#64748B]">Quick Sign-In (Supabase Accounts)</span>
+            <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-wider">
+              <span className="bg-white dark:bg-slate-900 px-3 text-slate-400">Quick Dev Accounts</span>
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <Button
               variant="outline"
-              className="w-full justify-between text-xs"
+              className="w-full justify-between text-xs py-2.5"
               onClick={() => handleDevLogin('dayeshlaptop@gmail.com', 'dayesh')}
               loading={devLoading}
             >
-              <span className="font-medium text-[#0F172A]">dayeshlaptop@gmail.com</span>
-              <span className="text-[11px] bg-blue-50 text-[#2563EB] px-2 py-0.5 rounded font-semibold">4 Groups</span>
+              <span className="font-bold text-slate-900 dark:text-white">dayeshlaptop@gmail.com</span>
+              <span className="text-[10px] bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-cyan-400 border border-blue-200/50 dark:border-blue-800/40 px-2 py-0.5 rounded-full font-bold">4 Groups</span>
             </Button>
 
             <Button
               variant="outline"
-              className="w-full justify-between text-xs"
+              className="w-full justify-between text-xs py-2.5"
               onClick={() => handleDevLogin('rob857210@gmail.com', 'rob')}
               loading={devLoading}
             >
-              <span className="font-medium text-[#0F172A]">rob857210@gmail.com</span>
-              <span className="text-[11px] bg-blue-50 text-[#2563EB] px-2 py-0.5 rounded font-semibold">2 Groups</span>
+              <span className="font-bold text-slate-900 dark:text-white">rob857210@gmail.com</span>
+              <span className="text-[10px] bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200/50 dark:border-purple-800/40 px-2 py-0.5 rounded-full font-bold">2 Groups</span>
             </Button>
           </div>
         </div>

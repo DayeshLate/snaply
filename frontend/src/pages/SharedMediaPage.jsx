@@ -5,8 +5,6 @@ import {
   Search,
   Filter,
   Upload,
-  Download,
-  Trash2,
 } from 'lucide-react';
 import { groupService } from '../services/groupService';
 import { mediaService } from '../services/mediaService';
@@ -22,7 +20,6 @@ import Button from '../components/common/Button';
 import Loader from '../components/common/Loader';
 import EmptyState from '../components/common/EmptyState';
 import ConfirmDialog from '../components/common/ConfirmDialog';
-import Modal from '../components/common/Modal';
 
 export default function SharedMediaPage() {
   const { user } = useAuth();
@@ -68,13 +65,11 @@ export default function SharedMediaPage() {
           setUploadFolderId(firstGroupFolders[0].id.toString());
         }
 
-        // Fetch media for all groups in parallel
         const mediaPromises = fetchedGroups.map((g) =>
           mediaService.getAllMediaByGroup(g.id).catch(() => [])
         );
         const results = await Promise.all(mediaPromises);
         const allMedia = results.flat();
-        // Remove duplicates if any
         const uniqueMedia = Array.from(
           new Map(allMedia.map((m) => [m.id, m])).values()
         );
@@ -148,30 +143,35 @@ export default function SharedMediaPage() {
     }
   };
 
-  // Find available folders for selected upload group
   const activeUploadGroup = groups.find((g) => g.id.toString() === uploadGroupId);
   const availableUploadFolders = activeUploadGroup?.folders || activeUploadGroup?.folderDTOs || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#0F172A] flex items-center gap-2">
-            <ImageIcon className="w-7 h-7 text-[#2563EB]" />
-            Shared Media
-          </h1>
-          <p className="text-sm text-[#64748B] mt-1">
-            Unified photo library across all groups you have access to
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-600 text-white flex items-center justify-center shadow-md shadow-purple-500/25">
+              <ImageIcon className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+                Shared Media Vault
+              </h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+                Unified photo and video library across all your group archives
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Button
             variant="outline"
             onClick={fetchData}
             title="Refresh"
-            className="p-2 sm:px-3"
+            className="p-2.5 sm:px-3"
           >
             <RefreshCw className="w-4 h-4" />
           </Button>
@@ -179,10 +179,11 @@ export default function SharedMediaPage() {
           {groups.length > 0 && (
             <Button
               onClick={() => setUploadModalOpen(true)}
+              variant="primary"
               className="flex items-center gap-2"
             >
               <Upload className="w-4 h-4" />
-              <span>Upload Photo</span>
+              <span>Upload Media</span>
             </Button>
           )}
         </div>
@@ -191,23 +192,23 @@ export default function SharedMediaPage() {
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             placeholder="Search photos by filename..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-white border border-[#E2E8F0] rounded text-sm text-[#0F172A] placeholder:text-[#64748B] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+            className="w-full pl-10 pr-4 py-2.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-500/20 font-medium shadow-xs"
           />
         </div>
 
         {groups.length > 0 && (
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[#64748B]" />
+          <div className="flex items-center gap-2.5">
+            <Filter className="w-4 h-4 text-slate-400" />
             <select
               value={selectedGroupId}
               onChange={(e) => handleGroupSelect(e.target.value)}
-              className="px-3 py-2 bg-white border border-[#E2E8F0] rounded text-sm text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+              className="px-3.5 py-2.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-xl text-sm text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-blue-500 shadow-xs"
             >
               <option value="ALL">All Groups ({photos.length} photos)</option>
               {groups.map((g) => (
@@ -236,7 +237,7 @@ export default function SharedMediaPage() {
               ? 'Join or create a group to start sharing photos.'
               : 'Upload photos to any of your group albums to build your library.'
           }
-          actionLabel={groups.length > 0 ? 'Upload Photo' : 'Go to Groups'}
+          actionText={groups.length > 0 ? 'Upload Photo' : 'Go to Groups'}
           onAction={
             groups.length > 0 ? () => setUploadModalOpen(true) : () => {}
           }
@@ -282,7 +283,7 @@ export default function SharedMediaPage() {
       {/* Page-level Drag and Drop Overlay */}
       <DragDropZoneOverlay
         onFilesDropped={handlePageDrop}
-        title="Drop media to upload to Shared Library"
+        title="Drop media to upload to Shared Vault"
         subtitle="Release your photos & videos to upload directly into your shared album"
       />
 
@@ -326,7 +327,7 @@ export default function SharedMediaPage() {
         title="Delete Photo"
         message={`Are you sure you want to delete "${photoToDelete?.fileName}"? This will permanently delete it from Google Drive and this group.`}
         confirmText="Delete Photo"
-        danger
+        isDanger={true}
       />
     </div>
   );

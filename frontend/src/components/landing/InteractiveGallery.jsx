@@ -45,17 +45,17 @@ export default function InteractiveGallery() {
     activePhotoIndex !== null ? GALLERY_PHOTOS[activePhotoIndex] : null;
 
   return (
-    <section id="gallery" className="py-24 md:py-32 bg-white">
+    <section id="gallery" className="py-24 md:py-32 bg-white dark:bg-slate-900 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-          <span className="text-xs font-bold text-[#2196F3] uppercase tracking-wider">
+          <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
             Public Gallery Exhibition
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#0D1B3E]">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
             A little collection of life’s best moments.
           </h2>
-          <p className="text-base text-[#536784] leading-relaxed">
+          <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
             Click any photograph to open the high-resolution lightbox viewer.
             Real moments captured and shared by collaborative groups.
           </p>
@@ -71,26 +71,26 @@ export default function InteractiveGallery() {
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.5, delay: (index % 4) * 0.08 }}
               onClick={() => setActivePhotoIndex(index)}
-              className="group relative rounded-xl overflow-hidden border border-[#D9E7F5] bg-slate-100 cursor-pointer shadow-2xs hover:shadow-lg transition-all duration-300"
+              className="group relative rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 cursor-pointer shadow-xs hover:shadow-2xl hover:border-blue-500/50 transition-all duration-300"
             >
               <div className="aspect-4/5 w-full overflow-hidden relative">
                 <img
                   src={photo.url}
                   alt={photo.title}
                   loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                  className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
                 />
 
                 {/* Hover Gradient Overlay */}
-                <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-5 flex flex-col justify-between text-white">
+                <div className="absolute inset-0 bg-linear-to-t from-slate-950/85 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-5 flex flex-col justify-between text-white">
                   <div className="flex justify-end">
-                    <span className="p-2 rounded-full bg-white/20 backdrop-blur-xs text-white">
+                    <span className="p-2.5 rounded-full bg-white/20 backdrop-blur-md text-white shadow-xs">
                       <Maximize2 className="w-4 h-4" />
                     </span>
                   </div>
 
                   <div className="space-y-1">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-[#90CAF9] block">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-300 block">
                       {photo.album}
                     </span>
                     <h4 className="text-base font-bold leading-tight">
@@ -104,11 +104,11 @@ export default function InteractiveGallery() {
               </div>
 
               {/* Bottom Label under photo */}
-              <div className="p-3 bg-white flex items-center justify-between text-xs text-[#536784]">
-                <span className="font-semibold text-[#0D1B3E] truncate">
+              <div className="p-3.5 bg-white dark:bg-slate-900 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs">
+                <span className="font-bold text-slate-900 dark:text-white truncate">
                   {photo.title}
                 </span>
-                <span className="text-[11px] shrink-0 text-[#2196F3] font-medium">
+                <span className="text-[11px] shrink-0 text-blue-600 dark:text-blue-400 font-semibold">
                   {photo.location}
                 </span>
               </div>
