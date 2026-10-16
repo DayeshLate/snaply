@@ -155,7 +155,13 @@ export default function PhotoSearch({
   return (
     <section className="bg-white dark:bg-[#0E1724] border border-[#CBD5E1] dark:border-[#1F2D40] rounded-sm p-6 sm:p-8 space-y-6 shadow-2xs relative overflow-hidden">
       {/* Decorative ambient background glow */}
-      <div className="absolute -top-24 -right-24 w-80 h-80 bg-linear-to-bl from-[#2196F3]/15 via-[#38BDF8]/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div
+        className="absolute -top-24 -right-24 w-80 h-80 rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(33, 150, 243, 0.15) 0%, rgba(56, 189, 248, 0.08) 40%, transparent 70%)',
+          transform: 'translateZ(0)',
+        }}
+      />
 
       {/* Top Header Row with System Info */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">

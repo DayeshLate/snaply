@@ -15,9 +15,21 @@ export default function LandingCtaSection() {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="relative rounded-2xl bg-gradient-to-br from-[#071733] via-[#0B254E] to-[#0A1A33] border border-[#1E3A66] dark:border-[#1E3A5F] p-10 md:p-16 lg:p-20 text-center text-white overflow-hidden shadow-2xl"
         >
-          {/* Subtle Ambient Radial Lighting Pools */}
-          <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#2196F3]/20 rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#38BDF8]/15 rounded-full blur-[120px] pointer-events-none" />
+          {/* Subtle Ambient Radial Lighting Pools (Hardware accelerated with zero GPU blur shader cost) */}
+          <div
+            className="absolute top-0 right-1/4 w-96 h-96 rounded-full pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, rgba(33, 150, 243, 0.22) 0%, transparent 70%)',
+              transform: 'translateZ(0)',
+            }}
+          />
+          <div
+            className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, transparent 70%)',
+              transform: 'translateZ(0)',
+            }}
+          />
 
           {/* Antigravity Floating Dots & Constellation Canvas */}
           <AntigravityDotsBackground className="opacity-90" />

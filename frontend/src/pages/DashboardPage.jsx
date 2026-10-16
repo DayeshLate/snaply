@@ -84,19 +84,24 @@ export default function DashboardPage() {
       setFolders(loadedFolders);
       setDriveStatus(loadedDrive);
 
-      // Collect media across groups and folders
+      // Collect media across groups and folders with O(1) Set deduplication
       const mediaList = [];
+      const seenMediaIds = new Set();
 
       // Extract media attached to folders/DTOs
       loadedFolders.forEach((f) => {
         if (f.media && Array.isArray(f.media)) {
           f.media.forEach((m) => {
-            mediaList.push({
-              ...m,
-              folderId: f.id,
-              folderName: f.name,
-              groupId: f.groupId || f.group?.id,
-            });
+            const mId = m.id || m.fileName;
+            if (!seenMediaIds.has(mId)) {
+              seenMediaIds.add(mId);
+              mediaList.push({
+                ...m,
+                folderId: f.id,
+                folderName: f.name,
+                groupId: f.groupId || f.group?.id,
+              });
+            }
           });
         }
       });
@@ -107,7 +112,9 @@ export default function DashboardPage() {
           g.folderDTOs.forEach((f) => {
             if (f.media && Array.isArray(f.media)) {
               f.media.forEach((m) => {
-                if (!mediaList.some((existing) => existing.id === m.id)) {
+                const mId = m.id || m.fileName;
+                if (!seenMediaIds.has(mId)) {
+                  seenMediaIds.add(mId);
                   mediaList.push({
                     ...m,
                     folderId: f.id,

@@ -84,7 +84,7 @@ export default function Header({
   };
 
   return (
-    <header className="h-16 bg-white/95 dark:bg-[#0E1724]/95 backdrop-blur-md border-b border-[#E2E8F0] dark:border-[#1F2D40] px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 transition-colors">
+    <header className="h-16 bg-white dark:bg-[#0E1724] border-b border-[#E2E8F0] dark:border-[#1F2D40] px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 transition-colors">
       {/* Left side: Mobile menu & Page Title */}
       <div className="flex items-center gap-3">
         <button

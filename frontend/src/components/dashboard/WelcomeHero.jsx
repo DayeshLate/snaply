@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import {
   Sparkles,
   ArrowRight,
@@ -43,8 +42,20 @@ export default function WelcomeHero({
   return (
     <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#0E1724] border border-[#E2E8F0] dark:border-[#1F2D40] p-6 sm:p-8 lg:p-10 shadow-sm transition-all duration-300">
       {/* Ambient background glow inside hero */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#2196F3]/15 via-[#38BDF8]/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-gradient-to-tr from-[#1E3A8A]/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div
+        className="absolute top-0 right-0 w-96 h-96 rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(33, 150, 243, 0.16) 0%, rgba(56, 189, 248, 0.08) 45%, transparent 70%)',
+          transform: 'translateZ(0)',
+        }}
+      />
+      <div
+        className="absolute bottom-0 left-1/3 w-80 h-80 rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(30, 58, 138, 0.12) 0%, transparent 70%)',
+          transform: 'translateZ(0)',
+        }}
+      />
 
       {/* Decorative top-right technical label */}
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6 hidden sm:flex items-center gap-2 font-mono text-[11px] text-[#64748B] dark:text-[#64748B] uppercase tracking-widest border border-[#E2E8F0] dark:border-[#1F2D40] px-2.5 py-1 rounded-sm bg-slate-50 dark:bg-[#121D2C]">
@@ -55,22 +66,12 @@ export default function WelcomeHero({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
         {/* Left Column: Typography & CTAs */}
         <div className="lg:col-span-7 space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-[#EFF6FF] dark:bg-[#152338] border border-[#BFDBFE] dark:border-[#1E3A5F] text-[#2563EB] dark:text-[#60A5FA] text-xs font-semibold tracking-wide uppercase"
-          >
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-[#EFF6FF] dark:bg-[#152338] border border-[#BFDBFE] dark:border-[#1E3A5F] text-[#2563EB] dark:text-[#60A5FA] text-xs font-semibold tracking-wide uppercase">
             <Sparkles className="w-3.5 h-3.5 text-[#2563EB] dark:text-[#38BDF8]" />
             <span>Curated Shared Memories</span>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.05 }}
-            className="space-y-2"
-          >
+          <div className="space-y-2">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0F172A] dark:text-[#F1F5F9] tracking-tight leading-tight">
               {greeting},{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2196F3] via-[#2563EB] to-[#38BDF8]">
@@ -81,15 +82,10 @@ export default function WelcomeHero({
             <p className="text-base sm:text-lg text-[#536784] dark:text-[#94A3B8] font-normal leading-relaxed max-w-xl">
               Bring your favorite moments together. Create shared albums, collect high-definition memories with your circle, and keep every story close.
             </p>
-          </motion.div>
+          </div>
 
           {/* Sharp-edged CTA Action Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="flex flex-wrap items-center gap-3 pt-1"
-          >
+          <div className="flex flex-wrap items-center gap-3 pt-1">
             <button
               onClick={onExploreMemories}
               className="px-5 py-2.5 rounded-sm bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#1E40AF] text-white font-medium text-sm flex items-center gap-2.5 transition-all shadow-sm hover:shadow hover:shadow-[#2563EB]/25 cursor-pointer border border-[#1D4ED8]"
@@ -105,15 +101,10 @@ export default function WelcomeHero({
               <Plus className="w-4 h-4 text-[#2563EB] dark:text-[#38BDF8]" />
               <span>Create Album</span>
             </button>
-          </motion.div>
+          </div>
 
           {/* Feature Badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2 text-xs text-[#64748B] dark:text-[#94A3B8] font-medium"
-          >
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2 text-xs text-[#64748B] dark:text-[#94A3B8] font-medium">
             <div className="flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
               <span>Full-res Google Drive storage</span>
@@ -126,19 +117,15 @@ export default function WelcomeHero({
               <HardDrive className="w-3.5 h-3.5 text-[#6366F1]" />
               <span>{driveConnected ? 'Drive Connected' : 'Google Drive Ready'}</span>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Right Column: Layered Editorial Memory Collage */}
         <div className="lg:col-span-5 relative flex justify-center items-center py-4 lg:py-0">
           <div className="relative w-full max-w-[380px] h-[300px] sm:h-[340px]">
             {/* Background decorative card (tilted) */}
-            <motion.div
-              initial={{ opacity: 0, rotate: -6, scale: 0.9 }}
-              animate={{ opacity: 1, rotate: -6, scale: 1 }}
-              transition={{ duration: 0.7, delay: 0.15 }}
-              whileHover={{ rotate: -3, scale: 1.02 }}
-              className="absolute top-3 left-0 w-64 sm:w-72 aspect-4/3 rounded-sm overflow-hidden border border-[#CBD5E1] dark:border-[#2F4158] shadow-md bg-slate-900 group cursor-pointer"
+            <div
+              className="absolute top-3 left-0 w-64 sm:w-72 aspect-4/3 rounded-sm overflow-hidden border border-[#CBD5E1] dark:border-[#2F4158] shadow-md bg-slate-900 group cursor-pointer -rotate-6 hover:-rotate-3 hover:scale-102 transition-transform duration-300"
             >
               <img
                 src={heroPhotos[1]}
@@ -150,15 +137,11 @@ export default function WelcomeHero({
                 <span className="text-[10px] font-mono uppercase tracking-wider text-blue-300">Coastal Trail</span>
                 <p className="text-xs font-semibold truncate">Summer Retreat 2026</p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Main foreground card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.7, delay: 0.25 }}
-              whileHover={{ y: -4, scale: 1.02 }}
-              className="absolute top-12 right-0 sm:right-2 w-64 sm:w-72 aspect-4/3 rounded-sm overflow-hidden border-2 border-white dark:border-[#38BDF8]/40 shadow-xl bg-slate-900 group z-20 cursor-pointer"
+            <div
+              className="absolute top-12 right-0 sm:right-2 w-64 sm:w-72 aspect-4/3 rounded-sm overflow-hidden border-2 border-white dark:border-[#38BDF8]/40 shadow-xl bg-slate-900 group z-20 cursor-pointer hover:-translate-y-1 hover:scale-102 transition-transform duration-300"
             >
               <img
                 src={heroPhotos[0]}
@@ -177,13 +160,10 @@ export default function WelcomeHero({
                 </span>
                 <p className="text-sm font-bold truncate">Golden Hour at Vagator</p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Floating mini badge widget */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.35 }}
+            <div
               className="absolute -bottom-2 left-6 z-30 bg-white dark:bg-[#121D2C] border border-[#CBD5E1] dark:border-[#2F4158] p-3 rounded-sm shadow-lg flex items-center gap-3"
             >
               <div className="w-8 h-8 rounded-sm bg-[#EFF6FF] dark:bg-[#152338] text-[#2563EB] dark:text-[#38BDF8] flex items-center justify-center border border-[#BFDBFE] dark:border-[#1E3A5F]">
@@ -193,7 +173,7 @@ export default function WelcomeHero({
                 <p className="text-xs font-bold text-[#0F172A] dark:text-white">Active Albums</p>
                 <p className="text-[10px] text-[#64748B] dark:text-[#94A3B8] font-mono">Synced to Drive</p>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>

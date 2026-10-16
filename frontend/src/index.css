@@ -36,13 +36,28 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* Instant 1:1 responsive scroll tracking without smooth-scroll fighting */
+  scroll-behavior: auto;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+/* Hardware-acceleration helper */
+.gpu-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Offscreen layout and paint optimization */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 700px;
+}
+
+/* Smooth, responsive momentum scrolling for internal scroll containers */
+main, [data-scroll-container] {
+  scroll-behavior: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 body {

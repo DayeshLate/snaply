@@ -251,22 +251,22 @@ export default function UploadPhotoModal({
           onClose();
         }
       }}
-      title="Upload Photos & Videos"
-      description="Upload media to your shared group albums with automatic cloud backup"
+      title="Upload Media"
+      description="Add photos or videos to your album"
     >
       <div className="space-y-4">
         {/* Optional Group & Folder Pickers */}
         {groups && groups.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
-                Target Group
+              <label className="block text-xs font-semibold text-[#0F172A] dark:text-[#E2E8F0] uppercase tracking-wider mb-1.5">
+                Group
               </label>
               <select
                 value={selectedGroupId}
                 onChange={(e) => onGroupChange && onGroupChange(e.target.value)}
                 disabled={uploading}
-                className="w-full px-3 py-2 bg-white border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-colors"
+                className="w-full px-3 py-2 bg-white dark:bg-[#121D2C] border border-[#CBD5E1] dark:border-[#1F2D40] rounded-lg text-sm text-[#0F172A] dark:text-[#E2E8F0] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-colors"
               >
                 {groups.map((g) => (
                   <option key={g.id} value={g.id}>
@@ -277,15 +277,15 @@ export default function UploadPhotoModal({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
-                Destination Album
+              <label className="block text-xs font-semibold text-[#0F172A] dark:text-[#E2E8F0] uppercase tracking-wider mb-1.5">
+                Album
               </label>
               <div className="relative">
                 <select
                   value={selectedFolderId}
                   onChange={(e) => setSelectedFolderId(e.target.value)}
                   disabled={uploading || folders.length === 0}
-                  className="w-full px-3 py-2 pl-9 bg-white border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-colors"
+                  className="w-full px-3 py-2 pl-9 bg-white dark:bg-[#121D2C] border border-[#CBD5E1] dark:border-[#1F2D40] rounded-lg text-sm text-[#0F172A] dark:text-[#E2E8F0] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-colors"
                 >
                   {folders.length === 0 ? (
                     <option value="">No albums available</option>
@@ -306,7 +306,7 @@ export default function UploadPhotoModal({
         {/* Folder picker if groups is not passed but multiple folders exist */}
         {(!groups || groups.length === 0) && folders && folders.length > 1 && (
           <div>
-            <label className="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-[#0F172A] dark:text-[#E2E8F0] uppercase tracking-wider mb-1.5">
               Select Destination Album
             </label>
             <div className="relative">
@@ -314,7 +314,7 @@ export default function UploadPhotoModal({
                 value={selectedFolderId}
                 onChange={(e) => setSelectedFolderId(e.target.value)}
                 disabled={uploading}
-                className="w-full px-3 py-2 pl-9 bg-white border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-colors"
+                className="w-full px-3 py-2 pl-9 bg-white dark:bg-[#121D2C] border border-[#CBD5E1] dark:border-[#1F2D40] rounded-lg text-sm text-[#0F172A] dark:text-[#E2E8F0] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-colors"
               >
                 {folders.map((f) => (
                   <option key={f.id} value={f.id}>
@@ -327,7 +327,7 @@ export default function UploadPhotoModal({
           </div>
         )}
 
-        {/* Drag and Drop Zone */}
+        {/* Clean, Minimalist Drag and Drop Zone */}
         <div
           onDragOver={(e) => {
             e.preventDefault();
@@ -343,10 +343,10 @@ export default function UploadPhotoModal({
           onClick={() => {
             if (!uploading) fileInputRef.current?.click();
           }}
-          className={`border-2 border-dashed rounded-xl p-7 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 ${
+          className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 ${
             dragOver
-              ? 'border-[#2563EB] bg-blue-50/80 scale-[1.01] shadow-inner'
-              : 'border-[#CBD5E1] hover:border-[#2563EB] bg-slate-50/60 hover:bg-blue-50/30'
+              ? 'border-[#2563EB] dark:border-[#38BDF8] bg-blue-50/70 dark:bg-blue-950/20 scale-[1.01]'
+              : 'border-slate-300 dark:border-[#1F2D40] hover:border-[#2563EB] dark:hover:border-[#38BDF8] bg-slate-50/50 dark:bg-[#121D2C]/40 hover:bg-blue-50/20 dark:hover:bg-blue-950/10'
           }`}
         >
           <input
@@ -359,45 +359,36 @@ export default function UploadPhotoModal({
           />
 
           <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-colors ${
-              dragOver ? 'bg-[#2563EB] text-white shadow-md' : 'bg-blue-100/70 text-[#2563EB]'
+            className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-colors ${
+              dragOver
+                ? 'bg-[#2563EB] text-white shadow-md'
+                : 'bg-blue-50 dark:bg-blue-950/60 text-[#2563EB] dark:text-[#38BDF8]'
             }`}
           >
-            <UploadCloud className="w-7 h-7" />
+            <UploadCloud className="w-6 h-6" />
           </div>
 
-          <p className="text-sm font-semibold text-[#0F172A]">
-            Drag & drop photos & videos here, or <span className="text-[#2563EB] underline">browse</span>
+          <p className="text-sm font-semibold text-[#0F172A] dark:text-[#F1F5F9]">
+            Drag & drop files here, or <span className="text-[#2563EB] dark:text-[#38BDF8] underline font-medium">browse</span>
           </p>
-          <p className="text-xs text-[#64748B] mt-1.5 max-w-sm">
-            High-res images (JPG, PNG, WEBP, GIF) and videos (MP4, WEBM, MOV) up to 100MB each
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Photos and videos up to 100MB
           </p>
-          <div className="flex items-center gap-2 mt-3">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-white border border-slate-200 text-slate-600">
-              <ImageIcon className="w-3 h-3 text-[#2563EB]" /> Photos
-            </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-white border border-slate-200 text-slate-600">
-              <Film className="w-3 h-3 text-purple-600" /> Videos
-            </span>
-            <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-[#2563EB]">
-              Multi-file support
-            </span>
-          </div>
         </div>
 
         {/* Overall Upload Progress Bar */}
         {uploading && (
-          <div className="bg-blue-50/70 border border-blue-200 rounded-lg p-3.5 space-y-2">
-            <div className="flex items-center justify-between text-xs font-semibold text-[#0F172A]">
+          <div className="bg-blue-50/70 dark:bg-[#121D2C] border border-blue-200 dark:border-[#1F2D40] rounded-lg p-3 space-y-2">
+            <div className="flex items-center justify-between text-xs font-semibold text-[#0F172A] dark:text-white">
               <span className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-[#2563EB]" />
-                Uploading item {currentIndex} of {fileQueue.length}...
+                <Loader2 className="w-4 h-4 animate-spin text-[#2563EB] dark:text-[#38BDF8]" />
+                Uploading {currentIndex} of {fileQueue.length}...
               </span>
-              <span className="text-[#2563EB] font-mono">{currentProgress}%</span>
+              <span className="text-[#2563EB] dark:text-[#38BDF8] font-mono">{currentProgress}%</span>
             </div>
-            <div className="w-full bg-blue-100 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
               <div
-                className="bg-[#2563EB] h-full rounded-full transition-all duration-200 ease-out"
+                className="bg-[#2563EB] dark:bg-[#38BDF8] h-full rounded-full transition-all duration-200 ease-out"
                 style={{ width: `${currentProgress}%` }}
               />
             </div>
@@ -408,7 +399,7 @@ export default function UploadPhotoModal({
         {fileQueue.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-semibold text-[#0F172A] uppercase tracking-wider">
+              <span className="text-xs font-semibold text-[#0F172A] dark:text-[#E2E8F0] uppercase tracking-wider">
                 Files Queue ({fileQueue.length})
                 {completedCount > 0 && ` • ${completedCount} uploaded`}
               </span>
@@ -416,14 +407,14 @@ export default function UploadPhotoModal({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="text-xs text-[#2563EB] hover:underline font-medium inline-flex items-center gap-1 cursor-pointer"
+                    className="text-xs text-[#2563EB] dark:text-[#38BDF8] hover:underline font-medium inline-flex items-center gap-1 cursor-pointer"
                   >
                     <Plus className="w-3 h-3" /> Add more
                   </button>
-                  <span className="text-slate-300">|</span>
+                  <span className="text-slate-300 dark:text-slate-600">|</span>
                   <button
                     onClick={clearQueue}
-                    className="text-xs text-slate-500 hover:text-red-600 transition-colors cursor-pointer"
+                    className="text-xs text-slate-500 hover:text-red-500 transition-colors cursor-pointer"
                   >
                     Clear all
                   </button>
@@ -435,14 +426,14 @@ export default function UploadPhotoModal({
               {fileQueue.map((item, index) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-2.5 rounded-lg border border-[#E2E8F0] bg-white hover:bg-slate-50/50 transition-colors"
+                  className="flex items-center justify-between p-2 rounded-lg border border-[#E2E8F0] dark:border-[#1F2D40] bg-white dark:bg-[#121D2C] hover:bg-slate-50 dark:hover:bg-[#19273A] transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {/* Thumbnail preview */}
-                    <div className="relative w-11 h-11 rounded-md overflow-hidden bg-slate-100 shrink-0 border border-slate-200 flex items-center justify-center">
+                    <div className="relative w-10 h-10 rounded-md overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700 flex items-center justify-center">
                       {item.isVideo ? (
-                        <div className="w-full h-full flex flex-col items-center justify-center bg-purple-50 text-purple-600">
-                          <Film className="w-5 h-5" />
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400">
+                          <Film className="w-4 h-4" />
                         </div>
                       ) : (
                         <img
@@ -451,32 +442,29 @@ export default function UploadPhotoModal({
                           className="w-full h-full object-cover"
                         />
                       )}
-                      <span className="absolute bottom-0 right-0 left-0 bg-black/60 text-white text-[9px] font-mono text-center truncate px-0.5 leading-tight">
-                        {item.badge}
-                      </span>
                     </div>
 
                     {/* File details */}
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-[#0F172A] truncate max-w-xs">
+                      <p className="text-xs font-medium text-[#0F172A] dark:text-[#F1F5F9] truncate max-w-xs">
                         {item.file.name}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-[#64748B]">
+                        <span className="text-[11px] text-[#64748B] dark:text-[#94A3B8]">
                           {formatFileSize(item.file.size)}
                         </span>
                         {item.status === 'completed' && (
-                          <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
+                          <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
                             <CheckCircle className="w-3 h-3" /> Done
                           </span>
                         )}
                         {item.status === 'uploading' && (
-                          <span className="inline-flex items-center gap-1 text-[11px] text-[#2563EB] font-medium">
+                          <span className="inline-flex items-center gap-1 text-[11px] text-[#2563EB] dark:text-[#38BDF8] font-medium">
                             <Loader2 className="w-3 h-3 animate-spin" /> {item.progress}%
                           </span>
                         )}
                         {item.status === 'error' && (
-                          <span className="inline-flex items-center gap-1 text-[11px] text-red-600 font-medium">
+                          <span className="inline-flex items-center gap-1 text-[11px] text-red-600 dark:text-red-400 font-medium">
                             <AlertCircle className="w-3 h-3" /> Failed
                           </span>
                         )}
@@ -487,21 +475,21 @@ export default function UploadPhotoModal({
                   {/* Actions / Status */}
                   <div className="flex items-center gap-1 shrink-0 ml-2">
                     {item.status === 'completed' ? (
-                      <span className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                        <CheckCircle className="w-4 h-4" />
+                      <span className="w-6 h-6 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                        <CheckCircle className="w-3.5 h-3.5" />
                       </span>
                     ) : item.status === 'uploading' ? (
-                      <span className="text-xs font-mono font-semibold text-[#2563EB]">
+                      <span className="text-xs font-mono font-semibold text-[#2563EB] dark:text-[#38BDF8]">
                         {item.progress}%
                       </span>
                     ) : (
                       <button
                         onClick={() => removeFileFromQueue(index)}
                         disabled={uploading}
-                        className="text-[#64748B] hover:text-[#DC2626] p-1.5 rounded-md hover:bg-slate-100 transition-colors cursor-pointer"
+                        className="text-[#64748B] hover:text-[#DC2626] p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                         title="Remove file"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>
@@ -512,10 +500,10 @@ export default function UploadPhotoModal({
         )}
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between pt-3 border-t border-[#E2E8F0]">
-          <span className="text-xs text-[#64748B]">
+        <div className="flex items-center justify-between pt-3 border-t border-[#E2E8F0] dark:border-[#1F2D40]">
+          <span className="text-xs text-[#64748B] dark:text-[#94A3B8]">
             {fileQueue.length === 0
-              ? 'Select or drop files to begin'
+              ? 'Select files to begin'
               : `${fileQueue.length} file(s) selected`}
           </span>
 

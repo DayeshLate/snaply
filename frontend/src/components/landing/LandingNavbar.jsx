@@ -7,36 +7,49 @@ export default function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [visible, setVisible] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const scrolledRef = useRef(false);
+  const visibleRef = useRef(true);
+  const ticking = useRef(false);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+    const onScroll = () => {
+      if (!ticking.current) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          const isScrolled = currentScrollY > 20;
 
-      // Enhance blur/specular styling when scrolled away from top
-      setScrolled(currentScrollY > 15);
+          if (isScrolled !== scrolledRef.current) {
+            scrolledRef.current = isScrolled;
+            setScrolled(isScrolled);
+          }
 
-      // Always show when near the top
-      if (currentScrollY <= 25) {
-        setVisible(true);
-      } else {
-        const delta = currentScrollY - lastScrollY.current;
-        // Scrolling down -> hide navbar smoothly
-        if (delta > 6) {
-          setVisible(false);
-          setMobileOpen(false);
-        }
-        // Scrolling up -> reveal navbar smoothly
-        else if (delta < -8) {
-          setVisible(true);
-        }
+          if (currentScrollY <= 30) {
+            if (!visibleRef.current) {
+              visibleRef.current = true;
+              setVisible(true);
+            }
+          } else {
+            const delta = currentScrollY - lastScrollY.current;
+            if (delta > 10 && visibleRef.current) {
+              visibleRef.current = false;
+              setVisible(false);
+              setMobileOpen(false);
+            } else if (delta < -14 && !visibleRef.current) {
+              visibleRef.current = true;
+              setVisible(true);
+            }
+          }
+
+          lastScrollY.current = currentScrollY;
+          ticking.current = false;
+        });
+        ticking.current = true;
       }
-
-      lastScrollY.current = currentScrollY;
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const navLinks = [
@@ -64,6 +77,7 @@ export default function LandingNavbar() {
 
   return (
     <header
+      style={{ transform: 'translateZ(0)', willChange: 'transform, opacity' }}
       className={`fixed top-3 sm:top-5 left-0 right-0 z-50 px-3 sm:px-6 lg:px-8 pointer-events-none transition-all duration-300 ease-in-out ${
         visible ? 'translate-y-0 opacity-100' : '-translate-y-28 opacity-0'
       }`}
@@ -71,10 +85,11 @@ export default function LandingNavbar() {
       <div className={`max-w-7xl mx-auto w-full ${visible ? 'pointer-events-auto' : 'pointer-events-none'}`}>
         {/* Continuous Glassy Row from Logo to Get Started */}
         <div
-          className={`flex items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-3 rounded-2xl transition-all duration-300 ${
+          style={{ transform: 'translateZ(0)' }}
+          className={`flex items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-3 rounded-2xl transition-all duration-200 ${
             scrolled
-              ? 'bg-white/80 dark:bg-[#070D16]/85 backdrop-blur-2xl backdrop-saturate-200 border border-white/85 dark:border-white/15 shadow-[0_12px_40px_-10px_rgba(33,150,243,0.18),0_4px_16px_-2px_rgba(0,0,0,0.06),inset_0_1px_1px_0_rgba(255,255,255,0.9)]'
-              : 'bg-white/65 dark:bg-[#070D16]/70 backdrop-blur-2xl backdrop-saturate-180 border border-white/80 dark:border-white/12 shadow-[0_8px_32px_0_rgba(15,23,42,0.08),inset_0_1px_1px_0_rgba(255,255,255,0.85)]'
+              ? 'bg-white/85 dark:bg-[#070D16]/90 backdrop-blur-md border border-white/85 dark:border-white/15 shadow-[0_8px_30px_rgba(33,150,243,0.12),0_2px_10px_rgba(0,0,0,0.04)]'
+              : 'bg-white/75 dark:bg-[#070D16]/75 backdrop-blur-md border border-white/80 dark:border-white/12 shadow-[0_4px_24px_rgba(15,23,42,0.06)]'
           }`}
         >
           {/* Logo on Left */}

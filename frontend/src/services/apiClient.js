@@ -10,6 +10,24 @@ export const apiClient = axios.create({
   },
 });
 
+// In-flight GET request deduplication to prevent simultaneous network storms on page mount
+const inFlightGetMap = new Map();
+const originalGet = apiClient.get.bind(apiClient);
+
+apiClient.get = function (url, config = {}) {
+  const token = localStorage.getItem('snaply_token') || '';
+  const key = `${url}:${JSON.stringify(config.params || {})}:${token}`;
+  if (inFlightGetMap.has(key)) {
+    return inFlightGetMap.get(key);
+  }
+  const promise = originalGet(url, config).finally(() => {
+    // Clear after 300ms so subsequent user actions fetch fresh data
+    setTimeout(() => inFlightGetMap.delete(key), 300);
+  });
+  inFlightGetMap.set(key, promise);
+  return promise;
+};
+
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('snaply_token');

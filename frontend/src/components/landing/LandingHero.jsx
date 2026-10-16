@@ -56,7 +56,13 @@ export default function LandingHero() {
 
       {/* Background Subtle Ambience */}
       <div className="absolute top-0 inset-x-0 h-96 bg-linear-to-b from-blue-100/60 to-transparent pointer-events-none" />
-      <div className="absolute -top-32 right-1/4 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl pointer-events-none" />
+      <div
+        className="absolute -top-32 right-1/4 w-96 h-96 rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(147, 197, 253, 0.35) 0%, transparent 70%)',
+          transform: 'translateZ(0)',
+        }}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Top Text Content */}

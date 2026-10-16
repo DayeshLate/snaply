@@ -12,35 +12,8 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-function AnimatedCounter({ targetValue = 0, duration = 1000 }) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    let startTime;
-    let animationFrame;
-    const target = Number(targetValue) || 0;
-
-    if (target === 0) {
-      setCount(0);
-      return;
-    }
-
-    const step = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      setCount(Math.floor(progress * target));
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(step);
-      } else {
-        setCount(target);
-      }
-    };
-
-    animationFrame = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [targetValue, duration]);
-
-  return <span>{count}</span>;
+function AnimatedCounter({ targetValue = 0 }) {
+  return <span>{targetValue ?? 0}</span>;
 }
 
 export default function StatsOverview({
