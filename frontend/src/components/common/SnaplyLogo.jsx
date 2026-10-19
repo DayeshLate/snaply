@@ -14,32 +14,32 @@ export default function SnaplyLogo({
 }) {
   const sizeMap = {
     xs: {
-      box: 'w-6 h-6',
-      img: 'w-6 h-6',
+      box: 'w-7 h-7',
+      img: 'w-7 h-7',
       text: 'text-base',
       badge: 'text-[9px]',
     },
     sm: {
-      box: 'w-8 h-8',
-      img: 'w-8 h-8',
+      box: 'w-10 h-10',
+      img: 'w-10 h-10',
       text: 'text-lg',
       badge: 'text-[10px]',
     },
     md: {
-      box: 'w-10 h-10',
-      img: 'w-10 h-10',
+      box: 'w-12 h-12',
+      img: 'w-12 h-12',
       text: 'text-xl',
       badge: 'text-[10px]',
     },
     lg: {
-      box: 'w-12 h-12',
-      img: 'w-12 h-12',
+      box: 'w-16 h-16',
+      img: 'w-16 h-16',
       text: 'text-2xl',
       badge: 'text-xs',
     },
     xl: {
-      box: 'w-16 h-16',
-      img: 'w-16 h-16',
+      box: 'w-20 h-20',
+      img: 'w-20 h-20',
       text: 'text-3xl',
       badge: 'text-xs',
     },
@@ -82,3 +82,4 @@ export default function SnaplyLogo({
     </div>
   );
 }
+

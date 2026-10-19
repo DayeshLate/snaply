@@ -13,7 +13,7 @@ export default function LandingCtaSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="relative rounded-3xl bg-[#071733] border border-blue-900/60 p-10 md:p-16 lg:p-20 text-center text-white overflow-hidden shadow-2xl"
+          className="relative rounded-3xl bg-[#11253E] border border-blue-800/60 p-10 md:p-16 lg:p-20 text-center text-white overflow-hidden shadow-2xl"
         >
           {/* Antigravity Floating Dots & Constellation Canvas */}
           <AntigravityDotsBackground className="opacity-90" />
@@ -23,9 +23,18 @@ export default function LandingCtaSection() {
 
           {/* Main Content */}
           <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md text-xs font-mono uppercase tracking-wider text-blue-400 border border-blue-400/40 shadow-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping" />
-              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+            <div className="w-20 h-20 mx-auto flex items-center justify-center">
+              <img
+                src="/snaply-cloud-mark.png"
+                alt="Snaply"
+                className="w-full h-full object-contain drop-shadow-md"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md text-xs font-mono uppercase tracking-wider text-sky-400 border border-sky-400/40 shadow-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping" />
+              <Sparkles className="w-3.5 h-3.5 text-sky-400" />
               <span>Begin Your Shared Album Today</span>
             </div>
 

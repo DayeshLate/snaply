@@ -97,14 +97,19 @@ export default function LandingNavbar() {
             to="/"
             className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl shrink-0"
           >
-            <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-all duration-200">
-              <Camera className="w-5 h-5 transition-transform group-hover:rotate-6 duration-200" />
+            <div className="w-12 h-12 flex items-center justify-center shrink-0 group-hover:scale-105 transition-all duration-200">
+              <img
+                src="/snaply-cloud-mark.png"
+                alt="Snaply"
+                className="w-full h-full object-contain drop-shadow-sm"
+                loading="eager"
+              />
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white leading-none">
                 Snaply
               </span>
-              <span className="text-[10px] tracking-wider uppercase font-bold text-blue-600 dark:text-blue-400 mt-0.5">
+              <span className="text-[10px] tracking-wider uppercase font-bold text-sky-600 dark:text-sky-400 mt-0.5">
                 Shared Albums
               </span>
             </div>

@@ -74,7 +74,7 @@ export default function Header({
   };
 
   return (
-    <header className="h-18 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 transition-colors">
+    <header className="h-18 bg-white/80 dark:bg-[#11253E]/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 transition-colors">
       {/* Left side: Mobile menu & Page Title */}
       <div className="flex items-center gap-3">
         <button
@@ -86,6 +86,11 @@ export default function Header({
         </button>
 
         <div className="flex items-center gap-2.5">
+          <img
+            src="/snaply-cloud-mark.png"
+            alt="Snaply"
+            className="md:hidden w-9 h-9 object-contain"
+          />
           <h1 className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-tight">
             {getPageTitle()}
           </h1>

@@ -41,12 +41,17 @@ export default function JoinInvitePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0F17] flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B1728] flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors">
       {/* Brand Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link to="/" className="inline-flex items-center gap-2.5 mb-5 group">
-          <div className="w-11 h-11 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
-            <Camera className="w-6 h-6" />
+        <Link to="/" className="inline-flex items-center gap-3 mb-5 group">
+          <div className="w-14 h-14 flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
+            <img
+              src="/snaply-cloud-mark.png"
+              alt="Snaply"
+              className="w-full h-full object-contain drop-shadow-sm"
+              loading="eager"
+            />
           </div>
           <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
             Snaply

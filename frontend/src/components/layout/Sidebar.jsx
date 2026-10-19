@@ -90,8 +90,13 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
           onClick={onCloseMobile}
           className="flex items-center gap-3 min-w-0 group"
         >
-          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm shrink-0 transition-transform group-hover:scale-105 duration-200">
-            <Camera className="w-5 h-5" />
+          <div className="w-11 h-11 shrink-0 transition-transform group-hover:scale-105 duration-200 flex items-center justify-center">
+            <img
+              src="/snaply-cloud-mark.png"
+              alt="Snaply"
+              className="w-full h-full object-contain drop-shadow-xs"
+              loading="eager"
+            />
           </div>
           {!isCollapsed && (
             <div className="min-w-0">

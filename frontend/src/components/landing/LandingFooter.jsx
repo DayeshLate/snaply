@@ -14,8 +14,13 @@ export default function LandingFooter() {
           {/* Brand Col */}
           <div className="md:col-span-1 space-y-4">
             <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25">
-                <Camera className="w-5 h-5" />
+              <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                <img
+                  src="/snaply-cloud-mark.png"
+                  alt="Snaply"
+                  className="w-full h-full object-contain drop-shadow-xs"
+                  loading="lazy"
+                />
               </div>
               <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
                 Snaply

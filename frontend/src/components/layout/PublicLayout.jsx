@@ -7,11 +7,16 @@ export default function PublicLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 transition-colors">
       {/* Public Navbar */}
-      <header className="h-18 border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md sticky top-0 z-40">
+      <header className="h-18 border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-[#0B1728]/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-full flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
-              <Camera className="w-5 h-5" />
+            <div className="w-12 h-12 flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
+              <img
+                src="/snaply-cloud-mark.png"
+                alt="Snaply"
+                className="w-full h-full object-contain drop-shadow-xs"
+                loading="eager"
+              />
             </div>
             <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
               Snaply
@@ -54,11 +59,16 @@ export default function PublicLayout() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-[#111827]/60 py-12 px-4 md:px-8">
+      <footer className="border-t border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-[#0B1728]/60 py-12 px-4 md:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
-              <Camera className="w-4 h-4" />
+            <div className="w-11 h-11 flex items-center justify-center shrink-0">
+              <img
+                src="/snaply-cloud-mark.png"
+                alt="Snaply"
+                className="w-full h-full object-contain drop-shadow-xs"
+                loading="lazy"
+              />
             </div>
             <span className="text-lg font-black text-slate-900 dark:text-white">Snaply</span>
             <span className="text-xs text-slate-500 dark:text-slate-400 ml-2 font-medium">Your Memories. Your People. One Place.</span>

@@ -70,11 +70,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0F17] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B1728] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center relative z-10">
-        <Link to="/" className="inline-flex items-center gap-3 group mb-4">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
-            <Camera className="w-6 h-6" />
+        <Link to="/" className="inline-flex items-center gap-3.5 group mb-4">
+          <div className="w-16 h-16 flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
+            <img
+              src="/snaply-cloud-mark.png"
+              alt="Snaply"
+              className="w-full h-full object-contain drop-shadow-sm"
+              loading="eager"
+            />
           </div>
           <span className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
             Snaply
