@@ -29,7 +29,7 @@ export default function GroupCard({ group, currentUserId }) {
       className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-blue-500 dark:hover:border-cyan-400 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col group shadow-sm"
     >
       {/* Top Banner */}
-      <div className="h-32 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative p-5 flex flex-col justify-between">
+      <div className="h-32 bg-blue-600 relative p-5 flex flex-col justify-between">
         <div className="flex items-center justify-between">
           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black/40 text-white backdrop-blur-md border border-white/20">
             {isOwner ? 'Owner' : 'Member'}

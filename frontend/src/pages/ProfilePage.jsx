@@ -55,7 +55,7 @@ export default function ProfilePage() {
             <span>Account Center</span>
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
-            <span className="gradient-text">My Profile</span>
+            <span>My Profile</span>
           </h1>
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
             Manage your account credentials, storage integration, and application preferences
@@ -74,13 +74,12 @@ export default function ProfilePage() {
 
       {/* Profile Hero Card */}
       <div className="relative rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none overflow-hidden p-6 sm:p-8">
-        {/* Subtle top gradient accent line */}
-        <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500" />
+        {/* Top accent line */}
+        <div className="absolute top-0 inset-x-0 h-1 bg-blue-600" />
 
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 pt-2">
-          {/* Avatar with gradient glow ring */}
+          {/* Avatar */}
           <div className="relative group shrink-0">
-            <div className="absolute -inset-1 rounded-full bg-linear-to-tr from-blue-600 via-indigo-500 to-purple-600 opacity-70 blur-xs group-hover:opacity-100 transition duration-300" />
             {user?.profilePicture ? (
               <img
                 src={user.profilePicture}
@@ -88,7 +87,7 @@ export default function ProfilePage() {
                 className="relative w-24 h-24 rounded-full object-cover ring-4 ring-white dark:ring-slate-900 shadow-md"
               />
             ) : (
-              <div className="relative w-24 h-24 rounded-full bg-linear-to-br from-blue-600 via-indigo-600 to-purple-700 text-white text-3xl font-extrabold flex items-center justify-center ring-4 ring-white dark:ring-slate-900 shadow-md">
+              <div className="relative w-24 h-24 rounded-full bg-blue-600 text-white text-3xl font-extrabold flex items-center justify-center ring-4 ring-white dark:ring-slate-900 shadow-md">
                 {getInitials(user?.name)}
               </div>
             )}
@@ -178,7 +177,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Storage & Drive Settings Quick Link */}
-      <div className="relative rounded-3xl bg-linear-to-br from-blue-50/70 via-indigo-50/40 to-white dark:from-slate-900/90 dark:via-blue-950/30 dark:to-slate-900/90 border border-blue-200/60 dark:border-blue-900/50 shadow-lg shadow-blue-500/5 p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 overflow-hidden">
+      <div className="relative rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 overflow-hidden">
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300 font-bold text-base">
             <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20">

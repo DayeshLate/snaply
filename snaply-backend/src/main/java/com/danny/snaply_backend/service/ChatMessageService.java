@@ -69,7 +69,7 @@ public class ChatMessageService {
 
         Media media = null;
         if (mediaId != null) {
-            media = mediaRepository.findById(mediaId)
+            media = mediaRepository.findByIdWithDetails(mediaId)
                     .orElseThrow(() -> new RuntimeException("Media not found with ID: " + mediaId));
 
             if (media.getFolder() == null || media.getFolder().getGroup() == null

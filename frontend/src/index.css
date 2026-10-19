@@ -3,11 +3,11 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-brand-blue: #2563EB;
-  --color-brand-indigo: #4F46E5;
-  --color-brand-purple: #7C3AED;
-  --color-brand-dark: #1E3A8A;
-  --color-brand-light: #DBEAFE;
+  --color-brand-blue: #1D78D6;
+  --color-brand-indigo: #2563EB;
+  --color-brand-purple: #3B82F6;
+  --color-brand-dark: #11253E;
+  --color-brand-light: #E0F2FE;
   --color-brand-bg: #F8FAFC;
   --color-brand-card: #FFFFFF;
   --color-brand-text: #0F172A;
@@ -16,29 +16,29 @@
   --color-brand-success: #10B981;
   --color-brand-error: #EF4444;
 
-  --color-accent-purple: #8B5CF6;
-  --color-accent-indigo: #6366F1;
-  --color-accent-cyan: #06B6D4;
-  --color-accent-teal: #14B8A6;
+  --color-accent-purple: #3B82F6;
+  --color-accent-indigo: #2563EB;
+  --color-accent-cyan: #62C1EA;
+  --color-accent-teal: #0284C7;
   --color-accent-emerald: #10B981;
   --color-accent-amber: #F59E0B;
   --color-accent-rose: #F43F5E;
   --color-accent-pink: #EC4899;
 
-  --color-snaply-primary: #2563EB;
-  --color-snaply-deep: #1E40AF;
-  --color-snaply-secondary: #3B82F6;
-  --color-snaply-light: #93C5FD;
-  --color-snaply-cyan: #06B6D4;
-  --color-snaply-purple: #8B5CF6;
-  --color-snaply-glow: rgba(37, 99, 235, 0.25);
+  --color-snaply-primary: #1D78D6;
+  --color-snaply-deep: #11253E;
+  --color-snaply-secondary: #38BDF8;
+  --color-snaply-light: #9EE1F9;
+  --color-snaply-cyan: #62C1EA;
+  --color-snaply-purple: #2563EB;
+  --color-snaply-glow: rgba(29, 120, 214, 0.25);
 
-  --color-canvas-dark: #0B0F17;
-  --color-surface-dark: #111827;
-  --color-surface-2-dark: #1F2937;
-  --color-surface-3-dark: #283548;
-  --color-line-dark: #243142;
-  --color-line-strong-dark: #37475E;
+  --color-canvas-dark: #0B1728;
+  --color-surface-dark: #11253E;
+  --color-surface-2-dark: #162E4D;
+  --color-surface-3-dark: #1C3B61;
+  --color-line-dark: #1F4068;
+  --color-line-strong-dark: #285387;
   --color-ink-dark: #F1F5F9;
   --color-ink-muted-dark: #94A3B8;
 
@@ -126,27 +126,35 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #2563EB 0%, #7C3AED 55%, #06B6D4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #2563EB;
+}
+
+.dark .gradient-text {
+  color: #38BDF8;
 }
 
 .gradient-text-cyan {
-  background: linear-gradient(135deg, #06B6D4 0%, #2563EB 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #0284C7;
+}
+
+.dark .gradient-text-cyan {
+  color: #38BDF8;
 }
 
 .gradient-text-amber {
-  background: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #D97706;
+}
+
+.dark .gradient-text-amber {
+  color: #FBBF24;
 }
 
 .gradient-text-purple {
-  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #7C3AED;
+}
+
+.dark .gradient-text-purple {
+  color: #A78BFA;
 }
 
 .glow-blue {

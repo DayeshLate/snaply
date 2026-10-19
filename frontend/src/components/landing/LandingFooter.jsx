@@ -14,7 +14,7 @@ export default function LandingFooter() {
           {/* Brand Col */}
           <div className="md:col-span-1 space-y-4">
             <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-2xl bg-linear-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25">
+              <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25">
                 <Camera className="w-5 h-5" />
               </div>
               <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white">

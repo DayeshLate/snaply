@@ -14,14 +14,6 @@ import {
 } from 'lucide-react';
 import { mediaService } from '../../services/mediaService';
 
-const SUGGESTED_QUERIES = [
-  'Goa beach sunset',
-  'Family birthday celebration with cake',
-  'Mountain trek & hiking trail',
-  'Campfire under the starry sky',
-  'Cars and road trip moments',
-];
-
 export default function PhotoSearch({
   allMedia = [],
   groups = [],
@@ -110,10 +102,6 @@ export default function PhotoSearch({
     return () => clearTimeout(timer);
   }, [query, selectedGroupId, minSimilarity, performSearch]);
 
-  const handleApplyQuery = (suggested) => {
-    setQuery(suggested);
-  };
-
   const handleTriggerSyncAll = async () => {
     setIsSyncing(true);
     setSyncMessage(null);
@@ -149,15 +137,6 @@ export default function PhotoSearch({
 
   return (
     <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-10 space-y-6 shadow-xl relative overflow-hidden">
-      {/* Decorative ambient background glow */}
-      <div
-        className="absolute -top-24 -right-24 w-96 h-96 rounded-full pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(37, 99, 235, 0.16) 0%, rgba(6, 182, 212, 0.1) 40%, transparent 70%)',
-          transform: 'translateZ(0)',
-        }}
-      />
-
       {/* Top Header Row with System Info */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
         <div>
@@ -206,7 +185,7 @@ export default function PhotoSearch({
       )}
 
       {/* Natural Language Search Input */}
-      <div className="relative z-10 space-y-3.5">
+      <div className="relative z-10">
         <div className="relative flex items-center">
           <Search className="w-5 h-5 text-slate-400 absolute left-4.5 pointer-events-none" />
           <input
@@ -225,22 +204,6 @@ export default function PhotoSearch({
             </button>
           )}
         </div>
-
-        {/* Suggested Queries Chips */}
-        <div className="flex flex-wrap items-center gap-2 pt-0.5">
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-            Quick Prompts:
-          </span>
-          {SUGGESTED_QUERIES.map((s) => (
-            <button
-              key={s}
-              onClick={() => handleApplyQuery(s)}
-              className="text-xs px-3 py-1.5 rounded-xl bg-slate-100/90 dark:bg-slate-800/80 hover:bg-blue-50 dark:hover:bg-blue-950/40 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-400 border border-slate-200/80 dark:border-slate-700/80 hover:border-blue-300 transition-all cursor-pointer font-medium"
-            >
-              {s}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Filter and Sensitivity Options Bar */}
@@ -257,7 +220,7 @@ export default function PhotoSearch({
                 onClick={() => setActiveTypeFilter(f)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
                   activeTypeFilter === f
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-transparent shadow-xs'
+                    ? 'bg-blue-600 text-white border-transparent shadow-xs'
                     : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-blue-400'
                 }`}
               >
@@ -382,7 +345,7 @@ export default function PhotoSearch({
                         'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&auto=format&fit=crop&q=80';
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent opacity-75 group-hover:opacity-95 transition-opacity" />
+                  <div className="absolute inset-0 bg-slate-950/60 opacity-75 group-hover:opacity-95 transition-opacity" />
 
                   {/* Similarity Badge */}
                   {similarityScore !== null && (

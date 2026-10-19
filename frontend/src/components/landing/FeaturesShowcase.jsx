@@ -47,7 +47,7 @@ export default function FeaturesShowcase() {
           >
             <div className="flex items-center justify-between pb-4 border-b border-slate-200/80 dark:border-slate-800">
               <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-500/25">
+                <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-500/25">
                   <FolderLock className="w-5 h-5" />
                 </div>
                 <div>
@@ -193,7 +193,7 @@ export default function FeaturesShowcase() {
             {/* Group Header Card */}
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between">
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-blue-500/25">
+                <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-blue-500/25">
                   PA
                 </div>
                 <div>
@@ -432,7 +432,7 @@ export default function FeaturesShowcase() {
               </div>
 
               <div className="flex items-start gap-2.5 justify-end">
-                <div className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-2xl rounded-tr-sm p-3 max-w-xs text-xs space-y-2 shadow-md shadow-blue-500/20">
+                <div className="bg-blue-600 text-white rounded-2xl rounded-tr-sm p-3 max-w-xs text-xs space-y-2 shadow-md shadow-blue-500/20">
                   <p>These came out unbelievable, the lighting was unreal!</p>
                   <div className="rounded-xl overflow-hidden border border-white/30">
                     <img

@@ -14,7 +14,7 @@ export default function EmptyState({
       className={`flex flex-col items-center justify-center p-12 text-center rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 backdrop-blur-sm transition-all ${className}`}
     >
       {Icon && (
-        <div className="p-4 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-cyan-500/10 dark:from-blue-500/20 dark:to-purple-500/20 rounded-2xl text-blue-600 dark:text-cyan-400 mb-4 ring-1 ring-blue-500/20 shadow-sm">
+        <div className="p-4 bg-blue-50 dark:bg-blue-950/50 rounded-2xl text-blue-600 dark:text-blue-400 mb-4 ring-1 ring-blue-500/20 shadow-xs">
           <Icon className="w-8 h-8" />
         </div>
       )}

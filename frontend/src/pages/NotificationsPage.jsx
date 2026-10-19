@@ -70,7 +70,7 @@ export default function NotificationsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
               <Bell className="w-5 h-5" />
             </div>
             <div>
@@ -114,7 +114,7 @@ export default function NotificationsPage() {
           onClick={() => setFilter('ALL')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             filter === 'ALL'
-              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20'
+              ? 'bg-blue-600 text-white shadow-sm'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
           }`}
         >
@@ -124,7 +124,7 @@ export default function NotificationsPage() {
           onClick={() => setFilter('UNREAD')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
             filter === 'UNREAD'
-              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20'
+              ? 'bg-blue-600 text-white shadow-sm'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
           }`}
         >

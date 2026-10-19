@@ -90,7 +90,7 @@ export default function PhotoGrid({
             )}
 
             {/* Hover Actions & Details Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3.5 flex flex-col justify-between text-white z-20">
+            <div className="absolute inset-0 bg-slate-950/65 opacity-0 group-hover:opacity-100 transition-opacity p-3.5 flex flex-col justify-between text-white z-20">
               <div className="flex items-center justify-end gap-1.5">
                 {/* Edit Button */}
                 {canManage && onEditPhoto && (

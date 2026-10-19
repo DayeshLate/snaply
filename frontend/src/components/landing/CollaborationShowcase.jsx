@@ -67,7 +67,7 @@ export default function CollaborationShowcase() {
               alt="Group Cover"
               className="w-full h-full object-cover opacity-85"
             />
-            <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/35 to-transparent p-6 md:p-8 flex flex-col justify-end text-white">
+            <div className="absolute inset-0 bg-slate-950/65 p-6 md:p-8 flex flex-col justify-end text-white">
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
                   <span className="text-xs font-bold uppercase tracking-wider text-blue-300">

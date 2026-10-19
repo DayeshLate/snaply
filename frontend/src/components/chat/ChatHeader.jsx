@@ -5,7 +5,7 @@ export default function ChatHeader({ group, memberCount = 0 }) {
   return (
     <div className="p-4 sm:p-5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
       <div className="flex items-center gap-3.5">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25">
+        <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
           <MessageSquare className="w-5 h-5" />
         </div>
         <div>

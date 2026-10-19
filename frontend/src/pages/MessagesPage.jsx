@@ -166,7 +166,7 @@ export default function MessagesPage() {
         <div className="p-4 sm:p-5 border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80">
           <div className="flex items-center justify-between mb-3.5">
             <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-xs">
+              <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
                 <MessageSquare className="w-4 h-4" />
               </div>
               <span>Discussions</span>
@@ -216,7 +216,7 @@ export default function MessagesPage() {
                       : 'hover:bg-slate-100/70 dark:hover:bg-slate-800/50'
                   }`}
                 >
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
+                  <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
                     {getInitials(g.name)}
                   </div>
                   <div className="min-w-0 flex-1">

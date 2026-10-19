@@ -79,7 +79,7 @@ export default function GroupWorkspace({
               <div>
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 text-white flex items-center justify-center font-black text-sm shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shadow-sm group-hover:scale-105 transition-transform">
                       {getInitials(group.name)}
                     </div>
                     <div>
@@ -152,7 +152,7 @@ export default function GroupWorkspace({
           onClick={onCreateGroup}
           className="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-cyan-400 rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-blue-50/40 dark:hover:bg-slate-800/40 transition-all min-h-[200px] group shadow-xs"
         >
-          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 group-hover:bg-gradient-to-tr group-hover:from-blue-600 group-hover:to-indigo-600 text-blue-600 group-hover:text-white flex items-center justify-center transition-all duration-300 mb-3 shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 group-hover:bg-blue-600 text-blue-600 group-hover:text-white flex items-center justify-center transition-all duration-300 mb-3 shadow-xs">
             <Plus className="w-6 h-6" />
           </div>
           <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors">

@@ -13,24 +13,8 @@ export default function LandingCtaSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="relative rounded-3xl bg-linear-to-br from-[#071733] via-[#0B254E] to-[#0A1A33] border border-blue-900/60 p-10 md:p-16 lg:p-20 text-center text-white overflow-hidden shadow-2xl"
+          className="relative rounded-3xl bg-[#071733] border border-blue-900/60 p-10 md:p-16 lg:p-20 text-center text-white overflow-hidden shadow-2xl"
         >
-          {/* Subtle Ambient Radial Lighting Pools (Hardware accelerated with zero GPU blur shader cost) */}
-          <div
-            className="absolute top-0 right-1/4 w-96 h-96 rounded-full pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, transparent 70%)',
-              transform: 'translateZ(0)',
-            }}
-          />
-          <div
-            className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%)',
-              transform: 'translateZ(0)',
-            }}
-          />
-
           {/* Antigravity Floating Dots & Constellation Canvas */}
           <AntigravityDotsBackground className="opacity-90" />
 
@@ -47,7 +31,7 @@ export default function LandingCtaSection() {
 
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
               Start collecting moments{' '}
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 via-indigo-300 to-white">
+              <span className="text-blue-400">
                 together.
               </span>
             </h2>
@@ -60,7 +44,7 @@ export default function LandingCtaSection() {
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 to="/login?tab=register"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-base font-bold shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-98 transition-all cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-base font-bold shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-98 transition-all cursor-pointer"
               >
                 <span>Get Started with Snaply</span>
                 <ArrowRight className="w-4 h-4" />

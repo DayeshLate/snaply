@@ -93,7 +93,7 @@ export default function AppLayout() {
         />
 
         {isDemo && (
-          <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-xs px-4 py-2 flex items-center justify-between shadow-xs z-10 shrink-0">
+          <div className="bg-blue-600 text-white text-xs px-4 py-2 flex items-center justify-between shadow-xs z-10 shrink-0">
             <div className="flex items-center gap-2 truncate">
               <span className="font-extrabold bg-white/20 px-2.5 py-0.5 rounded-full text-[10px] tracking-wide shrink-0">
                 PREVIEW MODE

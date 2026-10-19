@@ -81,8 +81,8 @@ export default function InteractiveGallery() {
                   className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
                 />
 
-                {/* Hover Gradient Overlay */}
-                <div className="absolute inset-0 bg-linear-to-t from-slate-950/85 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-5 flex flex-col justify-between text-white">
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-slate-950/65 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-5 flex flex-col justify-between text-white">
                   <div className="flex justify-end">
                     <span className="p-2.5 rounded-full bg-white/20 backdrop-blur-md text-white shadow-xs">
                       <Maximize2 className="w-4 h-4" />

@@ -66,7 +66,7 @@ export default function DragDropZoneOverlay({
   return (
     <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200">
       <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl p-10 max-w-lg mx-6 text-center shadow-2xl border-2 border-dashed border-blue-500 scale-100 animate-in zoom-in-95 duration-200 ring-4 ring-blue-500/20">
-        <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-blue-500/30">
+        <div className="w-20 h-20 mx-auto rounded-3xl bg-blue-600 text-white flex items-center justify-center mb-6 shadow-md shadow-blue-500/20">
           <UploadCloud className="w-10 h-10 animate-bounce" />
         </div>
         <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">

@@ -40,22 +40,6 @@ export default function WelcomeHero({
 
   return (
     <div className="relative overflow-hidden rounded-3xl bg-white/90 dark:bg-[#111827]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-10 lg:p-12 shadow-xl shadow-slate-200/40 dark:shadow-black/40 transition-all duration-300">
-      {/* Vibrant Ambient Gradient Glows inside hero */}
-      <div
-        className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, rgba(124, 58, 237, 0.12) 40%, transparent 70%)',
-          transform: 'translateZ(0)',
-        }}
-      />
-      <div
-        className="absolute bottom-0 left-1/4 w-[450px] h-[450px] rounded-full pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.14) 0%, transparent 65%)',
-          transform: 'translateZ(0)',
-        }}
-      />
-
       {/* Decorative top-right status pill */}
       <div className="absolute top-5 right-5 sm:top-7 sm:right-7 hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 border border-slate-200/80 dark:border-slate-800 px-3.5 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow-xs backdrop-blur-sm">
         <span className="w-2 h-2 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20 animate-pulse" />
@@ -65,7 +49,7 @@ export default function WelcomeHero({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
         {/* Left Column: Typography & CTAs */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 dark:from-blue-500/20 dark:to-purple-500/20 border border-blue-500/20 text-blue-600 dark:text-cyan-400 text-xs font-bold tracking-wide uppercase">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-xs font-bold tracking-wide uppercase">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Shared Photo Vault</span>
           </div>
@@ -73,7 +57,7 @@ export default function WelcomeHero({
           <div className="space-y-3">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1]">
               {greeting},{' '}
-              <span className="gradient-text">
+              <span className="text-blue-600 dark:text-blue-400">
                 {userName}
               </span>
               .
@@ -87,7 +71,7 @@ export default function WelcomeHero({
           <div className="flex flex-wrap items-center gap-3.5 pt-2">
             <button
               onClick={onExploreMemories}
-              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-600 active:scale-[0.98] text-white font-bold text-sm flex items-center gap-2.5 transition-all shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/35 cursor-pointer"
+              className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm flex items-center gap-2.5 transition-all shadow-md hover:shadow-lg cursor-pointer"
             >
               <span>Explore Memories</span>
               <ArrowRight className="w-4 h-4" />
@@ -131,7 +115,7 @@ export default function WelcomeHero({
                 alt="Memory preview"
                 className="w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent" />
+              <div className="absolute inset-0 bg-slate-950/60" />
               <div className="absolute bottom-3 left-3 right-3 text-white">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">Coastal Trail</span>
                 <p className="text-xs font-bold truncate">Summer Retreat 2026</p>
@@ -147,7 +131,7 @@ export default function WelcomeHero({
                 alt="Main memory highlight"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
+              <div className="absolute inset-0 bg-slate-950/60" />
               <div className="absolute top-3 right-3 bg-slate-950/70 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-white/20">
                 <ImageIcon className="w-3.5 h-3.5 text-cyan-400" />
                 <span>MEMORIES</span>
@@ -165,7 +149,7 @@ export default function WelcomeHero({
             <div
               className="absolute -bottom-2 left-6 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 p-3.5 rounded-2xl shadow-xl flex items-center gap-3.5"
             >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
                 <FolderLock className="w-4 h-4" />
               </div>
               <div>

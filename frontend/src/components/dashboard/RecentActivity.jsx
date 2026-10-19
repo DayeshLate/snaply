@@ -134,7 +134,7 @@ export default function RecentActivity({
                         'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&auto=format&fit=crop&q=80';
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity" />
+                  <div className="absolute inset-0 bg-slate-950/65 opacity-80 group-hover:opacity-95 transition-opacity" />
                   <div className="absolute bottom-2.5 left-2.5 right-2.5 text-white">
                     <p className="text-xs font-bold truncate leading-tight">
                       {photo.fileName}

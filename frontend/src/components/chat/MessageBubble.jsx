@@ -18,7 +18,7 @@ export default function MessageBubble({
           className="w-8 h-8 rounded-xl object-cover shrink-0 mt-1 border border-slate-200 dark:border-slate-700 shadow-xs"
         />
       ) : (
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-1 shadow-xs">
+        <div className="w-8 h-8 rounded-xl bg-blue-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-1 shadow-xs">
           {getInitials(message.senderName || 'User')}
         </div>
       )}
@@ -34,7 +34,7 @@ export default function MessageBubble({
         <div
           className={`p-3.5 rounded-2xl text-sm relative shadow-sm ${
             isSelf
-              ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white rounded-tr-xs shadow-blue-500/15'
+              ? 'bg-blue-600 text-white rounded-tr-xs'
               : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200/80 dark:border-slate-700 rounded-tl-xs'
           }`}
         >

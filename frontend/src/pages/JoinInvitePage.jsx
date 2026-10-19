@@ -45,10 +45,10 @@ export default function JoinInvitePage() {
       {/* Brand Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <Link to="/" className="inline-flex items-center gap-2.5 mb-5 group">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-blue-500/25 transition-transform group-hover:scale-105">
+          <div className="w-11 h-11 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
             <Camera className="w-6 h-6" />
           </div>
-          <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-white dark:via-blue-200 dark:to-cyan-200 bg-clip-text text-transparent">
+          <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
             Snaply
           </span>
         </Link>
@@ -120,7 +120,7 @@ export default function JoinInvitePage() {
             /* Ready to join form */
             <div className="space-y-6">
               <div className="flex items-center gap-3.5 p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 rounded-2xl">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
                   <Users className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">

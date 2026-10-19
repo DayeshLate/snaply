@@ -10,10 +10,10 @@ export default function PublicLayout() {
       <header className="h-18 border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-full flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-blue-500/25 transition-transform group-hover:scale-105">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
               <Camera className="w-5 h-5" />
             </div>
-            <span className="text-xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-white dark:via-blue-200 dark:to-cyan-200 bg-clip-text text-transparent">
+            <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
               Snaply
             </span>
           </Link>
@@ -57,7 +57,7 @@ export default function PublicLayout() {
       <footer className="border-t border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-[#111827]/60 py-12 px-4 md:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-xs">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
               <Camera className="w-4 h-4" />
             </div>
             <span className="text-lg font-black text-slate-900 dark:text-white">Snaply</span>

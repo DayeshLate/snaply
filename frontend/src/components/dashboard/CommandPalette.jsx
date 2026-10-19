@@ -221,8 +221,8 @@ export default function CommandPalette({
           transition={{ duration: 0.2 }}
           className="relative w-full max-w-xl bg-white/95 dark:bg-[#111827]/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden z-10"
         >
-          {/* Vibrant Top Accent Line */}
-          <div className="h-1.5 w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-400" />
+          {/* Solid Top Accent Line */}
+          <div className="h-1.5 w-full bg-blue-600" />
 
           {/* Search Header */}
           <div className="flex items-center px-5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50">
@@ -262,7 +262,7 @@ export default function CommandPalette({
                     onMouseEnter={() => setSelectedIndex(idx)}
                     className={`flex items-center justify-between p-3 rounded-2xl cursor-pointer transition-all ${
                       isSelected
-                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25'
+                        ? 'bg-blue-600 text-white shadow-sm'
                         : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >

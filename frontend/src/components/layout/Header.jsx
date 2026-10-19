@@ -114,7 +114,7 @@ export default function Header({
         <div className="relative">
           <button
             onClick={() => setCreateDropdownOpen(!createDropdownOpen)}
-            className="hidden md:flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-[0.98] text-white font-bold text-xs rounded-xl transition-all shadow-sm hover:shadow-md hover:shadow-blue-500/20 cursor-pointer"
+            className="hidden md:flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs rounded-xl transition-all shadow-sm hover:shadow cursor-pointer"
             title="Quick Create"
           >
             <Plus className="w-4 h-4" />
@@ -218,7 +218,7 @@ export default function Header({
                 className="w-8 h-8 rounded-xl object-cover ring-2 ring-blue-500/20"
               />
             ) : (
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white text-xs font-black flex items-center justify-center shadow-xs">
+              <div className="w-8 h-8 rounded-xl bg-blue-600 text-white text-xs font-black flex items-center justify-center shadow-xs">
                 {getInitials(user?.name)}
               </div>
             )}

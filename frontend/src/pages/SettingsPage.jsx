@@ -114,7 +114,7 @@ export default function SettingsPage() {
           <span>System & Preferences</span>
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
-          <span className="gradient-text">Settings & Integrations</span>
+          <span>Settings & Integrations</span>
         </h1>
         <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
           Configure external cloud storage, notifications, and security options
@@ -123,8 +123,8 @@ export default function SettingsPage() {
 
       {/* Google Drive Integration Card */}
       <div className="relative rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none overflow-hidden">
-        {/* Top gradient accent */}
-        <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500" />
+        {/* Top accent line */}
+        <div className="absolute top-0 inset-x-0 h-1 bg-blue-600" />
 
         <div className="p-6 sm:p-8 border-b border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-800/30">
           <div className="flex items-center gap-3.5">

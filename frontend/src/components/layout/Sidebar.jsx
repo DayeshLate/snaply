@@ -90,13 +90,13 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
           onClick={onCloseMobile}
           className="flex items-center gap-3 min-w-0 group"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-blue-500/25 shrink-0 transition-transform group-hover:scale-105 duration-200">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm shrink-0 transition-transform group-hover:scale-105 duration-200">
             <Camera className="w-5 h-5" />
           </div>
           {!isCollapsed && (
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="text-lg font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-950 dark:from-white dark:via-blue-200 dark:to-cyan-200 bg-clip-text text-transparent">
+                <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
                   Snaply
                 </span>
                 <span className="w-2 h-2 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20 animate-pulse" />
@@ -125,9 +125,9 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
             if (onCreateAlbum) onCreateAlbum();
             else navigate('/albums');
           }}
-          className={`w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-600 active:scale-[0.98] text-white font-bold text-xs flex items-center ${
+          className={`w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs flex items-center ${
             isCollapsed ? 'justify-center' : 'justify-center gap-2'
-          } transition-all duration-200 shadow-md hover:shadow-lg hover:shadow-blue-500/25 cursor-pointer`}
+          } transition-all duration-200 shadow-sm hover:shadow cursor-pointer`}
           title="Create Album"
         >
           <Plus className="w-4 h-4 shrink-0" />
@@ -151,7 +151,7 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
                 isCollapsed ? 'justify-center px-2' : 'justify-between px-3.5'
               } py-2.5 rounded-xl text-xs font-bold transition-all duration-200 group ${
                 isActive
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25'
+                  ? 'bg-blue-600 text-white shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -182,7 +182,7 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
                       className={`px-2 py-0.5 text-[9px] font-extrabold rounded-full ${
                         isActive
                           ? 'bg-white/20 text-white'
-                          : 'bg-gradient-to-r from-cyan-500/15 to-blue-500/15 text-blue-600 dark:text-cyan-400 border border-blue-500/30'
+                          : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-cyan-400 border border-blue-200 dark:border-blue-800'
                       }`}
                     >
                       {item.badgeText}
@@ -239,7 +239,7 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
               className="w-9 h-9 rounded-xl object-cover ring-2 ring-blue-500/30"
             />
           ) : (
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white text-xs font-black flex items-center justify-center shrink-0 shadow-xs">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white text-xs font-black flex items-center justify-center shrink-0 shadow-xs">
               {getInitials(user?.name)}
             </div>
           )}

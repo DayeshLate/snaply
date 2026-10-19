@@ -97,7 +97,7 @@ export default function LandingNavbar() {
             to="/"
             className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl shrink-0"
           >
-            <div className="w-10 h-10 rounded-2xl bg-linear-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-all duration-200">
+            <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-all duration-200">
               <Camera className="w-5 h-5 transition-transform group-hover:rotate-6 duration-200" />
             </div>
             <div className="flex flex-col">
@@ -134,7 +134,7 @@ export default function LandingNavbar() {
             </Link>
             <Link
               to="/login?tab=register"
-              className="inline-flex items-center gap-1.5 sm:gap-2 px-5 py-2.5 rounded-xl bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-xs sm:text-sm font-bold hover:shadow-lg hover:shadow-blue-500/25 active:scale-98 transition-all cursor-pointer whitespace-nowrap shadow-md shadow-blue-500/20"
+              className="inline-flex items-center gap-1.5 sm:gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs sm:text-sm font-bold hover:shadow-lg hover:shadow-blue-500/25 active:scale-98 transition-all cursor-pointer whitespace-nowrap shadow-md shadow-blue-500/20"
             >
               <span>Get Started</span>
               <ArrowRight className="w-4 h-4" />
@@ -182,7 +182,7 @@ export default function LandingNavbar() {
                 <Link
                   to="/login?tab=register"
                   onClick={() => setMobileOpen(false)}
-                  className="w-full text-center py-2.5 rounded-xl bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-sm font-bold shadow-md shadow-blue-500/25 flex items-center justify-center gap-2"
+                  className="w-full text-center py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-bold shadow-md shadow-blue-500/25 flex items-center justify-center gap-2"
                 >
                   <span>Get Started for Free</span>
                   <ArrowRight className="w-4 h-4" />

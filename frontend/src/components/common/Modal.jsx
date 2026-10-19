@@ -40,8 +40,8 @@ export default function Modal({
         role="dialog"
         aria-modal="true"
       >
-        {/* Vibrant Gradient Accent Line at top */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-400" />
+        {/* Solid Accent Line at top */}
+        <div className="h-1.5 w-full bg-blue-600" />
 
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800/80">
           <div>

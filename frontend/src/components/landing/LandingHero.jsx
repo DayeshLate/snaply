@@ -54,15 +54,7 @@ export default function LandingHero() {
       {/* Antigravity floating dots */}
       <AntigravityDotsBackground className="opacity-40 pointer-events-none" />
 
-      {/* Background Subtle Ambience */}
-      <div className="absolute top-0 inset-x-0 h-96 bg-linear-to-b from-blue-100/50 dark:from-blue-950/20 to-transparent pointer-events-none" />
-      <div
-        className="absolute -top-32 right-1/4 w-96 h-96 rounded-full pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, transparent 70%)',
-          transform: 'translateZ(0)',
-        }}
-      />
+
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Top Text Content */}
@@ -86,7 +78,7 @@ export default function LandingHero() {
             className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.08]"
           >
             Your memories.{' '}
-            <span className="gradient-text relative inline-block">
+            <span className="text-blue-600 dark:text-blue-400 relative inline-block">
               Your people.
             </span>{' '}
             One place.
@@ -112,7 +104,7 @@ export default function LandingHero() {
           >
             <Link
               to="/login?tab=register"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:shadow-xl hover:shadow-blue-500/25 text-white text-sm sm:text-base font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-98"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 hover:shadow-xl hover:shadow-blue-500/25 text-white text-sm sm:text-base font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-98"
             >
               <span>Start Sharing</span>
               <ArrowRight className="w-4 h-4" />
@@ -193,7 +185,7 @@ export default function LandingHero() {
                 alt={HERO_PHOTOS.main.title}
                 className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 ease-out"
               />
-              <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 via-black/20 to-transparent flex items-end p-6 md:p-8 text-white">
+              <div className="absolute inset-0 bg-slate-950/65 flex items-end p-6 md:p-8 text-white">
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-600 text-white shadow-xs">

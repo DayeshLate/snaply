@@ -18,17 +18,17 @@ export default function Button({
 
   const variants = {
     primary:
-      'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-600 text-white shadow-md hover:shadow-lg hover:shadow-blue-500/25 focus:ring-blue-500 border border-blue-500/30',
+      'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-sm hover:shadow focus:ring-blue-500 border border-blue-600',
     secondary:
       'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 focus:ring-blue-500 border border-blue-200/80 dark:border-blue-800/60 shadow-xs',
     outline:
       'bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800/90 focus:ring-blue-500 border border-slate-200 dark:border-slate-700/80 shadow-xs hover:border-slate-300 dark:hover:border-slate-600',
     danger:
-      'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-md hover:shadow-red-500/25 focus:ring-red-500 border border-red-500/30',
+      'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white shadow-sm hover:shadow focus:ring-red-500 border border-red-600',
     ghost:
       'bg-transparent text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white focus:ring-slate-400 border border-transparent',
     gradient:
-      'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 hover:opacity-95 text-white shadow-md hover:shadow-purple-500/25 focus:ring-purple-500 border border-purple-500/30',
+      'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white shadow-sm hover:shadow focus:ring-indigo-500 border border-indigo-600',
   };
 
   const sizes = {

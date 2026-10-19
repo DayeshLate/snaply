@@ -175,8 +175,9 @@ public class MediaService {
         return toDTO(savedMedia);
     }
 
+    @Transactional(readOnly = true)
     public MediaDownloadDTO downloadMedia(Long mediaId) {
-        Media media = mediaRepository.findById(mediaId)
+        Media media = mediaRepository.findByIdWithDetails(mediaId)
                 .orElseThrow(() -> new RuntimeException("Media not found with ID: " + mediaId));
 
         validateMemberAccess(media.getFolder().getGroup().getId());
@@ -208,9 +209,10 @@ public class MediaService {
         return new MediaDownloadDTO(media.getFileName(), media.getMimeType(), fileBytes);
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(value = CacheConstants.MEDIA_BY_ID, key = "#mediaId")
     public MediaDTO getMediaById(Long mediaId) {
-        Media media = mediaRepository.findById(mediaId)
+        Media media = mediaRepository.findByIdWithDetails(mediaId)
                 .orElseThrow(() -> new RuntimeException("Media not found with ID: " + mediaId));
 
         validateMemberAccess(media.getFolder().getGroup().getId());
@@ -228,6 +230,7 @@ public class MediaService {
         CacheConstants.GROUP_BY_ID,
         CacheConstants.GROUPS_ALL
     }, allEntries = true)
+    @Transactional
     public String createMedia(Media media){
         if (media == null || media.getFolder() == null || media.getFolder().getId() == null) {
             throw new RuntimeException("Valid folder is required for media");
@@ -278,8 +281,9 @@ public class MediaService {
         CacheConstants.GROUP_BY_ID,
         CacheConstants.GROUPS_ALL
     }, allEntries = true)
+    @Transactional
     public String deleteMedia(Long mediaId){
-        Media media = mediaRepository.findById(mediaId)
+        Media media = mediaRepository.findByIdWithDetails(mediaId)
                 .orElseThrow(()-> new RuntimeException("data does not exist"));
 
         User currentUser = userService.getCurrentUser();
@@ -340,7 +344,7 @@ public class MediaService {
     }, allEntries = true)
     @Transactional
     public MediaDTO updateMedia(Long mediaId, String newFileName, Long targetFolderId) {
-        Media media = mediaRepository.findById(mediaId)
+        Media media = mediaRepository.findByIdWithDetails(mediaId)
                 .orElseThrow(() -> new RuntimeException("Media not found with ID: " + mediaId));
 
         User currentUser = userService.getCurrentUser();
@@ -477,19 +481,31 @@ public class MediaService {
     }
 
     private User getDriveUserForMedia(Media media) {
-        if (media.getFolder() != null && media.getFolder().getOwner() != null && media.getFolder().getOwner().isDriveConnected()) {
-            return media.getFolder().getOwner();
-        }
-        if (media.getFolder() != null && media.getFolder().getGroup() != null && media.getFolder().getGroup().getUser() != null && media.getFolder().getGroup().getUser().isDriveConnected()) {
-            return media.getFolder().getGroup().getUser();
-        }
-        if (media.getUplodedBy() != null && media.getUplodedBy().isDriveConnected()) {
-            return media.getUplodedBy();
-        }
-        User currentUser = userService.getCurrentUser();
-        if (currentUser.isDriveConnected()) {
-            return currentUser;
-        }
+        try {
+            if (media.getFolder() != null && media.getFolder().getOwner() != null && media.getFolder().getOwner().isDriveConnected()) {
+                return media.getFolder().getOwner();
+            }
+        } catch (Exception ignored) {}
+
+        try {
+            if (media.getFolder() != null && media.getFolder().getGroup() != null && media.getFolder().getGroup().getUser() != null && media.getFolder().getGroup().getUser().isDriveConnected()) {
+                return media.getFolder().getGroup().getUser();
+            }
+        } catch (Exception ignored) {}
+
+        try {
+            if (media.getUplodedBy() != null && media.getUplodedBy().isDriveConnected()) {
+                return media.getUplodedBy();
+            }
+        } catch (Exception ignored) {}
+
+        try {
+            User currentUser = userService.getCurrentUser();
+            if (currentUser != null && currentUser.isDriveConnected()) {
+                return currentUser;
+            }
+        } catch (Exception ignored) {}
+
         throw new RuntimeException("No connected Google Drive account found to access media: " + media.getFileName());
     }
 

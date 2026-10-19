@@ -83,7 +83,7 @@ export default function PhotoViewer({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-xl animate-in fade-in select-none">
       {/* Top action bar */}
-      <div className="absolute top-0 left-0 right-0 h-20 px-6 sm:px-8 flex items-center justify-between text-white z-20 bg-gradient-to-b from-black/80 via-black/40 to-transparent">
+      <div className="absolute top-0 left-0 right-0 h-20 px-6 sm:px-8 flex items-center justify-between text-white z-20 bg-black/60 backdrop-blur-md">
         <div className="min-w-0 pr-4 flex items-center gap-3.5">
           {isVideo ? (
             <span className="p-2.5 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30">

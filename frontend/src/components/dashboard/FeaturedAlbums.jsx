@@ -76,7 +76,7 @@ export default function FeaturedAlbums({
           </button>
           <Link
             to="/albums"
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-blue-500/20"
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm"
           >
             <span>View All ({albums.length})</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -107,7 +107,7 @@ export default function FeaturedAlbums({
           </div>
           <button
             onClick={onCreateAlbum}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-95 text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer shadow-md shadow-blue-500/25 transition-all"
+            className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer shadow-sm transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>Create First Album</span>
@@ -141,7 +141,7 @@ export default function FeaturedAlbums({
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/35 to-slate-950/10 group-hover:via-slate-950/25 transition-colors" />
+                  <div className="absolute inset-0 bg-slate-950/65" />
 
                   {/* Top Badges */}
                   <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2">

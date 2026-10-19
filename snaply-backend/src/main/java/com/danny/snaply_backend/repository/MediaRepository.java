@@ -24,14 +24,14 @@ public interface MediaRepository extends JpaRepository<Media,Long>{
 
     boolean existsByDriveFileId(String driveFileId);
 
-    @Query("SELECT m FROM Media m LEFT JOIN FETCH m.folder f LEFT JOIN FETCH f.group g LEFT JOIN FETCH m.uplodedBy u WHERE m.folder.id = :folderId")
+    @Query("SELECT m FROM Media m LEFT JOIN FETCH m.folder f LEFT JOIN FETCH f.owner fo LEFT JOIN FETCH f.group g LEFT JOIN FETCH g.user gu LEFT JOIN FETCH m.uplodedBy u WHERE m.folder.id = :folderId")
     List<Media> findAllByFolderId(@Param("folderId") Long folderId);
 
     Page<Media> findAllByFolderId(Long folderId, Pageable pageable);
 
     Long countByFolderId(Long folderId);
 
-    @Query("SELECT m FROM Media m LEFT JOIN FETCH m.folder f LEFT JOIN FETCH f.group g LEFT JOIN FETCH m.uplodedBy u WHERE m.folder.group.id = :groupId")
+    @Query("SELECT m FROM Media m LEFT JOIN FETCH m.folder f LEFT JOIN FETCH f.owner fo LEFT JOIN FETCH f.group g LEFT JOIN FETCH g.user gu LEFT JOIN FETCH m.uplodedBy u WHERE m.folder.group.id = :groupId")
     List<Media> findAllByGroupId(@Param("groupId") Long groupId);
 
     @Query("SELECT m FROM Media m WHERE m.folder.group.id = :groupId")
@@ -41,16 +41,20 @@ public interface MediaRepository extends JpaRepository<Media,Long>{
     Page<Media> findAllByUploadedByUserId(@Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT m FROM Media m " +
-           "JOIN FETCH m.folder f " +
-           "JOIN FETCH f.group g " +
-           "JOIN FETCH m.uplodedBy u " +
+           "LEFT JOIN FETCH m.folder f " +
+           "LEFT JOIN FETCH f.owner fo " +
+           "LEFT JOIN FETCH f.group g " +
+           "LEFT JOIN FETCH g.user gu " +
+           "LEFT JOIN FETCH m.uplodedBy u " +
            "WHERE m.id = :id")
     Optional<Media> findByIdWithDetails(@Param("id") Long id);
 
     @Query("SELECT m FROM Media m " +
-           "JOIN FETCH m.folder f " +
-           "JOIN FETCH f.group g " +
-           "JOIN FETCH m.uplodedBy u " +
+           "LEFT JOIN FETCH m.folder f " +
+           "LEFT JOIN FETCH f.owner fo " +
+           "LEFT JOIN FETCH f.group g " +
+           "LEFT JOIN FETCH g.user gu " +
+           "LEFT JOIN FETCH m.uplodedBy u " +
            "WHERE m.id IN :ids")
     List<Media> findAllWithDetailsByIdIn(@Param("ids") List<Long> ids);
 }
