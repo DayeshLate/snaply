@@ -29,6 +29,7 @@ import Loader from '../components/common/Loader';
 import ErrorState from '../components/common/ErrorState';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import MemberList from '../components/groups/MemberList';
+import AddMemberModal from '../components/groups/AddMemberModal';
 import JoinRequestCard from '../components/groups/JoinRequestCard';
 import AlbumGrid from '../components/albums/AlbumGrid';
 import PhotoGrid from '../components/albums/PhotoGrid';
@@ -62,6 +63,7 @@ export default function GroupDetailsPage() {
   const [copied, setCopied] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [createAlbumModalOpen, setCreateAlbumModalOpen] = useState(false);
+  const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
   const [selectedFolderForUpload, setSelectedFolderForUpload] = useState(
     folderParam ? Number(folderParam) : null
   );
@@ -366,6 +368,17 @@ export default function GroupDetailsPage() {
                 onClick={handleCopyInvite}
               >
                 {copied ? 'Invite Copied!' : 'Copy Invite Link'}
+              </Button>
+            )}
+
+            {isGroupAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                icon={UserPlus}
+                onClick={() => setAddMemberModalOpen(true)}
+              >
+                Add Member
               </Button>
             )}
 
@@ -728,6 +741,15 @@ export default function GroupDetailsPage() {
         onClose={() => setCreateAlbumModalOpen(false)}
         groupId={groupId}
         onSuccess={() => loadGroupDetails()}
+      />
+
+      {/* Add Member Modal */}
+      <AddMemberModal
+        isOpen={addMemberModalOpen}
+        onClose={() => setAddMemberModalOpen(false)}
+        groupId={groupId}
+        isOwner={isOwner}
+        onMemberAdded={() => loadGroupDetails()}
       />
 
       {/* Confirm Delete Group */}

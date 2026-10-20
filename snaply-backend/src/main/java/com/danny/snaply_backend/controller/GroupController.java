@@ -1,6 +1,8 @@
 package com.danny.snaply_backend.controller;
 
+import com.danny.snaply_backend.dto.AddMemberRequest;
 import com.danny.snaply_backend.dto.GroupDTO;
+import com.danny.snaply_backend.dto.GroupMembersDTO;
 import com.danny.snaply_backend.entity.GroupMembers;
 import com.danny.snaply_backend.entity.JoinRequest;
 import com.danny.snaply_backend.entity.Role;
@@ -66,6 +68,28 @@ public class GroupController {
                 joinRequestService.rejectRequest(requestId);
 
         return ResponseEntity.ok(request);
+    }
+
+    @PostMapping({"/{groupId}/members/add", "/{groupId}/add-member"})
+    public ResponseEntity<GroupMembersDTO> addMember(
+            @PathVariable long groupId,
+            @RequestBody(required = false) AddMemberRequest request,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) Role role
+    ) {
+        String targetEmail = (request != null && request.getEmail() != null && !request.getEmail().isBlank())
+                ? request.getEmail()
+                : email;
+        Role targetRole = (request != null && request.getRole() != null)
+                ? request.getRole()
+                : (role != null ? role : Role.EDITOR);
+
+        if (targetEmail == null || targetEmail.isBlank()) {
+            throw new IllegalArgumentException("Email is required to add a member");
+        }
+
+        GroupMembersDTO addedMember = groupService.addMemberByEmail(groupId, targetEmail.trim(), targetRole);
+        return ResponseEntity.ok(addedMember);
     }
 
     @PostMapping("/delete/{groupId}/member/{memberId}")

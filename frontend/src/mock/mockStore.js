@@ -66,8 +66,16 @@ class MockStore {
     if (!grp) return null;
     // ensure folders have media
     const groupFolders = this.data.folders.filter((f) => f.groupId === numId);
+    const membersList = (grp.groupMembers || grp.members || []).map((m) => ({
+      ...m,
+      userId: m.userId || m.user?.id,
+      userName: m.userName || m.user?.name,
+      userEmail: m.userEmail || m.user?.email,
+    }));
     return {
       ...grp,
+      members: membersList,
+      groupMembers: membersList,
       folders: groupFolders.map((f) => ({
         ...f,
         media: this.data.media.filter((m) => m.folderId === f.id),
@@ -108,18 +116,59 @@ class MockStore {
   removeMember(groupId, memberId) {
     const grp = this.data.groups.find((g) => g.id === Number(groupId));
     if (grp) {
-      grp.members = grp.members.filter((m) => m.id !== Number(memberId));
+      const targetId = Number(memberId);
+      grp.members = (grp.members || []).filter((m) => m.id !== targetId && m.userId !== targetId);
+      grp.groupMembers = grp.members;
       this.save();
     }
     return { success: true };
   }
 
+  addMemberByEmail(groupId, email, role = 'EDITOR') {
+    const grp = this.data.groups.find((g) => g.id === Number(groupId));
+    if (!grp) throw new Error('Group not found');
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const existing = (grp.members || grp.groupMembers || []).find(
+      (m) =>
+        (m.userEmail && m.userEmail.toLowerCase() === normalizedEmail) ||
+        (m.user?.email && m.user.email.toLowerCase() === normalizedEmail)
+    );
+    if (existing) {
+      throw new Error('User is already a member of this group');
+    }
+
+    const memberId = Date.now();
+    const newMember = {
+      id: memberId,
+      userId: memberId + 100,
+      userName: normalizedEmail.split('@')[0],
+      userEmail: normalizedEmail,
+      role: role || 'EDITOR',
+      isAccepted: true,
+      joinedAt: new Date().toISOString(),
+      user: {
+        id: memberId + 100,
+        name: normalizedEmail.split('@')[0],
+        email: normalizedEmail,
+      },
+    };
+
+    if (!grp.members) grp.members = [];
+    grp.members.push(newMember);
+    grp.groupMembers = grp.members;
+    this.save();
+    return newMember;
+  }
+
   changeRole(groupId, memberId, role) {
     const grp = this.data.groups.find((g) => g.id === Number(groupId));
     if (grp) {
-      const m = grp.members.find((mem) => mem.id === Number(memberId));
+      const targetId = Number(memberId);
+      const m = (grp.members || []).find((mem) => mem.id === targetId || mem.userId === targetId);
       if (m) {
         m.role = role;
+        grp.groupMembers = grp.members;
         this.save();
       }
     }

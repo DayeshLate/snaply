@@ -44,6 +44,17 @@ export const groupService = {
     return response.data;
   },
 
+  async addMemberByEmail(groupId, email, role = 'EDITOR') {
+    if (isDemoMode()) {
+      return mockStore.addMemberByEmail(groupId, email, role);
+    }
+    const response = await apiClient.post(`/group/${groupId}/members/add`, {
+      email: email.trim(),
+      role,
+    });
+    return response.data;
+  },
+
   async changeRole(groupId, memberId, role) {
     if (isDemoMode()) {
       return mockStore.changeRole(groupId, memberId, role);

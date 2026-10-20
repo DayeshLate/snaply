@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Crown, Shield, User, Trash2 } from 'lucide-react';
+import { Crown, Shield, User, Edit3, Trash2, UserPlus } from 'lucide-react';
 import { ROLES, ROLE_LABELS } from '../../constants/theme';
 import { getInitials, formatDate } from '../../utils/formatters';
 import ConfirmDialog from '../common/ConfirmDialog';
+import Button from '../common/Button';
+import AddMemberModal from './AddMemberModal';
 import { useToast } from '../../context/ToastContext';
 import { groupService } from '../../services/groupService';
 
@@ -16,6 +18,7 @@ export default function MemberList({
   const { success, error: showError } = useToast();
   const [selectedMember, setSelectedMember] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const isOwnerOrAdmin = currentUserRole === ROLES.OWNER || currentUserRole === ROLES.ADMIN;
@@ -49,8 +52,21 @@ export default function MemberList({
 
   return (
     <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm">
-      <div className="p-5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-        <h4 className="text-base font-bold text-slate-900 dark:text-white">Group Members ({members.length})</h4>
+      <div className="p-5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h4 className="text-base font-bold text-slate-900 dark:text-white">Group Members ({members.length})</h4>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Manage members and their workspace permissions</p>
+        </div>
+        {isOwnerOrAdmin && (
+          <Button
+            size="sm"
+            variant="primary"
+            icon={UserPlus}
+            onClick={() => setAddMemberOpen(true)}
+          >
+            Add Member
+          </Button>
+        )}
       </div>
 
       <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
@@ -86,6 +102,7 @@ export default function MemberList({
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
                   {member.role === ROLES.OWNER && <Crown className="w-3.5 h-3.5 text-amber-500" />}
                   {member.role === ROLES.ADMIN && <Shield className="w-3.5 h-3.5 text-blue-500" />}
+                  {member.role === ROLES.EDITOR && <Edit3 className="w-3.5 h-3.5 text-teal-500" />}
                   {member.role === ROLES.VIEWER && <User className="w-3.5 h-3.5 text-slate-400" />}
                   <span>{ROLE_LABELS[member.role] || member.role}</span>
                 </div>
@@ -97,8 +114,9 @@ export default function MemberList({
                     onChange={(e) => handleRoleChange(member.id, e.target.value)}
                     className="text-xs border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 cursor-pointer font-medium"
                   >
-                    <option value={ROLES.VIEWER}>Member</option>
-                    <option value={ROLES.ADMIN}>Admin</option>
+                    <option value={ROLES.VIEWER}>{ROLE_LABELS[ROLES.VIEWER] || 'Viewer'}</option>
+                    <option value={ROLES.EDITOR}>{ROLE_LABELS[ROLES.EDITOR] || 'Editor'}</option>
+                    <option value={ROLES.ADMIN}>{ROLE_LABELS[ROLES.ADMIN] || 'Admin'}</option>
                   </select>
                 )}
 
@@ -130,6 +148,16 @@ export default function MemberList({
         message={`Are you sure you want to remove this member from the group?`}
         confirmText="Remove"
         isDanger={true}
+      />
+
+      <AddMemberModal
+        isOpen={addMemberOpen}
+        onClose={() => setAddMemberOpen(false)}
+        groupId={groupId}
+        isOwner={isOwner}
+        onMemberAdded={() => {
+          if (onMembersChanged) onMembersChanged();
+        }}
       />
     </div>
   );

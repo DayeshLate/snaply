@@ -38,6 +38,7 @@ public class GroupService {
         private final GroupMembersRepository groupMembersRepository;
         private final JoinRequestRepository joinRequestRepository;
         private final GoogleDriveService googleDriveService;
+        private final NotificationService notificationService;
 
         @CacheEvict(value = {CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
     public GroupDTO createGroup(GroupDTO groupDTO) {
@@ -103,6 +104,90 @@ public class GroupService {
                 .orElseThrow(()-> new RuntimeException("group not found"));
     }
 
+
+    @CacheEvict(value = {
+        CacheConstants.GROUP_BY_ID,
+        CacheConstants.GROUPS_ALL,
+        CacheConstants.GROUP_MEMBERS_BY_GROUP,
+        CacheConstants.GROUP_MEMBERS_BY_ROLE,
+        CacheConstants.GROUP_MEMBERS_BY_USER_AND_GROUP,
+        CacheConstants.GROUP_MEMBER_EXISTS_BY_USER_AND_GROUP,
+        CacheConstants.JOIN_REQUEST_BY_USER,
+        CacheConstants.JOIN_REQUEST_BY_GROUP
+    }, allEntries = true)
+    public GroupMembersDTO addMemberByEmail(long groupId, String email, Role role) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        String normalizedEmail = email.trim().toLowerCase();
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found with ID: " + groupId));
+
+        User currentUser = userService.getCurrentUser();
+        Long currentUserId = currentUser.getId();
+
+        GroupMembers currentMember = groupMembersRepository.findByUserIdAndGroupId(currentUserId, groupId);
+        boolean isOwner = (group.getUser() != null && group.getUser().getId().equals(currentUserId))
+                || (currentMember != null && currentMember.isAccepted() && currentMember.getRole() == Role.OWNER);
+        boolean isAdmin = currentMember != null && currentMember.isAccepted() && currentMember.getRole() == Role.ADMIN;
+
+        if (!isOwner && !isAdmin) {
+            throw new RuntimeException("Access Denied: Only Group OWNER or ADMIN can add members");
+        }
+
+        Role assignedRole = (role != null) ? role : Role.EDITOR;
+        if (!isOwner && (assignedRole == Role.ADMIN || assignedRole == Role.OWNER)) {
+            throw new RuntimeException("Access Denied: Only the Group OWNER can add members as ADMIN or OWNER");
+        }
+
+        User targetUser = userService.findByEmailDirect(normalizedEmail)
+                .or(() -> userService.findByEmail(normalizedEmail))
+                .orElseThrow(() -> new RuntimeException("User with email '" + email + "' not found. Make sure they have registered an account."));
+
+        if (group.getUser() != null && group.getUser().getId().equals(targetUser.getId())) {
+            throw new RuntimeException("User is already the owner of this group");
+        }
+
+        GroupMembers existingMembership = groupMembersRepository.findByUserIdAndGroupId(targetUser.getId(), groupId);
+        GroupMembers memberToSave;
+
+        if (existingMembership != null) {
+            if (existingMembership.isAccepted()) {
+                throw new RuntimeException("User is already a member of this group");
+            }
+            existingMembership.setAccepted(true);
+            existingMembership.setRole(assignedRole);
+            memberToSave = existingMembership;
+        } else {
+            memberToSave = GroupMembers.builder()
+                    .group(group)
+                    .user(targetUser)
+                    .role(assignedRole)
+                    .isAccepted(true)
+                    .build();
+        }
+
+        GroupMembers savedMember = groupMembersRepository.save(memberToSave);
+
+        try {
+            joinRequestRepository.findByGroupIdAndUserId(String.valueOf(groupId), String.valueOf(targetUser.getId()))
+                    .ifPresent(req -> {
+                        req.setStatus(JoinRequest.Status.ACCEPTED);
+                        joinRequestRepository.save(req);
+                    });
+        } catch (Exception ignored) {}
+
+        try {
+            notificationService.sendNotification(
+                    targetUser,
+                    "Added to " + group.getName(),
+                    currentUser.getName() + " added you to the group '" + group.getName() + "' as " + assignedRole.name()
+            );
+        } catch (Exception ignored) {}
+
+        return groupMembersService.toDTO(savedMember);
+    }
 
     @CacheEvict(value = {
         CacheConstants.GROUP_BY_ID,

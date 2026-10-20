@@ -26,11 +26,13 @@ export const LANDING_COLORS = {
 export const ROLES = {
   OWNER: 'OWNER',
   ADMIN: 'ADMIN',
+  EDITOR: 'EDITOR',
   VIEWER: 'VIEWER',
 };
 
 export const ROLE_LABELS = {
   OWNER: 'Owner',
   ADMIN: 'Admin',
+  EDITOR: 'Editor',
   VIEWER: 'Member',
 };
