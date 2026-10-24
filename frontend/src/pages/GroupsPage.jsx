@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { Plus, Search, Users } from 'lucide-react';
 import { groupService } from '../services/groupService';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +13,7 @@ import ErrorState from '../components/common/ErrorState';
 
 export default function GroupsPage() {
   const { user } = useAuth();
+  const { onOpenChat } = useOutletContext() || {};
   const [groups, setGroups] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -104,6 +106,7 @@ export default function GroupsPage() {
               key={group.id}
               group={group}
               currentUserId={user?.id}
+              onOpenChat={onOpenChat}
             />
           ))}
         </div>

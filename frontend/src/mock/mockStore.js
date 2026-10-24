@@ -16,24 +16,15 @@ class MockStore {
   }
 
   load() {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
-    } catch {
-      // fallback
-    }
-
     return {
-      user: { ...MOCK_USER },
-      groups: JSON.parse(JSON.stringify(INITIAL_GROUPS)),
-      folders: JSON.parse(JSON.stringify(INITIAL_FOLDERS)),
-      media: JSON.parse(JSON.stringify(INITIAL_MEDIA)),
-      messages: JSON.parse(JSON.stringify(INITIAL_MESSAGES)),
-      joinRequests: JSON.parse(JSON.stringify(INITIAL_JOIN_REQUESTS)),
-      notifications: JSON.parse(JSON.stringify(INITIAL_NOTIFICATIONS)),
-      driveConnected: true,
+      user: null,
+      groups: [],
+      folders: [],
+      media: [],
+      messages: [],
+      joinRequests: [],
+      notifications: [],
+      driveConnected: false,
     };
   }
 
@@ -58,6 +49,10 @@ class MockStore {
   // Groups
   getGroups() {
     return this.data.groups;
+  }
+
+  getAllGroups() {
+    return this.getGroups();
   }
 
   getGroup(id) {
@@ -203,6 +198,10 @@ class MockStore {
     }));
   }
 
+  getAllFolders() {
+    return this.getFolders();
+  }
+
   addFolder(groupId, name) {
     const newFolder = {
       id: Date.now(),
@@ -234,6 +233,10 @@ class MockStore {
   }
 
   // Media
+  getAllMedia() {
+    return this.data.media || [];
+  }
+
   getMediaByFolder(folderId) {
     return this.data.media.filter((m) => m.folderId === Number(folderId));
   }
@@ -290,8 +293,26 @@ class MockStore {
       senderId: this.data.user.id,
       senderName: this.data.user.name,
       message,
+      content: message,
       mediaId: mediaId ? Number(mediaId) : null,
       media: attachedMedia,
+      createdAt: new Date().toISOString(),
+    };
+    this.data.messages.push(newMsg);
+    this.save();
+    return newMsg;
+  }
+
+  createMessage({ groupId, content, message, senderName, senderId, mediaId }) {
+    const text = content || message || '';
+    const newMsg = {
+      id: Date.now(),
+      groupId: Number(groupId),
+      senderId: senderId || this.data.user?.id || 1,
+      senderName: senderName || this.data.user?.name || 'You',
+      message: text,
+      content: text,
+      mediaId: mediaId ? Number(mediaId) : null,
       createdAt: new Date().toISOString(),
     };
     this.data.messages.push(newMsg);
@@ -399,7 +420,8 @@ class MockStore {
 export const mockStore = new MockStore();
 
 export function isDemoMode() {
-  return localStorage.getItem('snaply_demo_mode') === 'true';
+  const envMock = import.meta.env.VITE_USE_MOCK;
+  return envMock === 'true' || envMock === true;
 }
 
 export function enableDemoMode() {

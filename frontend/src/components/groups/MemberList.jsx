@@ -3,7 +3,6 @@ import { Crown, Shield, User, Edit3, Trash2, UserPlus } from 'lucide-react';
 import { ROLES, ROLE_LABELS } from '../../constants/theme';
 import { getInitials, formatDate } from '../../utils/formatters';
 import ConfirmDialog from '../common/ConfirmDialog';
-import Button from '../common/Button';
 import AddMemberModal from './AddMemberModal';
 import { useToast } from '../../context/ToastContext';
 import { groupService } from '../../services/groupService';
@@ -21,8 +20,8 @@ export default function MemberList({
   const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const isOwnerOrAdmin = currentUserRole === ROLES.OWNER || currentUserRole === ROLES.ADMIN;
   const isOwner = currentUserRole === ROLES.OWNER;
+  const isOwnerOrAdmin = currentUserRole === ROLES.OWNER || currentUserRole === ROLES.ADMIN;
 
   const handleRoleChange = async (memberId, newRole) => {
     try {
@@ -51,25 +50,24 @@ export default function MemberList({
   };
 
   return (
-    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm">
-      <div className="p-5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-4 flex-wrap">
+    <div className="rounded-2xl border border-white/[0.08] bg-[#12141C] overflow-hidden">
+      <div className="p-5 border-b border-white/[0.08] flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h4 className="text-base font-bold text-slate-900 dark:text-white">Group Members ({members.length})</h4>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Manage members and their workspace permissions</p>
+          <h4 className="text-sm font-semibold text-white">Circle Members ({members.length})</h4>
+          <p className="text-xs text-white/50 mt-0.5">Manage member access and workspace roles</p>
         </div>
         {isOwnerOrAdmin && (
-          <Button
-            size="sm"
-            variant="primary"
-            icon={UserPlus}
+          <button
             onClick={() => setAddMemberOpen(true)}
+            className="px-3.5 py-1.5 rounded-[10px] bg-[#5B5BF0] hover:bg-[#4E4ED9] text-white text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
-            Add Member
-          </Button>
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>Add Member</span>
+          </button>
         )}
       </div>
 
-      <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
+      <div className="divide-y divide-white/[0.06]">
         {members.map((member) => {
           const memberUser = member.user || {};
           const displayName = member.userName || memberUser.name || 'Member';
@@ -78,41 +76,41 @@ export default function MemberList({
           const isSelf = (member.userId || memberUser.id) === currentUserId;
 
           return (
-            <div key={member.id} className="p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
+            <div key={member.id} className="p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors">
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
+                <div className="w-10 h-10 rounded-[10px] bg-[#1A1D28] border border-white/[0.1] text-white flex items-center justify-center font-bold text-xs shrink-0">
                   {getInitials(displayName)}
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{displayName}</p>
+                    <p className="text-sm font-semibold text-white truncate">{displayName}</p>
                     {isSelf && (
-                      <span className="text-[10px] bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-cyan-400 border border-blue-200/50 dark:border-blue-800/40 px-2 py-0.5 rounded-full font-bold">
+                      <span className="text-[10px] bg-white/[0.08] text-white/80 border border-white/[0.12] px-2 py-0.5 rounded-full font-mono">
                         You
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{displayEmail}</p>
-                  <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Joined {formatDate(member.joinedAt)}</p>
+                  <p className="text-xs text-white/50 truncate font-mono">{displayEmail}</p>
+                  <p className="text-[11px] text-white/40 mt-0.5 font-mono">Joined {formatDate(member.joinedAt)}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
                 {/* Role badge */}
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
-                  {member.role === ROLES.OWNER && <Crown className="w-3.5 h-3.5 text-amber-500" />}
-                  {member.role === ROLES.ADMIN && <Shield className="w-3.5 h-3.5 text-blue-500" />}
-                  {member.role === ROLES.EDITOR && <Edit3 className="w-3.5 h-3.5 text-teal-500" />}
-                  {member.role === ROLES.VIEWER && <User className="w-3.5 h-3.5 text-slate-400" />}
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-white/[0.04] text-white/80 border border-white/[0.08]">
+                  {member.role === ROLES.OWNER && <Crown className="w-3.5 h-3.5 text-amber-400" />}
+                  {member.role === ROLES.ADMIN && <Shield className="w-3.5 h-3.5 text-[#5B5BF0]" />}
+                  {member.role === ROLES.EDITOR && <Edit3 className="w-3.5 h-3.5 text-[#2DD4BF]" />}
+                  {member.role === ROLES.VIEWER && <User className="w-3.5 h-3.5 text-white/40" />}
                   <span>{ROLE_LABELS[member.role] || member.role}</span>
                 </div>
 
-                {/* Role change dropdown for Owner */}
+                {/* Role change dropdown for Owner only (Hidden for non-owners) */}
                 {isOwner && !isTargetOwner && (
                   <select
                     value={member.role}
                     onChange={(e) => handleRoleChange(member.id, e.target.value)}
-                    className="text-xs border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 cursor-pointer font-medium"
+                    className="text-xs border border-white/[0.1] rounded-[10px] px-2.5 py-1.5 bg-[#1A1D28] text-white focus:outline-none focus:border-[#5B5BF0] cursor-pointer font-medium"
                   >
                     <option value={ROLES.VIEWER}>{ROLE_LABELS[ROLES.VIEWER] || 'Viewer'}</option>
                     <option value={ROLES.EDITOR}>{ROLE_LABELS[ROLES.EDITOR] || 'Editor'}</option>
@@ -120,15 +118,15 @@ export default function MemberList({
                   </select>
                 )}
 
-                {/* Remove button for Owner/Admin */}
+                {/* Remove button for Owner/Admin only (Hidden for non-owners) */}
                 {isOwnerOrAdmin && !isTargetOwner && !isSelf && (
                   <button
                     onClick={() => {
                       setSelectedMember(member);
                       setConfirmOpen(true);
                     }}
-                    title="Remove from group"
-                    className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors cursor-pointer"
+                    title="Remove from circle"
+                    className="p-2 text-white/40 hover:text-rose-400 hover:bg-rose-500/10 rounded-[8px] transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -139,25 +137,26 @@ export default function MemberList({
         })}
       </div>
 
+      {/* Confirm Dialog */}
       <ConfirmDialog
         isOpen={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        onConfirm={handleRemoveMember}
-        loading={loading}
         title="Remove Member"
-        message={`Are you sure you want to remove this member from the group?`}
-        confirmText="Remove"
-        isDanger={true}
+        message={`Are you sure you want to remove ${selectedMember?.userName || 'this member'} from the circle?`}
+        confirmText="Remove Member"
+        onConfirm={handleRemoveMember}
+        onCancel={() => {
+          setConfirmOpen(false);
+          setSelectedMember(null);
+        }}
+        loading={loading}
       />
 
+      {/* Add Member Modal */}
       <AddMemberModal
         isOpen={addMemberOpen}
         onClose={() => setAddMemberOpen(false)}
         groupId={groupId}
-        isOwner={isOwner}
-        onMemberAdded={() => {
-          if (onMembersChanged) onMembersChanged();
-        }}
+        onMemberAdded={onMembersChanged}
       />
     </div>
   );

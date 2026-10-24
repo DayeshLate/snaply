@@ -1,16 +1,17 @@
 import React from 'react';
-import AlbumCard from './AlbumCard';
+import FolderCard3D from '../3d/FolderCard3D';
 
-export default function AlbumGrid({ albums = [], onSelectAlbum, onDeleteAlbum, canDelete = false }) {
+export default function AlbumGrid({
+  albums = [],
+  onSelectAlbum,
+}) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {albums.map((album) => (
-        <AlbumCard
+        <FolderCard3D
           key={album.id}
           album={album}
-          onClick={() => onSelectAlbum(album)}
-          onDelete={onDeleteAlbum}
-          canDelete={canDelete}
+          onClick={() => onSelectAlbum && onSelectAlbum(album)}
         />
       ))}
     </div>

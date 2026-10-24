@@ -7,29 +7,27 @@ import {
   Settings,
   Search,
   Plus,
-  Sun,
-  Moon,
   FolderLock,
   Users,
   Upload,
-  HardDrive,
-  Sparkles,
+  MessageSquare,
 } from 'lucide-react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
 import { notificationService } from '../../services/notificationService';
 import { getInitials } from '../../utils/formatters';
 
 export default function Header({
+  hasScrolled = false,
   onOpenMobile,
   onOpenCommandPalette,
   onCreateAlbum,
   onCreateGroup,
   onUploadMedia,
+  onToggleChat,
+  isChatOpen = false,
 }) {
   const { user, logout } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -48,7 +46,6 @@ export default function Header({
       }
     };
     loadUnread();
-
     const timer = setInterval(loadUnread, 30000);
     return () => {
       active = false;
@@ -63,67 +60,64 @@ export default function Header({
 
   const getPageTitle = () => {
     const p = location.pathname;
-    if (p.includes('/groups')) return 'Group Workspaces';
-    if (p.includes('/albums')) return 'Photo Albums';
-    if (p.includes('/shared')) return 'Shared Media Vault';
-    if (p.includes('/messages')) return 'Discussions';
+    if (p.startsWith('/groups/')) return 'Circle Space';
+    if (p.includes('/groups')) return 'Your Circles';
+    if (p.includes('/albums')) return 'Album Vaults';
+    if (p.includes('/shared')) return 'Shared Media';
     if (p.includes('/notifications')) return 'Activity Feed';
-    if (p.includes('/settings')) return 'Settings & Cloud';
-    if (p.includes('/profile')) return 'My Profile';
+    if (p.includes('/settings')) return 'Settings';
+    if (p.includes('/profile')) return 'Profile';
     return 'Dashboard';
   };
 
   return (
-    <header className="h-18 bg-white/80 dark:bg-[#11253E]/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 transition-colors">
+    <header
+      className={`h-16 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-20 bg-[#0B0C12] transition-colors duration-200 ${
+        hasScrolled ? 'border-b border-white/[0.08]' : 'border-b border-transparent'
+      }`}
+    >
       {/* Left side: Mobile menu & Page Title */}
       <div className="flex items-center gap-3">
         <button
           onClick={onOpenMobile}
-          className="md:hidden p-2 text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl cursor-pointer"
+          className="lg:hidden p-2 text-white/60 hover:text-white hover:bg-white/[0.04] rounded-[10px] cursor-pointer"
           aria-label="Open navigation menu"
         >
           <Menu className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-2.5">
-          <img
-            src="/snaply-cloud-mark.png"
-            alt="Snaply"
-            className="md:hidden w-9 h-9 object-contain"
-          />
-          <h1 className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-tight">
-            {getPageTitle()}
-          </h1>
-        </div>
+        <h1 className="text-base sm:text-lg font-semibold tracking-[-0.02em] text-white">
+          {getPageTitle()}
+        </h1>
       </div>
 
       {/* Center: Global Search Input Pill (Triggers Command Palette) */}
-      <div className="hidden sm:flex items-center max-w-sm w-full mx-6">
+      <div className="hidden md:flex items-center max-w-sm w-full mx-6">
         <button
           onClick={onOpenCommandPalette}
-          className="w-full flex items-center justify-between px-4 py-2 bg-slate-100/80 dark:bg-slate-900/80 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 hover:border-blue-500/50 dark:hover:border-cyan-500/50 rounded-xl text-xs text-slate-500 dark:text-slate-400 transition-all cursor-pointer shadow-xs group"
+          className="w-full flex items-center justify-between px-3.5 py-1.5 bg-[#12141C] hover:bg-[#1A1D28] border border-white/[0.08] hover:border-white/[0.16] rounded-[10px] text-xs text-white/50 transition-colors cursor-pointer group"
         >
-          <div className="flex items-center gap-2.5">
-            <Search className="w-4 h-4 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors" />
-            <span className="truncate font-medium">Search albums, groups, actions...</span>
+          <div className="flex items-center gap-2">
+            <Search className="w-3.5 h-3.5 text-white/40 group-hover:text-white/80 transition-colors" />
+            <span className="truncate">Search vaults, members, actions...</span>
           </div>
-          <kbd className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 shadow-2xs">
+          <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded-[6px] bg-white/[0.06] border border-white/[0.08] text-white/60">
             ⌘K
           </kbd>
         </button>
       </div>
 
-      {/* Right side: Quick Create, Theme Toggle, Notifications, Profile */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      {/* Right side: Quick Create, Notifications, Chat Drawer Toggle, Profile */}
+      <div className="flex items-center gap-2">
         {/* Quick Create Dropdown */}
         <div className="relative">
           <button
             onClick={() => setCreateDropdownOpen(!createDropdownOpen)}
-            className="hidden md:flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs rounded-xl transition-all shadow-sm hover:shadow cursor-pointer"
-            title="Quick Create"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#5B5BF0] hover:bg-[#4E4ED9] text-white font-medium text-xs rounded-[10px] transition-colors cursor-pointer"
+            title="Create new"
           >
-            <Plus className="w-4 h-4" />
-            <span>Create</span>
+            <Plus className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Create</span>
           </button>
 
           {createDropdownOpen && (
@@ -132,104 +126,77 @@ export default function Header({
                 className="fixed inset-0 z-40"
                 onClick={() => setCreateDropdownOpen(false)}
               />
-              <div className="absolute right-0 mt-2 w-52 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl p-1.5 z-50 animate-in fade-in zoom-in-95 text-xs">
+              <div className="absolute right-0 mt-2 w-48 bg-[#12141C] rounded-2xl border border-white/[0.08] shadow-2xl p-1.5 z-50 text-xs">
                 <button
                   onClick={() => {
                     setCreateDropdownOpen(false);
                     onCreateAlbum && onCreateAlbum();
                   }}
-                  className="w-full px-3.5 py-2.5 flex items-center gap-2.5 text-left text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-800/80 rounded-xl cursor-pointer font-medium transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-[8px] text-white/80 hover:text-white hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-600 dark:text-cyan-400 flex items-center justify-center">
-                    <FolderLock className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="font-bold">New Album</p>
-                    <p className="text-[10px] text-slate-400">Photo & video collection</p>
-                  </div>
+                  <FolderLock className="w-3.5 h-3.5 text-white/60" />
+                  <span>New Album</span>
                 </button>
                 <button
                   onClick={() => {
                     setCreateDropdownOpen(false);
                     onCreateGroup && onCreateGroup();
                   }}
-                  className="w-full px-3.5 py-2.5 flex items-center gap-2.5 text-left text-slate-700 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-slate-800/80 rounded-xl cursor-pointer font-medium transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-[8px] text-white/80 hover:text-white hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-purple-500/10 text-purple-600 flex items-center justify-center">
-                    <Users className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="font-bold">New Group</p>
-                    <p className="text-[10px] text-slate-400">Collaborative team vault</p>
-                  </div>
+                  <Users className="w-3.5 h-3.5 text-white/60" />
+                  <span>New Circle</span>
                 </button>
                 <button
                   onClick={() => {
                     setCreateDropdownOpen(false);
                     onUploadMedia && onUploadMedia();
                   }}
-                  className="w-full px-3.5 py-2.5 flex items-center gap-2.5 text-left text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-800/80 rounded-xl cursor-pointer font-medium transition-colors border-t border-slate-100 dark:border-slate-800/80 mt-1 pt-2"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-[8px] text-white/80 hover:text-white hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-                    <Upload className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="font-bold">Upload Photos</p>
-                    <p className="text-[10px] text-slate-400">Drag & drop files</p>
-                  </div>
+                  <Upload className="w-3.5 h-3.5 text-white/60" />
+                  <span>Upload Media</span>
                 </button>
               </div>
             </>
           )}
         </div>
 
-        {/* Theme Toggle Button */}
-        <button
-          onClick={toggleTheme}
-          className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition-all cursor-pointer"
-          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          aria-label="Toggle visual theme"
-        >
-          {isDark ? (
-            <Sun className="w-4 h-4 text-amber-400 transition-transform rotate-0 hover:rotate-90 duration-300" />
-          ) : (
-            <Moon className="w-4 h-4 text-indigo-600 transition-transform -rotate-12 hover:rotate-0 duration-300" />
-          )}
-        </button>
-
-        {/* Notifications Icon with Unread Pill */}
+        {/* Notifications */}
         <NavLink
           to="/notifications"
-          className="relative p-2.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition-all"
-          title="Notifications"
+          aria-label="View notifications"
+          className="relative p-2 text-white/60 hover:text-white hover:bg-white/[0.04] rounded-[10px] transition-colors"
         >
           <Bell className="w-4 h-4" />
           {unreadCount > 0 && (
-            <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white dark:ring-slate-900 animate-pulse" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#5B5BF0]" />
           )}
         </NavLink>
 
-        {/* User Profile Dropdown */}
-        <div className="relative">
+        {/* Circle Chat Sidebar Toggle */}
+        <button
+          onClick={onToggleChat}
+          aria-label="Toggle live circle chat sidebar"
+          className={`p-2 rounded-[10px] transition-colors cursor-pointer relative ${
+            isChatOpen
+              ? 'text-white bg-[#5B5BF0]/20 border border-[#5B5BF0]/30'
+              : 'text-white/60 hover:text-white hover:bg-white/[0.04]'
+          }`}
+          title={isChatOpen ? 'Close chat sidebar' : 'Open circle chat'}
+        >
+          <MessageSquare className="w-4 h-4" />
+          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#2DD4BF]" />
+        </button>
+
+        {/* Profile Avatar & Dropdown */}
+        <div className="relative pl-1">
           <button
             onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-            className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-all cursor-pointer"
-            aria-expanded={profileDropdownOpen}
+            aria-label="User account menu"
+            className="w-8 h-8 rounded-[10px] bg-[#1A1D28] border border-white/[0.1] text-white flex items-center justify-center font-bold text-xs cursor-pointer hover:border-white/[0.2] transition-colors"
           >
-            {user?.profilePicture ? (
-              <img
-                src={user.profilePicture}
-                alt={user.name}
-                className="w-8 h-8 rounded-xl object-cover ring-2 ring-blue-500/20"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-xl bg-blue-600 text-white text-xs font-black flex items-center justify-center shadow-xs">
-                {getInitials(user?.name)}
-              </div>
-            )}
-            <span className="text-xs font-bold text-slate-900 dark:text-slate-100 hidden lg:inline max-w-[110px] truncate">
-              {user?.name || 'Explorer'}
-            </span>
+            {user?.name ? getInitials(user.name) : 'EX'}
           </button>
 
           {profileDropdownOpen && (
@@ -238,41 +205,34 @@ export default function Header({
                 className="fixed inset-0 z-40"
                 onClick={() => setProfileDropdownOpen(false)}
               />
-              <div className="absolute right-0 mt-2 w-56 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl p-1.5 z-50 animate-in fade-in zoom-in-95 text-xs">
-                <div className="px-3.5 py-2.5 border-b border-slate-100 dark:border-slate-800/80">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Signed in as</p>
-                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate mt-0.5">{user?.email}</p>
+              <div className="absolute right-0 mt-2 w-52 bg-[#12141C] rounded-2xl border border-white/[0.08] shadow-2xl p-1.5 z-50 text-xs">
+                <div className="p-2 border-b border-white/[0.06] mb-1">
+                  <p className="font-medium text-white truncate">{user?.name || 'Explorer'}</p>
+                  <p className="text-[10px] text-white/40 truncate font-mono">{user?.email}</p>
                 </div>
-
-                <div className="space-y-0.5 py-1">
-                  <NavLink
-                    to="/profile"
-                    onClick={() => setProfileDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl font-medium transition-colors"
-                  >
-                    <User className="w-4 h-4 text-blue-600 dark:text-cyan-400" />
-                    <span>Profile Overview</span>
-                  </NavLink>
-
-                  <NavLink
-                    to="/settings"
-                    onClick={() => setProfileDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl font-medium transition-colors"
-                  >
-                    <HardDrive className="w-4 h-4 text-emerald-500" />
-                    <span>Drive & Storage</span>
-                  </NavLink>
-                </div>
-
-                <div className="border-t border-slate-100 dark:border-slate-800/80 pt-1 mt-1">
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2.5 px-3 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl w-full text-left font-bold cursor-pointer transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
-                  </button>
-                </div>
+                <NavLink
+                  to="/profile"
+                  onClick={() => setProfileDropdownOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-[8px] text-white/80 hover:text-white hover:bg-white/[0.04]"
+                >
+                  <User className="w-3.5 h-3.5 text-white/60" />
+                  <span>Profile details</span>
+                </NavLink>
+                <NavLink
+                  to="/settings"
+                  onClick={() => setProfileDropdownOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-[8px] text-white/80 hover:text-white hover:bg-white/[0.04]"
+                >
+                  <Settings className="w-3.5 h-3.5 text-white/60" />
+                  <span>Settings & Cloud</span>
+                </NavLink>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-[8px] text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 cursor-pointer text-left mt-1 border-t border-white/[0.06]"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign out</span>
+                </button>
               </div>
             </>
           )}

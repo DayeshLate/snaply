@@ -3,53 +3,67 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-brand-blue: #1D78D6;
-  --color-brand-indigo: #2563EB;
-  --color-brand-purple: #3B82F6;
-  --color-brand-dark: #11253E;
-  --color-brand-light: #E0F2FE;
-  --color-brand-bg: #F8FAFC;
-  --color-brand-card: #FFFFFF;
-  --color-brand-text: #0F172A;
-  --color-brand-muted: #64748B;
-  --color-brand-border: #E2E8F0;
-  --color-brand-success: #10B981;
-  --color-brand-error: #EF4444;
+  --color-ground: #0B0C12;
+  --color-surface: #12141C;
+  --color-surface-raised: #1A1D28;
+  --color-surface-overlay: #212534;
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --color-hairline-strong: rgba(255, 255, 255, 0.16);
+  --color-accent-indigo: #5B5BF0;
+  --color-accent-teal: #2DD4BF;
 
-  --color-accent-purple: #3B82F6;
-  --color-accent-indigo: #2563EB;
-  --color-accent-cyan: #62C1EA;
-  --color-accent-teal: #0284C7;
-  --color-accent-emerald: #10B981;
-  --color-accent-amber: #F59E0B;
-  --color-accent-rose: #F43F5E;
-  --color-accent-pink: #EC4899;
+  --color-brand-blue: #5B5BF0;
+  --color-brand-indigo: #5B5BF0;
+  --color-brand-dark: #0B0C12;
+  --color-brand-card: #12141C;
+  --color-brand-text: #F8FAFC;
+  --color-brand-muted: #94A3B8;
 
-  --color-snaply-primary: #1D78D6;
-  --color-snaply-deep: #11253E;
-  --color-snaply-secondary: #38BDF8;
-  --color-snaply-light: #9EE1F9;
-  --color-snaply-cyan: #62C1EA;
-  --color-snaply-purple: #2563EB;
-  --color-snaply-glow: rgba(29, 120, 214, 0.25);
+  --font-sans: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-display: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
 
-  --color-canvas-dark: #0B1728;
-  --color-surface-dark: #11253E;
-  --color-surface-2-dark: #162E4D;
-  --color-surface-3-dark: #1C3B61;
-  --color-line-dark: #1F4068;
-  --color-line-strong-dark: #285387;
-  --color-ink-dark: #F1F5F9;
-  --color-ink-muted-dark: #94A3B8;
-
-  --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  --font-display: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+:root {
+  --ease-snaply: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html {
-  /* Instant 1:1 responsive scroll tracking without smooth-scroll fighting */
   scroll-behavior: auto;
+  background-color: #0B0C12;
+  color: #F8FAFC;
+  font-family: var(--font-sans);
+}
+
+body {
+  margin: 0;
+  background-color: #0B0C12;
+  color: #F8FAFC;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Accessible global focus ring */
+*:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #5B5BF0, 0 0 0 4px #0B0C12;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Tabular nums helper */
+.num-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 
 /* Hardware-acceleration helper */

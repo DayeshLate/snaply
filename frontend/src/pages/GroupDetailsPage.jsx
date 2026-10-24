@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, useOutletContext } from 'react-router-dom';
 import {
   Users,
   FolderLock,
@@ -38,6 +38,7 @@ import UploadPhotoModal from '../components/albums/UploadPhotoModal';
 import CreateFolderModal from '../components/albums/CreateFolderModal';
 import EditMediaModal from '../components/albums/EditMediaModal';
 import DragDropZoneOverlay from '../components/common/DragDropZoneOverlay';
+import InviteModal from '../components/groups/InviteModal';
 
 import ChatHeader from '../components/chat/ChatHeader';
 import MessageList from '../components/chat/MessageList';
@@ -52,6 +53,7 @@ export default function GroupDetailsPage() {
 
   const { user } = useAuth();
   const { success, error: showError } = useToast();
+  const { onToggleChat, isChatOpen } = useOutletContext() || {};
 
   const [group, setGroup] = useState(null);
   const [groupMedia, setGroupMedia] = useState([]);
@@ -64,6 +66,7 @@ export default function GroupDetailsPage() {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [createAlbumModalOpen, setCreateAlbumModalOpen] = useState(false);
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [selectedFolderForUpload, setSelectedFolderForUpload] = useState(
     folderParam ? Number(folderParam) : null
   );
@@ -219,6 +222,16 @@ export default function GroupDetailsPage() {
     }
   };
 
+  const handleRegenerateInvite = async () => {
+    try {
+      const newCode = `SNP-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+      setGroup((prev) => (prev ? { ...prev, inviteCode: newCode } : prev));
+      success('New invite code generated');
+    } catch {
+      showError('Failed to regenerate invite code');
+    }
+  };
+
   const handleSendMessage = async ({ message, mediaId }) => {
     try {
       const sent = await messageService.sendMessage(groupId, { message, mediaId });
@@ -333,98 +346,142 @@ export default function GroupDetailsPage() {
       )
     : groupMedia;
 
+  // Active tab fallback: non-owners cannot be on settings
+  const currentTab = (activeTab === 'settings' && !isOwner) ? 'albums' : activeTab;
+
   return (
     <div className="space-y-8">
       {/* Top Header Card */}
-      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 shadow-xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{group.name}</h1>
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-600 dark:text-cyan-400 border border-blue-500/20">
-                {isOwner ? 'Group Owner' : isGroupAdmin ? 'Admin' : 'Member'}
+      <div className="bg-[#12141C] rounded-2xl border border-white/[0.08] p-6 sm:p-8">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-semibold text-white tracking-[-0.02em] leading-tight">
+                {group.name}
+              </h1>
+              <span
+                className={`px-2.5 py-0.5 rounded-[8px] text-[11px] font-medium tracking-wide ${
+                  isOwner
+                    ? 'bg-[#5B5BF0]/15 text-[#A5A6F6] border border-[#5B5BF0]/30'
+                    : 'bg-white/[0.06] text-white/70 border border-white/[0.08]'
+                }`}
+              >
+                {isOwner ? 'Circle Owner' : isGroupAdmin ? 'Admin' : 'Member'}
               </span>
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl font-medium">{group.description || 'No description provided.'}</p>
-            <div className="flex items-center gap-4 text-xs text-slate-400 mt-3 font-semibold">
-              <span className="flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-blue-500" />
+
+            <p className="text-sm text-white/60 max-w-2xl leading-relaxed">
+              {group.description || 'Private collaborative memory vault.'}
+            </p>
+
+            {/* Stacked Member Avatars & Metadata */}
+            <div className="flex items-center gap-4 pt-1 flex-wrap">
+              <div className="flex items-center -space-x-2 overflow-hidden">
+                {(group.groupMembers || []).slice(0, 5).map((m, idx) => {
+                  const initial = (m.user?.fullName?.[0] || m.user?.name?.[0] || m.userName?.[0] || m.user?.email?.[0] || 'U').toUpperCase();
+                  return (
+                    <div
+                      key={m.id || idx}
+                      title={m.user?.fullName || m.userName || m.user?.email || 'Member'}
+                      className="inline-flex h-7 w-7 items-center justify-center rounded-full ring-2 ring-[#12141C] bg-[#1E212E] text-white/80 text-[11px] font-medium select-none"
+                    >
+                      {initial}
+                    </div>
+                  );
+                })}
+                {(group.groupMembers?.length || 0) > 5 && (
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full ring-2 ring-[#12141C] bg-[#1A1D28] text-[10px] font-medium text-white/60 num-tabular">
+                    +{group.groupMembers.length - 5}
+                  </span>
+                )}
+              </div>
+
+              <span className="text-xs text-white/50 font-medium num-tabular">
                 {group.groupMembers?.length || 1} members
               </span>
-              <span>•</span>
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />
+              <span className="text-white/20">•</span>
+              <span className="text-xs text-white/40 font-medium">
                 Created {formatDate(group.createdAt)}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0 flex-wrap">
-            {group.inviteCode && (
-              <Button
-                variant="outline"
-                size="sm"
-                icon={copied ? Check : Copy}
-                onClick={handleCopyInvite}
-              >
-                {copied ? 'Invite Copied!' : 'Copy Invite Link'}
-              </Button>
-            )}
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <button
+              onClick={() => setInviteModalOpen(true)}
+              className="px-4 py-2 rounded-[10px] bg-[#5B5BF0] hover:bg-[#4E4ED9] text-white text-xs font-medium transition-colors flex items-center gap-2 cursor-pointer shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5B5BF0]"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Invite</span>
+            </button>
 
             {isGroupAdmin && (
-              <Button
-                variant="outline"
-                size="sm"
-                icon={UserPlus}
+              <button
                 onClick={() => setAddMemberModalOpen(true)}
+                className="px-3.5 py-2 rounded-[10px] bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-white/80 hover:text-white text-xs font-medium transition-colors flex items-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5B5BF0]"
               >
-                Add Member
-              </Button>
+                <span>Add Member</span>
+              </button>
             )}
 
             {canUpload && (
-              <Button
-                size="sm"
-                icon={Upload}
-                onClick={() => handleOpenUpload()}
-                variant="primary"
+              <button
+                onClick={() => handleOpenUpload(selectedFolderForUpload)}
+                className="px-3.5 py-2 rounded-[10px] bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-white/80 hover:text-white text-xs font-medium transition-colors flex items-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5B5BF0]"
               >
-                Upload Media
-              </Button>
+                <Upload className="w-3.5 h-3.5" />
+                <span>Upload Media</span>
+              </button>
+            )}
+
+            {onToggleChat && (
+              <button
+                onClick={() => onToggleChat(groupId)}
+                className={`px-3.5 py-2 rounded-[10px] border text-xs font-medium transition-colors flex items-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5B5BF0] ${
+                  isChatOpen
+                    ? 'bg-[#5B5BF0]/15 border-[#5B5BF0]/30 text-[#A5A6F6]'
+                    : 'bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.08] text-white/80 hover:text-white'
+                }`}
+                title={isChatOpen ? 'Close circle chat sidebar' : 'Open circle chat sidebar'}
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>{isChatOpen ? 'Close Chat' : 'Circle Chat'}</span>
+              </button>
             )}
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex items-center gap-2 border-t border-slate-100 dark:border-slate-800/80 mt-6 pt-5 overflow-x-auto">
+        {/* Tab Navigation: Albums | Members | Settings (Owner only) */}
+        <div className="flex items-center gap-2 border-t border-white/[0.08] mt-6 pt-5 overflow-x-auto">
           {[
             { id: 'albums', label: 'Albums', icon: FolderLock, count: group.folderDTOs?.length },
-            { id: 'photos', label: 'All Photos', icon: ImageIcon, count: groupMedia?.length },
             { id: 'members', label: 'Members', icon: Users, count: group.groupMembers?.length },
-            { id: 'chat', label: 'Group Chat', icon: MessageSquare, count: messages?.length },
-            ...(isGroupAdmin
-              ? [{ id: 'requests', label: 'Join Requests', icon: UserPlus, count: joinRequests?.length }]
-              : []),
             ...(isOwner ? [{ id: 'settings', label: 'Settings', icon: Settings }] : []),
           ].map((tab) => {
             const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
+            const isActive = currentTab === tab.id || (tab.id === 'albums' && currentTab === 'photos');
             return (
               <button
                 key={tab.id}
-                onClick={() => setSearchParams({ tab: tab.id })}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                onClick={() => {
+                  if (tab.id === 'albums') {
+                    setSelectedFolderForUpload(null);
+                  }
+                  setSearchParams({ tab: tab.id });
+                }}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-[10px] text-xs font-medium transition-colors cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5B5BF0] ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-[#5B5BF0] text-white'
+                    : 'text-white/60 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
                 <span>{tab.label}</span>
                 {typeof tab.count === 'number' && (
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                    className={`px-1.5 py-0.5 rounded-[6px] text-[10px] font-medium num-tabular ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-white/[0.06] text-white/60'
                     }`}
                   >
                     {tab.count}
@@ -438,249 +495,197 @@ export default function GroupDetailsPage() {
 
       {/* Tab Contents */}
       {/* 1. ALBUMS TAB */}
-      {activeTab === 'albums' && (
-        <div className="space-y-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">Albums & Folders</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Organize group memories into dedicated albums</p>
-            </div>
-            <div className="flex items-center gap-2.5">
-              {canUpload && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  icon={Upload}
-                  onClick={() => handleOpenUpload()}
-                >
-                  Upload Media
-                </Button>
-              )}
-              {canUpload && (
-                <Button
-                  size="sm"
-                  icon={Plus}
-                  onClick={() => setCreateAlbumModalOpen(true)}
-                  variant="primary"
-                >
-                  New Album
-                </Button>
-              )}
-            </div>
-          </div>
+      {(currentTab === 'albums' || currentTab === 'photos') && (
+        <div className="space-y-6">
+          {/* If viewing a specific album or all photos */}
+          {selectedFolder ? (
+            <div className="space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      setSelectedFolderForUpload(null);
+                      setSearchParams({ tab: 'albums' });
+                    }}
+                    className="px-3 py-1.5 rounded-[8px] bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-white/80 hover:text-white text-xs font-medium transition-colors cursor-pointer"
+                  >
+                    ← All Albums
+                  </button>
+                  <div>
+                    <h3 className="text-base font-semibold text-white tracking-[-0.02em]">
+                      {selectedFolder.name}
+                    </h3>
+                    <p className="text-xs text-white/50 num-tabular">
+                      {filteredPhotos.length} item{filteredPhotos.length === 1 ? '' : 's'}
+                    </p>
+                  </div>
+                </div>
 
-          {allGroupFolders.length === 0 ? (
-            <div className="p-12 bg-white/80 dark:bg-slate-900/80 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-center">
-              <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">No custom albums in this group yet.</p>
-              {canUpload && (
-                <Button
-                  size="sm"
-                  className="mt-4"
-                  onClick={() => setCreateAlbumModalOpen(true)}
-                  variant="primary"
-                >
-                  Create First Album
-                </Button>
-              )}
-            </div>
-          ) : (
-            <AlbumGrid
-              albums={allGroupFolders}
-              onSelectAlbum={(album) => {
-                setSelectedFolderForUpload(album.id);
-                setSearchParams({ tab: 'photos', folderId: album.id });
-              }}
-              onDeleteAlbum={(album) => setAlbumToDelete(album)}
-              canDelete={isGroupAdmin}
-            />
-          )}
-        </div>
-      )}
-
-      {/* 2. PHOTOS TAB */}
-      {activeTab === 'photos' && (
-        <div className="space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-xl font-black text-slate-900 dark:text-white">Group Photos</h3>
-                {selectedFolder && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-600 dark:text-cyan-400 border border-blue-500/20">
-                    Album: {selectedFolder.name}
+                <div className="flex items-center gap-2.5">
+                  {canUpload && (
                     <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedFolderForUpload(null);
-                        setSearchParams({ tab: 'photos' });
-                      }}
-                      className="hover:text-rose-500 font-black ml-1 cursor-pointer"
-                      title="Clear album filter"
+                      onClick={() => handleOpenUpload(selectedFolder.id)}
+                      className="px-3.5 py-2 rounded-[10px] bg-[#5B5BF0] hover:bg-[#4E4ED9] text-white text-xs font-medium transition-colors flex items-center gap-2 cursor-pointer shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5B5BF0]"
                     >
-                      ×
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Upload to Album</span>
                     </button>
-                  </span>
-                )}
+                  )}
+                </div>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                {selectedFolder
-                  ? `Showing photos inside "${selectedFolder.name}".`
-                  : 'All photos and videos uploaded across group albums.'}
-              </p>
-            </div>
-            <div className="flex items-center gap-2.5">
-              {allGroupFolders.length > 1 && (
-                <select
-                  value={selectedFolderForUpload || ''}
-                  onChange={(e) => {
-                    const val = e.target.value ? Number(e.target.value) : null;
-                    setSelectedFolderForUpload(val);
-                    if (val) {
-                      setSearchParams({ tab: 'photos', folderId: val });
-                    } else {
-                      setSearchParams({ tab: 'photos' });
-                    }
+
+              {filteredPhotos.length === 0 ? (
+                <div className="p-16 bg-[#12141C] border border-dashed border-white/[0.08] rounded-2xl text-center space-y-3">
+                  <ImageIcon className="w-10 h-10 text-white/20 mx-auto" />
+                  <p className="text-sm font-medium text-white/60">No photos in this album yet</p>
+                  <p className="text-xs text-white/40">Upload the first photo to begin sharing.</p>
+                  {canUpload && (
+                    <button
+                      onClick={() => handleOpenUpload(selectedFolder.id)}
+                      className="px-4 py-2 rounded-[10px] bg-[#5B5BF0] hover:bg-[#4E4ED9] text-white text-xs font-medium transition-colors inline-flex items-center gap-2 cursor-pointer"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Upload Media</span>
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <PhotoGrid
+                  photos={filteredPhotos}
+                  onViewPhoto={(photo, idx) => {
+                    setViewerIndex(idx);
+                    setViewerOpen(true);
                   }}
-                  className="px-3.5 py-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white font-medium focus:outline-none focus:border-blue-500 shadow-xs"
-                >
-                  <option value="">All Albums ({groupMedia.length})</option>
-                  {allGroupFolders.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-              {canUpload && (
-                <Button
-                  size="sm"
-                  icon={Upload}
-                  onClick={() => handleOpenUpload(selectedFolderForUpload)}
-                  variant="primary"
-                >
-                  Upload Media
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {filteredPhotos.length === 0 ? (
-            <div className="p-16 bg-white/80 dark:bg-slate-900/80 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-center">
-              <ImageIcon className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-              <p className="text-sm font-bold text-slate-900 dark:text-white">
-                {selectedFolder ? `No photos in "${selectedFolder.name}"` : 'No photos in this group yet'}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                {selectedFolder
-                  ? 'Upload photos or videos directly to this album.'
-                  : 'Upload the first photo to begin sharing.'}
-              </p>
-              {canUpload && (
-                <Button
-                  size="sm"
-                  className="mt-4"
-                  icon={Upload}
-                  onClick={() => handleOpenUpload(selectedFolderForUpload)}
-                  variant="primary"
-                >
-                  Upload Media
-                </Button>
-              )}
-            </div>
-          ) : (
-            <PhotoGrid
-              photos={filteredPhotos}
-              onViewPhoto={(photo, idx) => {
-                setViewerIndex(idx);
-                setViewerOpen(true);
-              }}
-              onDownloadPhoto={handleDownloadPhoto}
-              onDeletePhoto={(photo) => setPhotoToDelete(photo)}
-              onEditPhoto={(photo) => setPhotoToEdit(photo)}
-              canDelete={isGroupAdmin}
-            />
-          )}
-        </div>
-      )}
-
-      {/* 3. MEMBERS TAB */}
-      {activeTab === 'members' && (
-        <MemberList
-          groupId={groupId}
-          members={group.groupMembers || []}
-          currentUserRole={isOwner ? ROLES.OWNER : currentMember?.role}
-          currentUserId={user?.id}
-          onMembersChanged={() => loadGroupDetails()}
-        />
-      )}
-
-      {/* 4. CHAT TAB */}
-      {activeTab === 'chat' && (
-        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl border border-slate-200/80 dark:border-slate-800 flex flex-col h-[650px] overflow-hidden shadow-xl">
-          <ChatHeader
-            group={group}
-            memberCount={group.groupMembers?.length || 1}
-          />
-          <MessageList
-            messages={messages}
-            currentUserId={user?.id}
-            onDeleteMessage={handleDeleteMessage}
-            isGroupAdmin={isGroupAdmin}
-          />
-          <MessageComposer
-            onSendMessage={handleSendMessage}
-            availableMedia={groupMedia}
-          />
-        </div>
-      )}
-
-      {/* 5. JOIN REQUESTS TAB */}
-      {activeTab === 'requests' && isGroupAdmin && (
-        <div className="space-y-4">
-          <h3 className="text-xl font-black text-slate-900 dark:text-white">
-            Pending Join Requests ({joinRequests.length})
-          </h3>
-          {joinRequests.length === 0 ? (
-            <div className="p-10 bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-center text-xs text-slate-500 dark:text-slate-400 font-semibold">
-              No pending join requests for this group.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {joinRequests.map((req) => (
-                <JoinRequestCard
-                  key={req.id}
-                  request={req}
-                  onAccept={handleAcceptRequest}
-                  onReject={handleRejectRequest}
+                  onDownloadPhoto={handleDownloadPhoto}
+                  onDeletePhoto={(photo) => setPhotoToDelete(photo)}
+                  onEditPhoto={(photo) => setPhotoToEdit(photo)}
+                  canDelete={isGroupAdmin}
                 />
-              ))}
+              )}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-semibold text-white tracking-[-0.02em]">Albums & Vaults</h3>
+                  <p className="text-xs text-white/50 mt-0.5">Organize circle memories into curated albums</p>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  {canUpload && (
+                    <button
+                      onClick={() => handleOpenUpload()}
+                      className="px-3.5 py-2 rounded-[10px] bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-white/80 hover:text-white text-xs font-medium transition-colors flex items-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5B5BF0]"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Upload</span>
+                    </button>
+                  )}
+                  {canUpload && (
+                    <button
+                      onClick={() => setCreateAlbumModalOpen(true)}
+                      className="px-3.5 py-2 rounded-[10px] bg-[#5B5BF0] hover:bg-[#4E4ED9] text-white text-xs font-medium transition-colors flex items-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5B5BF0]"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>New Album</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {allGroupFolders.length === 0 ? (
+                <div className="p-12 bg-[#12141C] border border-dashed border-white/[0.08] rounded-2xl text-center space-y-3">
+                  <p className="text-sm font-medium text-white/60">No custom albums in this circle yet.</p>
+                  {canUpload && (
+                    <button
+                      onClick={() => setCreateAlbumModalOpen(true)}
+                      className="px-4 py-2 rounded-[10px] bg-[#5B5BF0] hover:bg-[#4E4ED9] text-white text-xs font-medium transition-colors inline-flex items-center gap-2 cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Create First Album</span>
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <AlbumGrid
+                  albums={allGroupFolders}
+                  onSelectAlbum={(album) => {
+                    setSelectedFolderForUpload(album.id);
+                    setSearchParams({ tab: 'albums', folderId: album.id });
+                  }}
+                  onDeleteAlbum={(album) => setAlbumToDelete(album)}
+                  canDelete={isGroupAdmin}
+                />
+              )}
             </div>
           )}
         </div>
       )}
 
-      {/* 6. SETTINGS TAB */}
-      {activeTab === 'settings' && isOwner && (
-        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 space-y-6 shadow-xl">
+      {/* 2. MEMBERS TAB */}
+      {currentTab === 'members' && (
+        <div className="space-y-6">
+          {/* Pending Join Requests (Owner / Admin only) */}
+          {isGroupAdmin && joinRequests.length > 0 && (
+            <div className="rounded-2xl border border-white/[0.08] bg-[#12141C] p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-semibold text-white tracking-[-0.02em]">
+                    Pending Join Requests
+                  </h4>
+                  <p className="text-xs text-white/50 mt-0.5">
+                    Review and approve users requesting to join this circle
+                  </p>
+                </div>
+                <span className="px-2 py-0.5 rounded-[6px] text-xs font-mono bg-[#5B5BF0]/20 text-[#A5A6F6] border border-[#5B5BF0]/30 num-tabular">
+                  {joinRequests.length} pending
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {joinRequests.map((req) => (
+                  <JoinRequestCard
+                    key={req.id}
+                    request={req}
+                    onAccept={handleAcceptRequest}
+                    onReject={handleRejectRequest}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <MemberList
+            groupId={groupId}
+            members={group.groupMembers || []}
+            currentUserRole={isOwner ? ROLES.OWNER : currentMember?.role}
+            currentUserId={user?.id}
+            onMembersChanged={() => loadGroupDetails()}
+          />
+        </div>
+      )}
+
+      {/* 3. SETTINGS TAB (Owner Only) */}
+      {currentTab === 'settings' && isOwner && (
+        <div className="bg-[#12141C] p-6 sm:p-8 rounded-2xl border border-white/[0.08] space-y-6">
           <div>
-            <h3 className="text-xl font-black text-slate-900 dark:text-white">Group Settings</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Manage destructive actions and ownership permissions</p>
+            <h3 className="text-base font-semibold text-white tracking-[-0.02em]">Circle Settings</h3>
+            <p className="text-xs text-white/50 mt-0.5">Manage destructive actions and circle configuration</p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="p-5 rounded-xl bg-rose-500/[0.04] border border-rose-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h4 className="text-sm font-bold text-rose-600 dark:text-rose-400">Delete Group</h4>
-              <p className="text-xs text-rose-700 dark:text-rose-300 mt-1 leading-relaxed">
-                Permanently delete this group, its albums, and associated cloud references. This action is irreversible.
+              <h4 className="text-sm font-medium text-rose-400">Delete Circle</h4>
+              <p className="text-xs text-white/50 mt-1 max-w-xl leading-relaxed">
+                Permanently delete this circle, its albums, and associated cloud references. This action is irreversible.
               </p>
             </div>
-            <Button
-              variant="danger"
-              size="sm"
-              icon={Trash2}
+            <button
               onClick={() => setDeleteGroupOpen(true)}
+              className="px-3.5 py-2 rounded-[10px] bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-medium transition-colors flex items-center gap-2 cursor-pointer shrink-0"
             >
-              Delete Group
-            </Button>
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Delete Circle</span>
+            </button>
           </div>
         </div>
       )}
@@ -741,6 +746,14 @@ export default function GroupDetailsPage() {
         onClose={() => setCreateAlbumModalOpen(false)}
         groupId={groupId}
         onSuccess={() => loadGroupDetails()}
+      />
+
+      {/* Invite Modal */}
+      <InviteModal
+        isOpen={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+        group={group}
+        onRegenerateCode={handleRegenerateInvite}
       />
 
       {/* Add Member Modal */}

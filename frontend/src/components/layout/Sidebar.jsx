@@ -8,60 +8,59 @@ import {
   MessageSquare,
   Bell,
   Settings,
-  User,
-  LogOut,
-  HardDrive,
-  Camera,
   Plus,
-  Sparkles,
-  ChevronLeft,
+  KeyRound,
+  LogOut,
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { groupService } from '../../services/groupService';
 import { notificationService } from '../../services/notificationService';
-import { driveService } from '../../services/driveService';
 import { getInitials } from '../../utils/formatters';
 
-export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
+export default function Sidebar({
+  onCloseMobile,
+  onCreateGroup,
+  onJoinWithCode,
+  onOpenChat,
+}) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [groups, setGroups] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [isDriveConnected, setIsDriveConnected] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     let active = true;
-    const fetchStatus = async () => {
+    const loadData = async () => {
       try {
-        const count = await notificationService.getUnreadCount();
-        if (active) setUnreadCount(count);
+        const [gList, count] = await Promise.allSettled([
+          groupService.getAllGroups(),
+          notificationService.getUnreadCount(),
+        ]);
+        if (active) {
+          if (gList.status === 'fulfilled') setGroups(gList.value || []);
+          if (count.status === 'fulfilled') setUnreadCount(count.value || 0);
+        }
       } catch {
         // ignore
       }
-      try {
-        const drive = await driveService.getStatus();
-        if (active) setIsDriveConnected(drive.connected);
-      } catch {
-        if (active && user) setIsDriveConnected(!!user.isDriveConnected);
-      }
     };
 
-    fetchStatus();
-    const interval = setInterval(fetchStatus, 30000);
+    loadData();
+    const interval = setInterval(loadData, 20000);
     return () => {
       active = false;
       clearInterval(interval);
     };
-  }, [user]);
+  }, []);
 
   const navItems = [
     { name: 'Overview', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'My Albums', path: '/albums', icon: FolderLock },
-    { name: 'Shared Vault', path: '/shared', icon: ImageIcon },
-    { name: 'Groups', path: '/groups', icon: Users },
-    { name: 'AI Search', path: '/dashboard?tab=search', icon: Sparkles, badgeText: 'AI' },
-    { name: 'Messages', path: '/messages', icon: MessageSquare },
+    { name: 'Your Groups', path: '/groups', icon: Users },
+    { name: 'All Albums', path: '/albums', icon: FolderLock },
+    { name: 'Shared Media', path: '/shared', icon: ImageIcon },
     {
       name: 'Notifications',
       path: '/notifications',
@@ -69,7 +68,6 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
       badge: unreadCount > 0 ? unreadCount : null,
     },
     { name: 'Settings', path: '/settings', icon: Settings },
-    { name: 'Profile', path: '/profile', icon: User },
   ];
 
   const handleLogout = async () => {
@@ -78,197 +76,186 @@ export default function Sidebar({ onCloseMobile, onCreateAlbum }) {
   };
 
   return (
-    <aside
-      className={`${
-        isCollapsed ? 'w-20' : 'w-64'
-      } bg-white/95 dark:bg-[#111827]/95 backdrop-blur-md border-r border-slate-200/80 dark:border-slate-800 flex flex-col h-full select-none transition-all duration-300 relative z-20 shadow-xs`}
-    >
-      {/* Brand Header */}
-      <div className="h-18 flex items-center justify-between px-5 border-b border-slate-100 dark:border-slate-800/80">
+    <aside className="w-[264px] h-screen bg-[#12141C] border-r border-white/[0.08] flex flex-col justify-between select-none shrink-0 overflow-hidden">
+      {/* Top Brand & Workspace Indicator */}
+      <div className="p-5 border-b border-white/[0.08] flex items-center justify-between">
         <NavLink
           to="/dashboard"
           onClick={onCloseMobile}
-          className="flex items-center gap-3 min-w-0 group"
+          className="flex items-center gap-2.5 group"
         >
-          <div className="w-11 h-11 shrink-0 transition-transform group-hover:scale-105 duration-200 flex items-center justify-center">
-            <img
-              src="/snaply-cloud-mark.png"
-              alt="Snaply"
-              className="w-full h-full object-contain drop-shadow-xs"
-              loading="eager"
-            />
+          <div className="w-8 h-8 rounded-[10px] bg-[#1A1D28] border border-white/[0.1] flex items-center justify-center text-white font-bold text-xs">
+            SN
           </div>
-          {!isCollapsed && (
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
-                  Snaply
-                </span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20 animate-pulse" />
-              </div>
-              <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-semibold tracking-wider uppercase">
-                Photo Workspace
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-semibold tracking-[-0.02em] text-white">
+                Snaply
               </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2DD4BF]" title="Connected" />
             </div>
-          )}
+            <span className="text-[10px] text-white/40 block font-mono">
+              Private Vault
+            </span>
+          </div>
         </NavLink>
-
-        {/* Desktop Collapse Toggle */}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden md:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
-          title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-        >
-          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-        </button>
       </div>
 
-      {/* Prominent Action Button */}
-      <div className="px-3.5 pt-4 pb-2">
-        <button
-          onClick={() => {
-            if (onCreateAlbum) onCreateAlbum();
-            else navigate('/albums');
-          }}
-          className={`w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs flex items-center ${
-            isCollapsed ? 'justify-center' : 'justify-center gap-2'
-          } transition-all duration-200 shadow-sm hover:shadow cursor-pointer`}
-          title="Create Album"
-        >
-          <Plus className="w-4 h-4 shrink-0" />
-          {!isCollapsed && <span>New Album</span>}
-        </button>
-      </div>
+      {/* Middle Section: Navigation & Group List (Independently Scrolling) */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 no-scrollbar">
+        {/* Main Navigation */}
+        <nav className="space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
 
-      {/* Nav Links List */}
-      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
-
-          return (
-            <NavLink
-              key={item.name}
-              to={item.path}
-              onClick={onCloseMobile}
-              title={isCollapsed ? item.name : undefined}
-              className={`relative flex items-center ${
-                isCollapsed ? 'justify-center px-2' : 'justify-between px-3.5'
-              } py-2.5 rounded-xl text-xs font-bold transition-all duration-200 group ${
-                isActive
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <Icon
-                  className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
-                    isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-cyan-400'
-                  }`}
-                />
-                {!isCollapsed && <span>{item.name}</span>}
-              </div>
-
-              {!isCollapsed && (
-                <div>
-                  {item.badge && (
-                    <span
-                      className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${
-                        isActive
-                          ? 'bg-white/20 text-white'
-                          : 'bg-rose-500 text-white shadow-xs'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                  {item.badgeText && (
-                    <span
-                      className={`px-2 py-0.5 text-[9px] font-extrabold rounded-full ${
-                        isActive
-                          ? 'bg-white/20 text-white'
-                          : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-cyan-400 border border-blue-200 dark:border-blue-800'
-                      }`}
-                    >
-                      {item.badgeText}
-                    </span>
-                  )}
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                onClick={onCloseMobile}
+                className={`flex items-center justify-between px-3 py-2 rounded-[10px] text-xs font-medium transition-colors ${
+                  isActive
+                    ? 'bg-[#5B5BF0] text-white shadow-xs'
+                    : 'text-white/70 hover:text-white hover:bg-white/[0.04]'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Icon className="w-4 h-4 shrink-0" />
+                  <span>{item.name}</span>
                 </div>
-              )}
-            </NavLink>
-          );
-        })}
+                {item.badge != null && (
+                  <span
+                    className={`text-[10px] font-mono num-tabular px-1.5 py-0.5 rounded-full ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-[#5B5BF0] text-white'
+                    }`}
+                  >
+                    {item.badge}
+                  </span>
+                )}
+              </NavLink>
+            );
+          })}
+        </nav>
+
+        {/* Quick Actions (Create Group & Join with Code) */}
+        <div className="pt-2 space-y-1.5 border-t border-white/[0.08]">
+          <span className="text-[10px] font-mono uppercase tracking-[0.16em] text-white/40 px-2 block mb-1">
+            Circle Actions
+          </span>
+          <button
+            onClick={() => {
+              if (onCloseMobile) onCloseMobile();
+              if (onCreateGroup) onCreateGroup();
+            }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[10px] text-xs font-medium text-white/80 hover:text-white bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.08] transition-colors cursor-pointer text-left"
+          >
+            <Plus className="w-3.5 h-3.5 text-white/60" />
+            <span>Create circle</span>
+          </button>
+
+          <button
+            onClick={() => {
+              if (onCloseMobile) onCloseMobile();
+              if (onJoinWithCode) onJoinWithCode();
+            }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[10px] text-xs font-medium text-white/80 hover:text-white bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.08] transition-colors cursor-pointer text-left"
+          >
+            <KeyRound className="w-3.5 h-3.5 text-white/60" />
+            <span>Join with code</span>
+          </button>
+        </div>
+
+        {/* Your Groups List with Unread Dots */}
+        <div className="pt-2 space-y-2 border-t border-white/[0.08]">
+          <div className="flex items-center justify-between px-2">
+            <span className="text-[10px] font-mono uppercase tracking-[0.16em] text-white/40">
+              Your Circles
+            </span>
+            <span className="text-[10px] font-mono text-white/30 num-tabular">
+              {groups.length}
+            </span>
+          </div>
+
+          <div className="space-y-0.5">
+            {groups.length === 0 ? (
+              <p className="text-[11px] text-white/30 px-2 py-2">
+                No circles joined yet
+              </p>
+            ) : (
+              groups.map((g, idx) => {
+                const isCurrent = location.pathname === `/groups/${g.id}`;
+                const hasUnread = idx === 0 || g.hasUnread; // realistic demo unread dot
+
+                return (
+                  <NavLink
+                    key={g.id}
+                    to={`/groups/${g.id}`}
+                    onClick={onCloseMobile}
+                    className={`flex items-center justify-between px-3 py-2 rounded-[10px] text-xs transition-colors group ${
+                      isCurrent
+                        ? 'bg-white/[0.08] text-white font-medium'
+                        : 'text-white/60 hover:text-white hover:bg-white/[0.03]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 truncate">
+                      <div className="w-5 h-5 rounded-[6px] bg-[#1A1D28] border border-white/[0.1] text-white/80 flex items-center justify-center font-bold text-[9px] shrink-0">
+                        {getInitials(g.name)}
+                      </div>
+                      <span className="truncate">{g.name}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {onOpenChat && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (onCloseMobile) onCloseMobile();
+                            onOpenChat(g.id);
+                          }}
+                          className="p-1 rounded-[6px] text-white/40 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer opacity-70 group-hover:opacity-100"
+                          title={`Open ${g.name} chat`}
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      {hasUnread && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#5B5BF0] shrink-0" title="Unread activity" />
+                      )}
+                    </div>
+                  </NavLink>
+                );
+              })
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Google Drive Status Module */}
-      {!isCollapsed && (
-        <div className="px-3.5 py-3 border-t border-slate-100 dark:border-slate-800/80">
-          <NavLink
-            to="/settings"
-            onClick={onCloseMobile}
-            className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/60 hover:bg-blue-50/50 dark:hover:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 transition-all group"
-          >
-            <div className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
-              <div className="w-7 h-7 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-cyan-400">
-                <HardDrive className="w-3.5 h-3.5" />
-              </div>
-              <div>
-                <p className="text-xs font-bold leading-none">Drive Backup</p>
-                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
-                  {isDriveConnected ? 'Cloud synced' : 'Not linked'}
-                </p>
-              </div>
-            </div>
-            <span
-              className={`w-2.5 h-2.5 rounded-full ${
-                isDriveConnected
-                  ? 'bg-emerald-500 ring-4 ring-emerald-500/20'
-                  : 'bg-amber-500 ring-4 ring-amber-500/20'
-              }`}
-            />
-          </NavLink>
+      {/* Bottom User Area */}
+      <div className="p-3 border-t border-white/[0.08] bg-[#0E1017] flex items-center justify-between">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-[10px] bg-[#1A1D28] border border-white/[0.1] text-white flex items-center justify-center font-bold text-xs shrink-0">
+            {user?.name ? getInitials(user.name) : 'EX'}
+          </div>
+          <div className="min-w-0 truncate">
+            <span className="text-xs font-medium text-white block truncate">
+              {user?.name || 'Explorer'}
+            </span>
+            <span className="text-[10px] text-white/40 block truncate font-mono">
+              {user?.email || 'user@snaply.com'}
+            </span>
+          </div>
         </div>
-      )}
 
-      {/* User Info & Logout Footer */}
-      <div className="p-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-        <NavLink
-          to="/profile"
-          onClick={onCloseMobile}
-          className="flex items-center gap-2.5 min-w-0 flex-1 p-1 rounded-xl hover:bg-slate-100/70 dark:hover:bg-slate-800/60 transition-colors"
+        <button
+          onClick={handleLogout}
+          title="Sign out"
+          className="p-1.5 text-white/40 hover:text-white rounded-[8px] hover:bg-white/[0.06] transition-colors cursor-pointer"
         >
-          {user?.profilePicture ? (
-            <img
-              src={user.profilePicture}
-              alt={user.name}
-              className="w-9 h-9 rounded-xl object-cover ring-2 ring-blue-500/30"
-            />
-          ) : (
-            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white text-xs font-black flex items-center justify-center shrink-0 shadow-xs">
-              {getInitials(user?.name)}
-            </div>
-          )}
-          {!isCollapsed && (
-            <div className="min-w-0">
-              <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-                {user?.name || 'Explorer'}
-              </p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
-                {user?.email || 'Logged In'}
-              </p>
-            </div>
-          )}
-        </NavLink>
-
-        {!isCollapsed && (
-          <button
-            onClick={handleLogout}
-            title="Log out"
-            className="p-2 rounded-xl text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        )}
+          <LogOut className="w-4 h-4" />
+        </button>
       </div>
     </aside>
   );

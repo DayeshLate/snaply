@@ -3,12 +3,18 @@ import { mockStore, isDemoMode, disableDemoMode } from '../mock/mockStore';
 
 export const authService = {
   async register({ name, email, password }) {
+    if (isDemoMode()) {
+      return { token: 'mock-demo-token', user: mockStore.getUser() };
+    }
     disableDemoMode();
     const response = await apiClient.post('/api/auth/register', { name, email, password });
     return response.data;
   },
 
   async login({ email, password }) {
+    if (isDemoMode()) {
+      return { token: 'mock-demo-token', user: mockStore.getUser() };
+    }
     disableDemoMode();
     const response = await apiClient.post('/api/auth/login', { email, password });
     return response.data;

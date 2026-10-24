@@ -22,6 +22,16 @@ export function formatDateTime(dateString) {
   }).format(date);
 }
 
+export function formatTime(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(date);
+}
+
 export function formatRelativeTime(dateString) {
   if (!dateString) return '';
   const date = new Date(dateString);

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Folder, Copy, Check, Crown, UserCheck } from 'lucide-react';
+import { Users, Folder, Copy, Check, Crown, UserCheck, MessageSquare } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 
-export default function GroupCard({ group, currentUserId }) {
+export default function GroupCard({ group, currentUserId, onOpenChat }) {
   const navigate = useNavigate();
   const { success } = useToast();
   const [copied, setCopied] = useState(false);
@@ -34,15 +34,30 @@ export default function GroupCard({ group, currentUserId }) {
           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black/40 text-white backdrop-blur-md border border-white/20">
             {isOwner ? 'Owner' : 'Member'}
           </span>
-          {group.inviteCode && (
-            <button
-              onClick={handleCopyInvite}
-              title="Copy invite link"
-              className="p-1.5 rounded-xl bg-black/40 hover:bg-black/60 text-white transition-colors cursor-pointer border border-white/20 backdrop-blur-md"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            </button>
-          )}
+          <div className="flex items-center gap-1.5">
+            {onOpenChat && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenChat(group.id);
+                }}
+                title="Open circle chat"
+                className="p-1.5 rounded-xl bg-black/40 hover:bg-black/60 text-white transition-colors cursor-pointer border border-white/20 backdrop-blur-md"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+              </button>
+            )}
+            {group.inviteCode && (
+              <button
+                onClick={handleCopyInvite}
+                title="Copy invite link"
+                className="p-1.5 rounded-xl bg-black/40 hover:bg-black/60 text-white transition-colors cursor-pointer border border-white/20 backdrop-blur-md"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              </button>
+            )}
+          </div>
         </div>
         <div className="text-white">
           <h4 className="text-lg font-black truncate group-hover:text-cyan-200 transition-colors">
