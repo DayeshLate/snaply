@@ -16,11 +16,13 @@ export default function HomeHeroSection({
   photoCount = 0,
   pendingRequestCount = 0,
   samplePhotos = [],
+  onCreateGroup,
   onCreateAlbum,
   scrollerRef,
 }) {
   const greeting = getGreeting();
   const userName = user?.name ? user.name.split(' ')[0] : 'Creator';
+  const handleCreate = onCreateGroup || onCreateAlbum;
 
   return (
     <section className="space-y-8 pt-2">
@@ -45,11 +47,11 @@ export default function HomeHeroSection({
 
         <div className="flex items-center gap-3 shrink-0">
           <button
-            onClick={onCreateAlbum}
+            onClick={handleCreate}
             className="px-4 py-2.5 rounded-[10px] bg-[#5B5BF0] hover:bg-[#4E4ED9] text-white text-xs font-medium transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Create album</span>
+            <span>Create group</span>
           </button>
         </div>
       </div>

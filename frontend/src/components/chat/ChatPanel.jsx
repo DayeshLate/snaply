@@ -10,10 +10,12 @@ export default function ChatPanel({
   isOpen = true,
   onClose,
   activeGroupId = null,
+  activeGroup = null,
 }) {
   const { user } = useAuth();
   const [groups, setGroups] = useState([]);
   const [selectedGroupId, setSelectedGroupId] = useState(activeGroupId);
+  const [currentGroupDetails, setCurrentGroupDetails] = useState(activeGroup);
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -23,25 +25,60 @@ export default function ChatPanel({
   const scrollContainerRef = useRef(null);
   const endMarkerRef = useRef(null);
 
+  // Sync activeGroup prop
+  useEffect(() => {
+    if (activeGroup) {
+      setCurrentGroupDetails(activeGroup);
+    }
+  }, [activeGroup]);
+
+  // Sync activeGroupId prop
+  useEffect(() => {
+    if (activeGroupId) {
+      setSelectedGroupId(activeGroupId);
+    }
+  }, [activeGroupId]);
+
   // Load available groups for chat channels
   useEffect(() => {
     let active = true;
     groupService.getAllGroups().then((res) => {
       if (active && res && res.length > 0) {
         setGroups(res);
-        if (!selectedGroupId) {
+        if (!selectedGroupId && !activeGroupId) {
           setSelectedGroupId(res[0].id);
         }
       }
     }).catch(() => {});
     return () => { active = false; };
-  }, []);
+  }, [selectedGroupId, activeGroupId]);
 
+  // Keep currentGroupDetails up to date when selectedGroupId changes
   useEffect(() => {
-    if (activeGroupId) {
-      setSelectedGroupId(activeGroupId);
+    if (!selectedGroupId) return;
+    let active = true;
+
+    // Check if group is in groups list (using String equality)
+    const found = groups.find((g) => String(g.id) === String(selectedGroupId));
+    if (found) {
+      setCurrentGroupDetails(found);
+      return;
     }
-  }, [activeGroupId]);
+
+    // If not found in groups list, load directly by ID
+    groupService
+      .getGroupById(selectedGroupId)
+      .then((res) => {
+        if (active && res) {
+          setCurrentGroupDetails(res);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, [selectedGroupId, groups]);
 
   // Load initial group messages
   const loadMessages = useCallback(async (gId) => {
@@ -155,7 +192,8 @@ export default function ChatPanel({
     }
   };
 
-  const selectedGroup = groups.find((g) => g.id === selectedGroupId);
+  const selectedGroup = currentGroupDetails || groups.find((g) => String(g.id) === String(selectedGroupId));
+  const circleName = selectedGroup?.name || (activeGroupId ? `Circle #${activeGroupId}` : 'Circle Chat');
 
   return (
     <aside
@@ -163,21 +201,21 @@ export default function ChatPanel({
         isOpen ? 'flex' : 'hidden'
       }`}
     >
-      {/* Header with Channel Picker */}
+      {/* Header with Channel Identifier */}
       <div className="h-16 px-4 border-b border-white/[0.08] flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="w-8 h-8 rounded-[8px] bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/60">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-[8px] bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/60 shrink-0">
             <Hash className="w-4 h-4" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-white truncate max-w-[170px]">
-                {selectedGroup ? selectedGroup.name : 'Select Circle'}
+              <span className="text-xs font-semibold text-white truncate max-w-[170px]" title={circleName}>
+                {circleName}
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2DD4BF]" title="Channel connected" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2DD4BF] shrink-0" title="Channel connected" />
             </div>
-            <span className="text-[10px] text-white/40 block font-mono">
-              STOMP Channel
+            <span className="text-[10px] text-white/40 block font-mono truncate">
+              {selectedGroup ? `Chat • ${selectedGroup.name}` : 'Live Circle Stream'}
             </span>
           </div>
         </div>
@@ -205,9 +243,11 @@ export default function ChatPanel({
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-2 text-white/40">
             <MessageSquare className="w-8 h-8 mx-auto text-white/20" />
-            <p className="text-xs font-medium text-white/60">No messages in this circle</p>
-            <p className="text-[11px] leading-relaxed max-w-[200px]">
-              Chat in real-time with circle members about shared albums.
+            <p className="text-xs font-medium text-white/70">No messages in {circleName}</p>
+            <p className="text-[11px] leading-relaxed max-w-[210px] text-white/40">
+              {selectedGroup
+                ? `This chat belongs to "${selectedGroup.name}". Send a message to chat with circle members.`
+                : 'Chat in real-time with circle members about shared albums.'}
             </p>
           </div>
         ) : (
@@ -299,7 +339,7 @@ export default function ChatPanel({
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder={`Message #${selectedGroup ? selectedGroup.name : 'channel'}...`}
+          placeholder={`Message in #${circleName}...`}
           className="flex-1 bg-white/[0.04] border border-white/[0.08] focus:border-[#5B5BF0] rounded-[10px] px-3.5 py-2 text-xs text-white placeholder:text-white/30 focus:outline-none transition-colors"
         />
         <button

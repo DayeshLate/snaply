@@ -92,7 +92,8 @@ export default function AppLayout() {
 
   // Derive active group ID from URL if on /groups/:groupId or custom selection
   const groupMatch = location.pathname.match(/\/groups\/([0-9a-zA-Z-]+)/);
-  const activeGroupId = customChatGroupId || (groupMatch ? groupMatch[1] : (groups[0]?.id || null));
+  const activeGroupId = groupMatch ? groupMatch[1] : (customChatGroupId || (groups[0]?.id || null));
+  const activeGroup = groups.find((g) => String(g.id) === String(activeGroupId)) || null;
 
   // Sync active group whenever URL changes to /groups/:id
   useEffect(() => {
@@ -188,6 +189,7 @@ export default function AppLayout() {
             isOpen={true}
             onClose={() => setChatOpen(false)}
             activeGroupId={activeGroupId}
+            activeGroup={activeGroup}
           />
         </div>
       )}
@@ -197,10 +199,10 @@ export default function AppLayout() {
         <button
           onClick={() => setChatOpen(true)}
           className="hidden xl:flex fixed bottom-6 right-6 z-40 items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#12141C] border border-white/[0.12] hover:border-[#5B5BF0] shadow-2xl text-white text-xs font-medium transition-all duration-200 hover:scale-105 cursor-pointer"
-          title="Open circle chat sidebar"
+          title={`Open ${activeGroup?.name || 'circle'} chat sidebar`}
         >
           <span className="w-2 h-2 rounded-full bg-[#2DD4BF]" />
-          <span className="text-[#A5A6F6]">Circle Chat</span>
+          <span className="text-[#A5A6F6]">{activeGroup?.name || 'Circle Chat'}</span>
         </button>
       )}
 
@@ -216,6 +218,7 @@ export default function AppLayout() {
               isOpen={true}
               onClose={() => setChatDrawerOpen(false)}
               activeGroupId={activeGroupId}
+              activeGroup={activeGroup}
             />
           </div>
         </div>
