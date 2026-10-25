@@ -38,16 +38,23 @@ public class GroupController {
     }
 
 
-    @PostMapping("/join/{inviteCode}")
+    @PostMapping({"/join/{inviteCode}", "/request/{inviteCode}", "/join", "/request"})
     public ResponseEntity<JoinRequest> requestToJoin(
-            @PathVariable String inviteCode
+            @PathVariable(value = "inviteCode", required = false) String pathInviteCode,
+            @RequestParam(value = "code", required = false) String paramInviteCode,
+            @RequestBody(required = false) JoinCodeRequest body
     ) {
+        String code = pathInviteCode != null && !pathInviteCode.isBlank() ? pathInviteCode :
+                      (paramInviteCode != null && !paramInviteCode.isBlank() ? paramInviteCode :
+                      (body != null && body.code() != null ? body.code() : (body != null ? body.inviteCode() : null)));
 
         JoinRequest request =
-                groupService.requestToJoin(inviteCode);
+                groupService.requestToJoin(code);
 
         return ResponseEntity.ok(request);
     }
+
+    public record JoinCodeRequest(String code, String inviteCode) {}
 
     @PostMapping("/requests/{requestId}/accept")
     public ResponseEntity<GroupMembers> acceptRequest(

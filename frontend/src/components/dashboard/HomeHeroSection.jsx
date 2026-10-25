@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Image as ImageIcon, UserCheck, Plus, ArrowRight } from 'lucide-react';
+import { Users, Image as ImageIcon, UserCheck, Plus, ArrowRight, KeyRound } from 'lucide-react';
 import MemoryStack3D from '../3d/MemoryStack3D';
 import StatCounter from './StatCounter';
 
@@ -18,6 +18,7 @@ export default function HomeHeroSection({
   samplePhotos = [],
   onCreateGroup,
   onCreateAlbum,
+  onJoinWithCode,
   scrollerRef,
 }) {
   const greeting = getGreeting();
@@ -46,6 +47,16 @@ export default function HomeHeroSection({
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
+          {onJoinWithCode && (
+            <button
+              onClick={onJoinWithCode}
+              className="px-4 py-2.5 rounded-[10px] bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-white text-xs font-medium transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
+            >
+              <KeyRound className="w-4 h-4 text-white/60" />
+              <span>Join with code</span>
+            </button>
+          )}
+
           <button
             onClick={handleCreate}
             className="px-4 py-2.5 rounded-[10px] bg-[#5B5BF0] hover:bg-[#4E4ED9] text-white text-xs font-medium transition-colors flex items-center gap-2 shadow-xs cursor-pointer"

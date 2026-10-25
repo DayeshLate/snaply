@@ -168,18 +168,19 @@ export default function GroupDetailsPage() {
     return () => clearInterval(interval);
   }, [activeTab, groupId]);
 
-  // Load join requests if owner/admin and on joinRequests tab
+  // Load join requests if owner/admin
   useEffect(() => {
-    if (activeTab !== 'requests') return;
     const loadRequests = async () => {
       try {
         const reqs = await joinRequestService.getRequestsByGroup(groupId);
-        setJoinRequests(reqs?.filter((r) => r.status === 'PENDING') || []);
+        setJoinRequests(reqs?.filter((r) => !r.status || r.status === 'PENDING') || []);
       } catch {
         // ignore
       }
     };
-    loadRequests();
+    if (groupId) {
+      loadRequests();
+    }
   }, [activeTab, groupId]);
 
   // Current user's membership and role in this group
@@ -219,16 +220,6 @@ export default function GroupDetailsPage() {
       setCopied(true);
       success('Invite link copied to clipboard!');
       setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  const handleRegenerateInvite = async () => {
-    try {
-      const newCode = `SNP-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-      setGroup((prev) => (prev ? { ...prev, inviteCode: newCode } : prev));
-      success('New invite code generated');
-    } catch {
-      showError('Failed to regenerate invite code');
     }
   };
 
@@ -753,7 +744,6 @@ export default function GroupDetailsPage() {
         isOpen={inviteModalOpen}
         onClose={() => setInviteModalOpen(false)}
         group={group}
-        onRegenerateCode={handleRegenerateInvite}
       />
 
       {/* Add Member Modal */}

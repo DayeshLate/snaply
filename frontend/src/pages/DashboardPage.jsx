@@ -60,11 +60,8 @@ export default function DashboardPage() {
       );
       const userMediaPromise = mediaService.getMyMediaPaginated({ size: 100 }).catch(() => null);
 
-      // 3. Fetch join requests: both group-specific (for owned groups) and user requests
-      const ownedGroups = loadedGroups.filter(
-        (g) => g.ownerId === user?.id || g.user?.id === user?.id || user?.role === 'ADMIN'
-      );
-      const groupReqPromises = ownedGroups.map((g) =>
+      // 3. Fetch join requests: query all loaded groups for incoming requests
+      const groupReqPromises = loadedGroups.map((g) =>
         joinRequestService.getRequestsByGroup(g.id).catch(() => [])
       );
       const myReqsPromise = joinRequestService.getMyRequests().catch(() => []);
@@ -206,7 +203,17 @@ export default function DashboardPage() {
   };
 
   const isOwnerOfAnyGroup = groups.some(
-    (g) => g.ownerId === user?.id || g.user?.id === user?.id || user?.role === 'ADMIN'
+    (g) =>
+      user?.role === 'ADMIN' ||
+      (g.ownerId && String(g.ownerId) === String(user?.id)) ||
+      (g.user?.id && String(g.user.id) === String(user?.id)) ||
+      (g.ownerEmail && user?.email && g.ownerEmail.toLowerCase() === user.email.toLowerCase()) ||
+      g.groupMembers?.some(
+        (m) =>
+          (String(m.userId || m.user?.id) === String(user?.id) ||
+            (m.userEmail && user?.email && m.userEmail.toLowerCase() === user.email.toLowerCase())) &&
+          (m.role === 'OWNER' || m.role === 'ADMIN')
+      )
   );
 
   return (
@@ -222,6 +229,7 @@ export default function DashboardPage() {
         pendingRequestCount={joinRequests.length}
         samplePhotos={allMedia}
         onCreateGroup={() => outletContext?.onCreateGroup()}
+        onJoinWithCode={() => outletContext?.onJoinWithCode()}
         scrollerRef={scrollerRef}
       />
 
@@ -235,7 +243,7 @@ export default function DashboardPage() {
       </section>
 
       {/* SECTION 03 — JOIN REQUESTS (OWNER ONLY WITH OPTIMISTIC ROLLBACK) */}
-      {isOwnerOfAnyGroup && joinRequests.length > 0 && (
+      {(isOwnerOfAnyGroup || joinRequests.length > 0) && joinRequests.length > 0 && (
         <JoinRequestsSection
           requests={joinRequests}
           onRequestHandled={loadDashboardData}

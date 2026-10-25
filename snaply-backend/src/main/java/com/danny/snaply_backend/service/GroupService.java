@@ -43,10 +43,14 @@ public class GroupService {
         @CacheEvict(value = {CacheConstants.GROUP_BY_ID, CacheConstants.GROUPS_ALL}, allEntries = true)
     public GroupDTO createGroup(GroupDTO groupDTO) {
 
-        String inviteCode = UUID.randomUUID()
-                .toString()
-                .replace("-", "")
-                .substring(0, 10);
+        String inviteCode;
+        do {
+            inviteCode = UUID.randomUUID()
+                    .toString()
+                    .replace("-", "")
+                    .substring(0, 10)
+                    .toUpperCase();
+        } while (groupRepository.existsByInviteCode(inviteCode));
 
         Group group = toEntity(groupDTO);
         User currentUser = userService.getCurrentUser();
@@ -64,7 +68,7 @@ public class GroupService {
             }
         }
 
-        Group savedGroup = groupRepository.save(group);
+        Group savedGroup = groupRepository.saveAndFlush(group);
 
         Folder folder = Folder.builder()
                 .name("General")
@@ -231,7 +235,7 @@ public class GroupService {
         return "Member deleted successfully";
     }
 
-        @Transactional(readOnly = true)
+        @Transactional
         @Cacheable(value = CacheConstants.GROUP_BY_ID, key = "#id")
     public GroupDTO getGroup(long id) {
 
@@ -240,6 +244,15 @@ public class GroupService {
                 .orElseThrow(() ->
                         new RuntimeException("Group not found")
                 );
+
+        if (group.getInviteCode() == null || group.getInviteCode().isBlank()) {
+            String newCode;
+            do {
+                newCode = UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
+            } while (groupRepository.existsByInviteCode(newCode));
+            group.setInviteCode(newCode);
+            group = groupRepository.saveAndFlush(group);
+        }
 
         Long currentUserId = userService.getCurrentUser().getId();
 
@@ -262,12 +275,20 @@ public class GroupService {
                 CacheConstants.JOIN_REQUEST_BY_GROUP
         }, allEntries = true)
         public JoinRequest requestToJoin(String inviteCode) {
+        if (inviteCode == null || inviteCode.isBlank()) {
+                throw new RuntimeException("Invite code cannot be empty");
+        }
 
+        String cleanCode = inviteCode.trim();
+        if (cleanCode.contains("/")) {
+                cleanCode = cleanCode.substring(cleanCode.lastIndexOf('/') + 1).trim();
+        }
+
+        final String lookupCode = cleanCode;
         Group group = groupRepository
-                .findByInviteCode(inviteCode)
-                .orElseThrow(() ->
-                        new RuntimeException("Invalid invite code")
-                );
+                .findByInviteCodeIgnoreCase(lookupCode)
+                .orElseGet(() -> groupRepository.findByInviteCode(lookupCode)
+                        .orElseThrow(() -> new RuntimeException("Invalid invite code: " + lookupCode)));
 
         Long userId = userService.getCurrentUser().getId();
 
@@ -402,6 +423,17 @@ public class GroupService {
         return groupMembersRepository.findByUserId(currentUserId).stream()
                 .filter(GroupMembers::isAccepted)
                 .map(GroupMembers::getGroup)
+                .map(g -> {
+                    if (g.getInviteCode() == null || g.getInviteCode().isBlank()) {
+                        String newCode;
+                        do {
+                            newCode = UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
+                        } while (groupRepository.existsByInviteCode(newCode));
+                        g.setInviteCode(newCode);
+                        return groupRepository.saveAndFlush(g);
+                    }
+                    return g;
+                })
                 .map(this::toDTO)
                 .toList();
     }

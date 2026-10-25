@@ -19,7 +19,13 @@ public class JoinRequestDTO {
 
     public String groupId;
 
+    public String groupName;
+
     public String userId;
+
+    public String userName;
+
+    public String userEmail;
 
     public Status status;
 

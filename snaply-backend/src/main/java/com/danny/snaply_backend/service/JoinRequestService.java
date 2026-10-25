@@ -38,7 +38,6 @@ public class JoinRequestService {
     private final GroupMembersService groupMembersService;
     private final UserRepository userRepository;
 
-    @Cacheable(value = CacheConstants.JOIN_REQUEST_BY_USER, key = "@userService.getCurrentUser().id")
     public List<JoinRequestDTO> getRequestByUserId(){
         Long userId = userService.getCurrentUser().getId();
         Optional<List<JoinRequest>> joinRequestByUser = joinRequestRepository.findByUserId(userId.toString());
@@ -49,7 +48,6 @@ public class JoinRequestService {
 
     }
 
-    @Cacheable(value = CacheConstants.JOIN_REQUEST_BY_GROUP, key = "#groupId")
     public List<JoinRequestDTO> getRequestByGroupId(String groupId){
         User currentUser = userService.getCurrentUser();
         Long gId = Long.parseLong(groupId);
@@ -61,8 +59,9 @@ public class JoinRequestService {
                 ? groupMembersService.getByUserAndGroup(currentUser.getId(), gId)
                 : null;
         boolean isAdmin = member != null && member.isAccepted() && member.getRole() == Role.ADMIN;
+        boolean isOwnerMember = member != null && member.isAccepted() && member.getRole() == Role.OWNER;
 
-        if (!isOwner && !isAdmin) {
+        if (!isOwner && !isAdmin && !isOwnerMember) {
             throw new RuntimeException("Access Denied: Only group owner or admin can view join requests");
         }
 
@@ -187,10 +186,39 @@ public class JoinRequestService {
     }
 
     public JoinRequestDTO toDTO(JoinRequest entity){
+        if (entity == null) return null;
+
+        String uName = null;
+        String uEmail = null;
+        if (entity.getUserId() != null) {
+            try {
+                Long uId = Long.parseLong(entity.getUserId());
+                User u = userRepository.findById(uId).orElse(null);
+                if (u != null) {
+                    uName = u.getName();
+                    uEmail = u.getEmail();
+                }
+            } catch (Exception ignored) {}
+        }
+
+        String gName = null;
+        if (entity.getGroupId() != null) {
+            try {
+                Long gId = Long.parseLong(entity.getGroupId());
+                Group g = groupRepository.findById(gId).orElse(null);
+                if (g != null) {
+                    gName = g.getName();
+                }
+            } catch (Exception ignored) {}
+        }
+
         return JoinRequestDTO.builder()
             .id(entity.getId())
             .groupId(entity.getGroupId())
+            .groupName(gName)
             .userId(entity.getUserId())
+            .userName(uName)
+            .userEmail(uEmail)
             .requestAt(entity.getRequestedAt())
             .respondedAt(entity.getRespondedAt())
             .status(entity.getStatus())

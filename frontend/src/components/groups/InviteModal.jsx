@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
-import { X, Copy, Check, RefreshCw, Link as LinkIcon, ShieldCheck } from 'lucide-react';
+import { X, Copy, Check, Link as LinkIcon, ShieldCheck } from 'lucide-react';
 
 export default function InviteModal({
   isOpen,
   onClose,
   group,
-  onRegenerateCode,
 }) {
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [isRegenerating, setIsRegenerating] = useState(false);
 
   if (!isOpen || !group) return null;
 
-  const inviteCode = group.inviteCode || 'SNAP-VAULT26';
-  const inviteUrl = `${window.location.origin}/invite/${inviteCode}`;
+  const inviteCode = group.inviteCode || '';
+  const inviteUrl = inviteCode ? `${window.location.origin}/invite/${inviteCode}` : '';
 
   const handleCopyCode = async () => {
+    if (!inviteCode) return;
     try {
       await navigator.clipboard.writeText(inviteCode);
       setCopiedCode(true);
@@ -27,22 +26,13 @@ export default function InviteModal({
   };
 
   const handleCopyLink = async () => {
+    if (!inviteUrl) return;
     try {
       await navigator.clipboard.writeText(inviteUrl);
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2000);
     } catch {
       // fallback
-    }
-  };
-
-  const handleRegenerate = async () => {
-    if (!onRegenerateCode) return;
-    setIsRegenerating(true);
-    try {
-      await onRegenerateCode();
-    } finally {
-      setIsRegenerating(false);
     }
   };
 
@@ -85,13 +75,14 @@ export default function InviteModal({
           </label>
           <div className="flex items-center gap-2 p-3 rounded-[10px] bg-[#0E1017] border border-white/[0.08]">
             <span className="font-mono text-xl font-semibold tracking-wider text-white flex-1 select-all pl-1">
-              {inviteCode}
+              {inviteCode || <span className="text-xs text-white/40 font-sans">Generating permanent code...</span>}
             </span>
 
             <button
               onClick={handleCopyCode}
+              disabled={!inviteCode}
               title="Copy invite code"
-              className="px-3 py-1.5 rounded-[8px] bg-[#5B5BF0] hover:bg-[#4E4ED9] text-white text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+              className="px-3 py-1.5 rounded-[8px] bg-[#5B5BF0] hover:bg-[#4E4ED9] text-white text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {copiedCode ? (
                 <>
@@ -115,13 +106,14 @@ export default function InviteModal({
           </label>
           <div className="flex items-center gap-2 p-2.5 rounded-[10px] bg-[#0E1017] border border-white/[0.08]">
             <span className="font-mono text-xs text-white/60 truncate flex-1 pl-1">
-              {inviteUrl}
+              {inviteUrl || <span className="text-xs text-white/40 font-sans">Generating permanent link...</span>}
             </span>
 
             <button
               onClick={handleCopyLink}
+              disabled={!inviteUrl}
               title="Copy join link"
-              className="px-3 py-1.5 rounded-[8px] bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-white/80 hover:text-white text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="px-3 py-1.5 rounded-[8px] bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-white/80 hover:text-white text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {copiedLink ? (
                 <>
@@ -138,26 +130,14 @@ export default function InviteModal({
           </div>
         </div>
 
-        {/* Security notice & Regenerate Code */}
+        {/* Security notice */}
         <div className="pt-2 border-t border-white/[0.08] flex items-center justify-between text-xs">
           <div className="flex items-center gap-1.5 text-white/40">
             <ShieldCheck className="w-4 h-4 text-[#2DD4BF]" />
             <span>Join requests require owner approval</span>
           </div>
-
-          {onRegenerateCode && (
-            <button
-              onClick={handleRegenerate}
-              disabled={isRegenerating}
-              className="text-xs font-mono text-white/60 hover:text-white flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-40"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRegenerating ? 'animate-spin' : ''}`} />
-              <span>Regenerate</span>
-            </button>
-          )}
         </div>
       </div>
     </div>
   );
 }
-

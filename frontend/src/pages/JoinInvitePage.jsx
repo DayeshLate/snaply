@@ -28,13 +28,14 @@ export default function JoinInvitePage() {
     setLoading(true);
     setErrorMsg('');
     try {
-      await groupService.requestToJoin(inviteCode);
+      await groupService.requestToJoin(inviteCode.trim());
       setRequested(true);
       success('Join request submitted successfully!');
     } catch (err) {
-      const msg = err.message || 'Failed to submit join request';
-      setErrorMsg(msg);
-      showError(msg);
+      const msg = err.response?.data?.message || err.response?.data || err.message || 'Failed to submit join request';
+      const cleanMsg = typeof msg === 'string' ? msg : 'Failed to submit join request';
+      setErrorMsg(cleanMsg);
+      showError(cleanMsg);
     } finally {
       setLoading(false);
     }

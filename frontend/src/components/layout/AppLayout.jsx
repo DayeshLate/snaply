@@ -6,9 +6,9 @@ import ChatPanel from '../chat/ChatPanel';
 import MobileNavigation from './MobileNavigation';
 import CommandPalette from '../dashboard/CommandPalette';
 import GroupFormModal from '../groups/GroupFormModal';
+import JoinWithCodeModal from '../groups/JoinWithCodeModal';
 import CreateFolderModal from '../albums/CreateFolderModal';
 import UploadPhotoModal from '../albums/UploadPhotoModal';
-import JoinInvitePage from '../../pages/JoinInvitePage';
 import { groupService } from '../../services/groupService';
 import { folderService } from '../../services/folderService';
 
@@ -171,6 +171,7 @@ export default function AppLayout() {
                 scrollerRef: mainScrollerRef,
                 onCreateAlbum: handleOpenCreateAlbum,
                 onCreateGroup: () => setCreateGroupModalOpen(true),
+                onJoinWithCode: () => setJoinModalOpen(true),
                 onUploadMedia: handleOpenUploadMedia,
                 refreshLayoutData: loadNavData,
                 onToggleChat: handleToggleChat,
@@ -243,6 +244,13 @@ export default function AppLayout() {
           setCreateGroupModalOpen(false);
           loadNavData();
         }}
+      />
+
+      {/* Join with Code Modal */}
+      <JoinWithCodeModal
+        isOpen={joinModalOpen}
+        onClose={() => setJoinModalOpen(false)}
+        onSuccess={loadNavData}
       />
 
       {/* Create Folder/Album Modal */}
