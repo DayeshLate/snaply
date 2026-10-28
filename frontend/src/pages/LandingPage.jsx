@@ -3,7 +3,6 @@ import LandingNavbar from '../components/landing/LandingNavbar';
 import LandingHero from '../components/landing/LandingHero';
 import SocialProofStrip from '../components/landing/SocialProofStrip';
 import FeaturesShowcase from '../components/landing/FeaturesShowcase';
-import InteractiveGallery from '../components/landing/InteractiveGallery';
 import HowItWorksSection from '../components/landing/HowItWorksSection';
 import CollaborationShowcase from '../components/landing/CollaborationShowcase';
 import PrivacyTrustSection from '../components/landing/PrivacyTrustSection';
@@ -16,35 +15,32 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-blue-500 selection:text-white transition-colors duration-200">
-      {/* Navigation */}
+    <div className="min-h-screen bg-[#090A0F] text-[#F8FAFC] selection:bg-[#5B5BF0] selection:text-white relative font-sans overflow-x-clip">
+      {/* 1. Sticky Glassmorphic Navbar */}
       <LandingNavbar />
 
-      {/* Hero Section */}
+      {/* 2. Above-the-Fold Hero Section with Interactive Floating Preview */}
       <LandingHero />
 
-      {/* Social Proof Strip */}
+      {/* 3. Social Proof & High-Signal Metric Trust Bar */}
       <SocialProofStrip />
 
-      {/* 4 Distinct Core Features */}
+      {/* 4. 3-Column Asymmetrical Bento Grid Feature Showcase */}
       <FeaturesShowcase />
 
-      {/* Interactive Photo Gallery with Lightbox */}
-      <InteractiveGallery />
-
-      {/* 3 Simple Steps Process */}
+      {/* 5. Interactive 3-Step Workflow Section */}
       <HowItWorksSection />
 
-      {/* Group Collaboration Workspace Mockup */}
+      {/* 6. Vault Architecture & Role Governance */}
       <CollaborationShowcase />
 
-      {/* Privacy & Trust Pillars */}
+      {/* 7. Security & Sovereignty Pillars */}
       <PrivacyTrustSection />
 
-      {/* Final Action Call */}
+      {/* 8. Frictionless Closing Conversion Card */}
       <LandingCtaSection />
 
-      {/* Footer */}
+      {/* 9. Minimalist Sitemap Footer */}
       <LandingFooter />
     </div>
   );

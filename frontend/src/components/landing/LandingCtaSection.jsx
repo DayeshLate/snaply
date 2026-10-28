@@ -1,72 +1,61 @@
 import React from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import AntigravityDotsBackground from './AntigravityDotsBackground';
+import { ArrowRight, Sparkles, Shield, KeyRound } from 'lucide-react';
 
 export default function LandingCtaSection() {
   return (
-    <section className="py-20 md:py-28 bg-slate-50 dark:bg-slate-950 relative overflow-hidden transition-colors">
+    <section className="py-24 bg-[#090A0F] relative overflow-hidden">
+      {/* Background radial glow */}
+      <div
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-[#5B5BF0]/10 rounded-full blur-[130px] pointer-events-none"
+        aria-hidden="true"
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="relative rounded-3xl bg-[#11253E] border border-blue-800/60 p-10 md:p-16 lg:p-20 text-center text-white overflow-hidden shadow-2xl"
-        >
-          {/* Antigravity Floating Dots & Constellation Canvas */}
-          <AntigravityDotsBackground className="opacity-90" />
-
-          {/* Subtle overlay grid for added technical depth */}
-          <div className="absolute inset-0 tech-grid-pattern opacity-25 pointer-events-none" />
-
-          {/* Main Content */}
-          <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-            <div className="w-20 h-20 mx-auto flex items-center justify-center">
-              <img
-                src="/snaply-cloud-mark.png"
-                alt="Snaply"
-                className="w-full h-full object-contain drop-shadow-md"
-                loading="lazy"
-              />
-            </div>
-
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md text-xs font-mono uppercase tracking-wider text-sky-400 border border-sky-400/40 shadow-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping" />
-              <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-              <span>Begin Your Shared Album Today</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
-              Start collecting moments{' '}
-              <span className="text-blue-400">
-                together.
-              </span>
-            </h2>
-
-            <p className="text-base sm:text-lg text-blue-100/90 leading-relaxed font-normal">
-              Create your Snaply space and bring your favorite people closer to
-              the memories you share. Free to start, private forever.
-            </p>
-
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                to="/login?tab=register"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-base font-bold shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-98 transition-all cursor-pointer"
-              >
-                <span>Get Started with Snaply</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/login"
-                className="text-sm font-semibold text-blue-200 hover:text-white underline underline-offset-4 transition-colors font-medium cursor-pointer"
-              >
-                Already have an account? Sign in
-              </Link>
-            </div>
+        <div className="rounded-3xl border border-white/[0.08] bg-[#12141C] p-8 sm:p-14 text-center max-w-4xl mx-auto space-y-8 shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
+          {/* Eyebrow badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs font-mono text-white/70">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2DD4BF] animate-pulse" />
+            <span>Ready in 30 seconds</span>
           </div>
-        </motion.div>
+
+          {/* Heading */}
+          <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-bold tracking-[-0.02em] text-white leading-tight max-w-2xl mx-auto">
+            Your memories deserve weightless precision.
+          </h2>
+
+          <p className="text-[16px] leading-[1.6] text-white/60 max-w-[58ch] mx-auto">
+            Start a private group memory circle today. Invite your inner circle, store original uncompressed RAW files, and protect your moments forever.
+          </p>
+
+          {/* Buttons: Exactly ONE primary + ONE secondary */}
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              to="/dashboard"
+              className="w-full sm:w-auto h-12 px-7 rounded-[10px] bg-[#5B5BF0] hover:bg-[#4E4ED9] active:scale-[0.98] text-white text-[14px] font-medium transition-all duration-200 flex items-center justify-center gap-2.5 shadow-[0_4px_24px_rgba(91,91,240,0.35)] focus-visible:ring-2 focus-visible:ring-[#5B5BF0]"
+            >
+              <span>Launch Snaply Vault</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            <Link
+              to="/login"
+              className="w-full sm:w-auto h-12 px-6 rounded-[10px] border border-white/[0.12] hover:border-white/[0.24] bg-white/[0.03] hover:bg-white/[0.06] text-white/80 hover:text-white text-[14px] font-medium transition-all duration-200 flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-[#5B5BF0]"
+            >
+              <KeyRound className="w-4 h-4 text-white/60" />
+              <span>Join With Code</span>
+            </Link>
+          </div>
+
+          {/* Reassurance pills */}
+          <div className="pt-4 border-t border-white/[0.06] flex flex-wrap items-center justify-center gap-6 text-xs font-mono text-white/40">
+            <span>✓ No credit card required</span>
+            <span>•</span>
+            <span>✓ Full RAW camera support</span>
+            <span>•</span>
+            <span>✓ Complete data sovereignty</span>
+          </div>
+        </div>
       </div>
     </section>
   );

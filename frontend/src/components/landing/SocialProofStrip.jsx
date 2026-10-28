@@ -1,58 +1,71 @@
 import React from 'react';
-import { Users, Sparkles, FolderHeart } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { SOCIAL_AVATARS } from './landingData';
+import { ShieldCheck, Zap, HardDrive, Lock } from 'lucide-react';
 
 export default function SocialProofStrip() {
-  const memoryTags = [
-    'Summer Roadtrips',
-    'Family Archives',
-    'Studio Offsites',
-    'Weekend Getaways',
-    'Annual Reunions',
+  const metrics = [
+    {
+      value: '100%',
+      label: 'Lossless Fidelity',
+      sublabel: 'Zero compression or downsampling',
+      icon: ShieldCheck,
+      accent: 'text-[#2DD4BF]',
+    },
+    {
+      value: '0',
+      label: 'Public URLs',
+      sublabel: 'Only authenticated circle members',
+      icon: Lock,
+      accent: 'text-white',
+    },
+    {
+      value: '<24ms',
+      label: 'Sync Latency',
+      sublabel: 'Real-time STOMP group event bus',
+      icon: Zap,
+      accent: 'text-[#5B5BF0]',
+    },
+    {
+      value: '100MB',
+      label: 'Single File Cap',
+      sublabel: 'Direct chunked RAW buffer streaming',
+      icon: HardDrive,
+      accent: 'text-white',
+    },
   ];
 
   return (
-    <div className="border-y border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 backdrop-blur-md py-6 transition-colors">
+    <section className="py-12 border-y border-white/[0.06] bg-[#0B0C12]" aria-label="Key Performance Metrics">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Avatar stack & Statement */}
-          <div className="flex items-center gap-4">
-            <div className="flex -space-x-2.5">
-              {SOCIAL_AVATARS.map((avatar, idx) => (
-                <img
-                  key={idx}
-                  src={avatar.src}
-                  alt={avatar.name}
-                  title={avatar.name}
-                  className="w-10 h-10 rounded-full object-cover border-2 border-white dark:border-slate-800 shadow-sm"
-                />
-              ))}
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <span>Better memories, shared together.</span>
-                <Sparkles className="w-4 h-4 text-blue-500 shrink-0" />
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Private groups built for families, travel crews, and creative teams.
-              </p>
-            </div>
-          </div>
-
-          {/* Memory collections tag pills */}
-          <div className="flex flex-wrap items-center gap-2 justify-center md:justify-end">
-            {memoryTags.map((tag, idx) => (
-              <span
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {metrics.map((m, idx) => {
+            const Icon = m.icon;
+            return (
+              <div
                 key={idx}
-                className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700/70 text-slate-700 dark:text-slate-300 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-2xs cursor-default"
+                className="p-5 sm:p-6 rounded-2xl border border-white/[0.08] bg-[#12141C] flex flex-col justify-between space-y-4 hover:border-white/[0.16] hover:-translate-y-0.5 transition-all duration-200 shadow-sm"
               >
-                {tag}
-              </span>
-            ))}
-          </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-mono uppercase tracking-[0.16em] text-white/50">
+                    {m.label}
+                  </span>
+                  <div className="w-8 h-8 rounded-[8px] bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/60">
+                    <Icon className="w-4 h-4" />
+                  </div>
+                </div>
+
+                <div>
+                  <div className={`text-3xl sm:text-4xl font-semibold tracking-[-0.03em] font-mono ${m.accent}`}>
+                    {m.value}
+                  </div>
+                  <p className="text-xs text-white/40 mt-1.5 leading-relaxed">
+                    {m.sublabel}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

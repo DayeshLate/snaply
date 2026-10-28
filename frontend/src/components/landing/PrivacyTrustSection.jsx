@@ -1,78 +1,91 @@
 import React from 'react';
-import { ShieldCheck, Lock, HardDrive, KeyRound, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ShieldCheck, Lock, HardDrive, KeyRound, CheckCircle2 } from 'lucide-react';
 
 export default function PrivacyTrustSection() {
   const pillars = [
     {
       icon: Lock,
-      title: 'Invite-Only Spaces',
+      title: 'Zero Public Indexing',
       description:
-        'No public discoverability, algorithm feeds, or strangers viewing your albums. Every group requires a private invite code or owner approval.',
+        'No public discoverability, no search engine crawlers, no algorithm feeds. Every vault requires a 10-char invite code.',
+      metric: '0 Public URLs',
     },
     {
       icon: HardDrive,
-      title: 'Direct Personal Cloud Sync',
+      title: 'Sovereign Cloud Backup',
       description:
-        'Snaply stores your media directly in your own Google Drive application folder. You maintain full sovereignty over your raw photographs.',
+        'Connect your own Google Drive account for off-site mirroring. You own your raw assets with complete data portability.',
+      metric: 'Byo-Storage',
     },
     {
       icon: ShieldCheck,
-      title: 'Role-Based Permissions',
+      title: 'Granular Role Controls',
       description:
-        'Control who can contribute, delete, and invite with clear Owner, Admin, and Viewer roles enforced by the backend on every request.',
+        'Backend-enforced permission barriers on every request. Owners approve every member before access is unlocked.',
+      metric: 'Owner Approved',
     },
     {
       icon: KeyRound,
-      title: 'Protected Authentication',
+      title: 'Hardened JWT & OAuth',
       description:
-        'Built with secure JWT token sessions, verified email workflows, and Google OAuth 2.0 integration to ensure account safety.',
+        'Strict token expiration, secure HttpOnly cookie persistence, and Google OAuth 2.0 credential isolation.',
+      metric: 'AES-256 GCM',
     },
   ];
 
   return (
-    <section id="privacy" className="py-24 md:py-32 bg-slate-50 dark:bg-slate-950 border-t border-slate-200/80 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="security" className="py-24 bg-[#0B0C12] border-t border-white/[0.06] scroll-mt-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 text-xs font-bold text-blue-700 dark:text-blue-300 shadow-xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-            <span>Privacy & Ownership</span>
+        <div className="max-w-2xl">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs font-mono uppercase tracking-[0.16em] text-[#2DD4BF]">
+              Security & Sovereignty
+            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2DD4BF]" />
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-            Your memories deserve a space you trust.
+
+          <h2 className="text-[clamp(1.75rem,3vw,2.5rem)] font-bold tracking-[-0.02em] text-white leading-tight">
+            Your memories deserve a space you completely trust.
           </h2>
-          <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-            Designed for intimate circles of friends, families, and creative teams
-            who value control over their personal photography.
+
+          <p className="text-[16px] leading-[1.6] text-white/60 mt-3 max-w-[62ch]">
+            Engineered for intimate circles, traveling photographers, and families who refuse to feed personal photos into advertising algorithms.
           </p>
         </div>
 
         {/* 4 Pillars Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {pillars.map((pillar, idx) => {
             const Icon = pillar.icon;
             return (
-              <motion.div
-                key={pillar.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.5, delay: idx * 0.1, ease: 'easeOut' }}
-                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none hover:shadow-2xl hover:border-blue-500/40 transition-all duration-300 flex flex-col justify-between"
+              <div
+                key={idx}
+                className="p-6 rounded-2xl border border-white/[0.08] bg-[#12141C] flex flex-col justify-between hover:border-white/[0.16] hover:-translate-y-0.5 transition-all duration-200 shadow-sm space-y-6"
               >
-                <div>
-                  <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-950/70 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 shadow-xs">
-                    <Icon className="w-6 h-6" />
+                <div className="space-y-4">
+                  <div className="w-10 h-10 rounded-[10px] bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[#5B5BF0]">
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2.5">
-                    {pillar.title}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                    {pillar.description}
-                  </p>
+
+                  <div>
+                    <h3 className="text-base font-semibold text-white tracking-[-0.01em]">
+                      {pillar.title}
+                    </h3>
+                    <p className="text-xs text-white/50 mt-2 leading-relaxed">
+                      {pillar.description}
+                    </p>
+                  </div>
                 </div>
-              </motion.div>
+
+                <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+                  <span className="text-[#2DD4BF] flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Verified</span>
+                  </span>
+                  <span className="text-white/40">{pillar.metric}</span>
+                </div>
+              </div>
             );
           })}
         </div>

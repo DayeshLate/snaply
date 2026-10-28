@@ -1,293 +1,195 @@
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
-  Sparkles,
-  Users,
-  HardDrive,
-  FolderLock,
-  Heart,
+  Shield,
   CheckCircle2,
+  Sparkles,
+  SlidersHorizontal,
+  HardDrive,
+  Users,
+  Eye,
+  Camera,
 } from 'lucide-react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { HERO_PHOTOS, SOCIAL_AVATARS } from './landingData';
-import AntigravityDotsBackground from './AntigravityDotsBackground';
 
 export default function LandingHero() {
-  const containerRef = useRef(null);
+  const [selectedQuality, setSelectedQuality] = useState('raw'); // 'raw' | 'compressed'
 
-  // Pointer parallax coordinates
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const springConfig = { damping: 25, stiffness: 150 };
-  const smoothMouseX = useSpring(mouseX, springConfig);
-  const smoothMouseY = useSpring(mouseY, springConfig);
-
-  const rotateX = useTransform(smoothMouseY, [-0.5, 0.5], [4, -4]);
-  const rotateY = useTransform(smoothMouseX, [-0.5, 0.5], [-4, 4]);
-
-  const handleMouseMove = (e) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    mouseX.set(x);
-    mouseY.set(y);
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
-
-  const scrollToFeatures = (e) => {
+  const scrollToBento = (e) => {
     e.preventDefault();
     const target = document.querySelector('#features');
     if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      target.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors">
-      {/* Antigravity floating dots */}
-      <AntigravityDotsBackground className="opacity-40 pointer-events-none" />
-
-
+    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden bg-[#090A0F]">
+      {/* Subtle radial indigo glow (12% opacity) behind hero */}
+      <div
+        className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-[#5B5BF0]/12 rounded-full blur-[140px] pointer-events-none"
+        aria-hidden="true"
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        {/* Top Text Content */}
+        {/* Top Copy Container */}
         <div className="text-center max-w-3xl mx-auto space-y-6">
-          {/* Eyebrow badge */}
-          <motion.div
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 shadow-xs text-xs font-bold text-blue-700 dark:text-blue-300"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-            <span>Collaborative Albums & Private Cloud Sharing</span>
-          </motion.div>
+          {/* Eyebrow badge / pill */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#12141C] border border-white/[0.08] text-[12px] font-mono text-white/70 shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-[#2DD4BF] animate-pulse" />
+            <span className="text-white/50">Private Vault •</span>
+            <span className="text-white font-medium">Zero Compression RAW</span>
+          </div>
 
-          {/* Main Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.08]"
-          >
-            Your memories.{' '}
-            <span className="text-blue-600 dark:text-blue-400 relative inline-block">
-              Your people.
-            </span>{' '}
-            One place.
-          </motion.h1>
+          {/* Benefit-Driven H1 Headline (Exactly 8 words) */}
+          <h1 className="text-[clamp(2.25rem,4vw,3.5rem)] font-bold tracking-[-0.03em] leading-[1.15] text-white">
+            Uncompressed group memories. Preserved in private circles.
+          </h1>
 
-          {/* Supporting Text */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed"
-          >
-            Bring your favorite moments together. Create shared albums, collect
-            photos with your people, and keep every memory close.
-          </motion.p>
+          {/* 2-line Subheadline (Max width 62ch) */}
+          <p className="text-[16px] leading-[1.6] text-white/60 max-w-[62ch] mx-auto">
+            End-to-end invite access, uncompressed RAW storage, and collaborative photo vaults for photographers, travelers, and families who demand pixel-perfect fidelity.
+          </p>
 
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3, ease: 'easeOut' }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2"
-          >
+          {/* Exactly ONE Primary CTA + At most ONE Secondary Outline */}
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              to="/login?tab=register"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 hover:shadow-xl hover:shadow-blue-500/25 text-white text-sm sm:text-base font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-98"
+              to="/dashboard"
+              className="w-full sm:w-auto h-12 px-6 rounded-[10px] bg-[#5B5BF0] hover:bg-[#4E4ED9] active:scale-[0.98] text-white text-[14px] font-medium transition-all duration-200 flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(91,91,240,0.3)] focus-visible:ring-2 focus-visible:ring-[#5B5BF0]"
             >
-              <span>Start Sharing</span>
+              <span>Create Private Circle</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
 
-            <a
-              href="#features"
-              onClick={scrollToFeatures}
-              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-bold border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-blue-500 transition-all cursor-pointer"
+            <button
+              onClick={scrollToBento}
+              className="w-full sm:w-auto h-12 px-6 rounded-[10px] border border-white/[0.12] hover:border-white/[0.24] bg-white/[0.03] hover:bg-white/[0.06] text-white/80 hover:text-white text-[14px] font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#5B5BF0]"
             >
-              Explore Features
-            </a>
+              <Eye className="w-4 h-4 text-white/60" />
+              <span>Explore Live Vault</span>
+            </button>
+          </div>
 
-            <a
-              href="#how-it-works"
-              onClick={(e) => {
-                e.preventDefault();
-                const target = document.querySelector('#how-it-works');
-                if (target) {
-                  const topOffset = 85;
-                  const elementPosition = target.getBoundingClientRect().top;
-                  const offsetPosition = elementPosition + window.pageYOffset - topOffset;
-                  window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-                }
-              }}
-              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 hover:bg-blue-100/90 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-sm sm:text-base font-bold border border-blue-200/70 dark:border-blue-800/60 shadow-xs transition-all cursor-pointer"
-            >
-              How It Works
-            </a>
-          </motion.div>
-
-          {/* Trust Caption */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1"
-          >
-            Made for the moments worth remembering.
-          </motion.p>
+          {/* Micro Trust reassurance line */}
+          <p className="text-[12px] font-mono text-white/40 pt-1">
+            Zero public links • 10-char invite authentication • AES-256 encryption
+          </p>
         </div>
 
-        {/* Hero Visual Composition — Editorial Layered Gallery */}
-        <motion.div
-          ref={containerRef}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-          style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-14 md:mt-20 max-w-5xl mx-auto relative perspective-1000"
-        >
-          {/* Main Central Showcase Frame */}
-          <div className="relative rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl group">
-            {/* Window Bar */}
-            <div className="h-11 bg-slate-100/70 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-slate-800 px-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-rose-400" />
-                <span className="w-3 h-3 rounded-full bg-amber-400" />
-                <span className="w-3 h-3 rounded-full bg-emerald-400" />
-                <span className="text-xs font-mono text-slate-500 dark:text-slate-400 ml-2 hidden sm:inline">
-                  snaply.app / shared / summer-adventure-2026
-                </span>
+        {/* Interactive Floating UI Preview / Mockup */}
+        <div className="mt-14 max-w-5xl mx-auto">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#12141C] p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.45)] backdrop-blur-md relative overflow-hidden transition-all duration-300">
+            {/* Mockup Header Bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-white/[0.06] gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-[10px] bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/80">
+                  <Camera className="w-5 h-5 text-[#5B5BF0]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-white tracking-[-0.02em]">
+                      Alpine Expedition 2026
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full bg-[#2DD4BF]/10 border border-[#2DD4BF]/20 text-[10px] font-mono text-[#2DD4BF]">
+                      Lossless Vault
+                    </span>
+                  </div>
+                  <p className="text-[12px] font-mono text-white/40 mt-0.5">
+                    Sony A7 IV • 14-Bit DNG • Code: <span className="text-white/80">ALP-94K2-10</span>
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-xs font-semibold">
-                <span className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-1 rounded-full border border-blue-200/60 dark:border-blue-800/60">
-                  <HardDrive className="w-3.5 h-3.5" />
-                  Google Drive Synced
-                </span>
+
+              {/* Interactive Fidelity Mode Selector */}
+              <div className="flex items-center gap-1.5 p-1 rounded-[10px] bg-[#090A0F] border border-white/[0.08] self-start sm:self-auto">
+                <button
+                  onClick={() => setSelectedQuality('raw')}
+                  className={`px-3 py-1.5 rounded-[8px] text-[12px] font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
+                    selectedQuality === 'raw'
+                      ? 'bg-[#5B5BF0] text-white font-medium shadow-xs'
+                      : 'text-white/50 hover:text-white'
+                  }`}
+                >
+                  <Sparkles className="w-3 h-3 text-[#2DD4BF]" />
+                  <span>Original RAW (42.4 MB)</span>
+                </button>
+                <button
+                  onClick={() => setSelectedQuality('compressed')}
+                  className={`px-3 py-1.5 rounded-[8px] text-[12px] font-mono transition-all cursor-pointer ${
+                    selectedQuality === 'compressed'
+                      ? 'bg-white/[0.1] text-white font-medium'
+                      : 'text-white/50 hover:text-white'
+                  }`}
+                >
+                  <span>Social App (1.2 MB)</span>
+                </button>
               </div>
             </div>
 
-            {/* Central Photo */}
-            <div className="relative aspect-16/9 md:aspect-21/9 overflow-hidden bg-slate-100 dark:bg-slate-800">
+            {/* Photo Preview Stage */}
+            <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-xl overflow-hidden border border-white/[0.06] bg-[#090A0F]">
               <img
                 src={HERO_PHOTOS.main.url}
-                alt={HERO_PHOTOS.main.title}
-                className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 ease-out"
+                alt="Pacific Coast RAW Preview"
+                className={`w-full h-full object-cover transition-all duration-300 ${
+                  selectedQuality === 'compressed'
+                    ? 'blur-[1.2px] contrast-95 saturate-80'
+                    : 'contrast-100 saturate-105 filter-none'
+                }`}
+                loading="eager"
               />
-              <div className="absolute inset-0 bg-slate-950/65 flex items-end p-6 md:p-8 text-white">
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-600 text-white shadow-xs">
-                      Featured Album
-                    </span>
-                    <span className="text-xs text-slate-300">
-                      Added yesterday by Elena
-                    </span>
+
+              {/* Quality overlay badge inside image */}
+              <div className="absolute top-4 left-4 p-2.5 rounded-lg bg-[#090A0F]/85 backdrop-blur-md border border-white/[0.12] text-xs font-mono space-y-1">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      selectedQuality === 'raw' ? 'bg-[#2DD4BF]' : 'bg-[#F59E0B]'
+                    }`}
+                  />
+                  <span className="text-white font-semibold">
+                    {selectedQuality === 'raw' ? '100% Bit-for-Bit RAW' : 'Recompressed JPEG (4:2:0)'}
+                  </span>
+                </div>
+                <div className="text-[11px] text-white/50">
+                  {selectedQuality === 'raw'
+                    ? '3840 × 2160 • 42.4 MB • Lossless'
+                    : '1080 × 607 • 1.2 MB • Compressed artifacts'}
+                </div>
+              </div>
+
+              {/* Bottom EXIF metadata bar */}
+              <div className="absolute bottom-4 inset-x-4 flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg bg-[#090A0F]/90 backdrop-blur-md border border-white/[0.1]">
+                <div className="flex items-center gap-4 text-xs font-mono text-white/70">
+                  <span>ISO 100</span>
+                  <span>•</span>
+                  <span>35mm f/1.4 GM</span>
+                  <span>•</span>
+                  <span>1/500s</span>
+                  <span className="hidden sm:inline">•</span>
+                  <span className="hidden sm:inline text-[#2DD4BF]">Direct Sensor Readout</span>
+                </div>
+
+                {/* Stacked Circle Members */}
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono text-white/40">Circle Access:</span>
+                  <div className="flex items-center -space-x-2">
+                    {SOCIAL_AVATARS.slice(0, 4).map((av, i) => (
+                      <img
+                        key={i}
+                        src={av.src}
+                        alt={av.name}
+                        className="w-6 h-6 rounded-full border-2 border-[#12141C] object-cover"
+                        title={av.name}
+                      />
+                    ))}
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold tracking-tight">
-                    {HERO_PHOTOS.main.title}
-                  </h3>
-                  <p className="text-xs md:text-sm text-slate-300">
-                    Cannon Beach sunset shoot with the team • 48 original photos
-                  </p>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Left Overlapping Card: Group Portrait */}
-          <motion.div
-            initial={{ opacity: 0, x: -30, y: 20 }}
-            animate={{ opacity: 1, x: 0, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.5, ease: 'easeOut' }}
-            className="absolute -bottom-8 -left-2 sm:-left-6 md:-left-12 w-48 sm:w-60 md:w-64 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl hidden sm:block hover:-translate-y-1 transition-transform"
-          >
-            <div className="aspect-4/3 rounded-xl overflow-hidden relative">
-              <img
-                src={HERO_PHOTOS.card1.url}
-                alt={HERO_PHOTOS.card1.title}
-                className="w-full h-full object-cover"
-              />
-              <span className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
-                Campfire
-              </span>
-            </div>
-            <div className="pt-2.5 px-1">
-              <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                {HERO_PHOTOS.card1.title}
-              </p>
-              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                <span>By {HERO_PHOTOS.card1.author}</span>
-                <span className="flex items-center gap-1 text-rose-500 font-bold">
-                  <Heart className="w-3 h-3 fill-rose-500" />
-                  <span>14</span>
-                </span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Right Overlapping Card: Alpine Treks */}
-          <motion.div
-            initial={{ opacity: 0, x: 30, y: -20 }}
-            animate={{ opacity: 1, x: 0, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.6, ease: 'easeOut' }}
-            className="absolute -top-6 -right-2 sm:-right-6 md:-right-10 w-44 sm:w-56 md:w-60 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl hidden sm:block hover:-translate-y-1 transition-transform"
-          >
-            <div className="aspect-4/3 rounded-xl overflow-hidden relative">
-              <img
-                src={HERO_PHOTOS.card2.url}
-                alt={HERO_PHOTOS.card2.title}
-                className="w-full h-full object-cover"
-              />
-              <span className="absolute top-2 right-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
-                Alpine Treks
-              </span>
-            </div>
-            <div className="pt-2.5 px-1 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold text-slate-900 dark:text-white">Cascade Range</p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400">24 photos shared</p>
-              </div>
-              <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-bold">
-                ✓
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Floating Collaborators Badge */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="absolute -bottom-6 right-6 sm:right-12 md:right-16 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 py-2.5 rounded-full border border-slate-200/80 dark:border-slate-800 shadow-xl flex items-center gap-3"
-          >
-            <div className="flex -space-x-2">
-              {SOCIAL_AVATARS.slice(0, 3).map((a, i) => (
-                <img
-                  key={i}
-                  src={a.src}
-                  alt={a.name}
-                  className="w-7 h-7 rounded-full object-cover border-2 border-white dark:border-slate-800"
-                />
-              ))}
-            </div>
-            <div className="text-left text-xs leading-tight pr-1">
-              <p className="font-bold text-slate-900 dark:text-white">+12 members</p>
-              <p className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">Active album</p>
-            </div>
-          </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -1,109 +1,145 @@
 import React from 'react';
-import { Camera, Heart, ArrowUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ArrowUpRight, ShieldCheck } from 'lucide-react';
 
 export default function LandingFooter() {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const currentYear = new Date().getFullYear();
+
+  const handleSmoothScroll = (e, href) => {
+    e.preventDefault();
+    const target = document.querySelector(href);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
-    <footer className="bg-white dark:bg-slate-950 border-t border-slate-200/80 dark:border-slate-800 py-16 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
-          {/* Brand Col */}
-          <div className="md:col-span-1 space-y-4">
+    <footer className="border-t border-white/[0.08] bg-[#090A0F] pt-16 pb-12 text-white/60 text-xs">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        {/* Top Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
+          {/* Brand Info (Span 2) */}
+          <div className="md:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-12 h-12 flex items-center justify-center shrink-0">
+              <div className="w-7 h-7 rounded-[7px] bg-white/[0.04] border border-white/[0.08] flex items-center justify-center p-1">
                 <img
                   src="/snaply-cloud-mark.png"
                   alt="Snaply"
-                  className="w-full h-full object-contain drop-shadow-xs"
-                  loading="lazy"
+                  className="w-full h-full object-contain"
                 />
               </div>
-              <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
+              <span className="text-sm font-semibold tracking-[-0.02em] text-white">
                 Snaply
               </span>
             </Link>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Your memories. Your people. One place. Collaborative group photo
-              albums integrated with personal cloud storage.
+
+            <p className="text-xs text-white/50 max-w-sm leading-relaxed">
+              Weightless precision in group memory preservation. Private collaborative vaults, uncompressed RAW storage, and zero-knowledge circle sharing.
             </p>
+
+            {/* System Status Pill */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-[11px] font-mono text-white/70">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2DD4BF] animate-pulse" />
+              <span>All Systems Operational</span>
+            </div>
           </div>
 
-          {/* Product Links */}
-          <div className="space-y-3.5">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-              Product
-            </h4>
-            <ul className="space-y-2.5 text-sm text-slate-500 dark:text-slate-400">
+          {/* Sitemap Columns */}
+          <div className="space-y-3">
+            <span className="text-[11px] font-mono uppercase tracking-[0.16em] text-white/40 block">
+              Platform
+            </span>
+            <ul className="space-y-2.5">
               <li>
-                <a href="#features" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Features
+                <a
+                  href="#features"
+                  onClick={(e) => handleSmoothScroll(e, '#features')}
+                  className="hover:text-white transition-colors"
+                >
+                  Features Bento
                 </a>
               </li>
               <li>
-                <a href="#how-it-works" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  How It Works
+                <a
+                  href="#vaults"
+                  onClick={(e) => handleSmoothScroll(e, '#vaults')}
+                  className="hover:text-white transition-colors"
+                >
+                  Circle Vaults
                 </a>
               </li>
               <li>
-                <a href="#collaboration" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  For Groups
+                <a
+                  href="#workflow"
+                  onClick={(e) => handleSmoothScroll(e, '#workflow')}
+                  className="hover:text-white transition-colors"
+                >
+                  3-Step Workflow
                 </a>
               </li>
               <li>
-                <a href="#gallery" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Public Gallery
-                </a>
+                <Link to="/dashboard" className="hover:text-white transition-colors">
+                  Web Dashboard
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Access & Storage */}
-          <div className="space-y-3.5">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-              Account & Storage
-            </h4>
-            <ul className="space-y-2.5 text-sm text-slate-500 dark:text-slate-400">
+          <div className="space-y-3">
+            <span className="text-[11px] font-mono uppercase tracking-[0.16em] text-white/40 block">
+              Security
+            </span>
+            <ul className="space-y-2.5">
               <li>
-                <Link to="/login" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <a
+                  href="#security"
+                  onClick={(e) => handleSmoothScroll(e, '#security')}
+                  className="hover:text-white transition-colors"
+                >
+                  Invite-Only Protocol
+                </a>
+              </li>
+              <li>
+                <span className="text-white/40 cursor-default">
+                  Zero Public Indexing
+                </span>
+              </li>
+              <li>
+                <span className="text-white/40 cursor-default">
+                  Google Drive Hybrid
+                </span>
+              </li>
+              <li>
+                <span className="text-white/40 cursor-default">
+                  AES-256 Storage
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="space-y-3">
+            <span className="text-[11px] font-mono uppercase tracking-[0.16em] text-white/40 block">
+              Access
+            </span>
+            <ul className="space-y-2.5">
+              <li>
+                <Link to="/login" className="hover:text-white transition-colors">
                   Sign In
                 </Link>
               </li>
               <li>
-                <Link to="/login?tab=register" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Create Account
+                <Link to="/dashboard" className="hover:text-white transition-colors">
+                  Create Circle
                 </Link>
               </li>
               <li>
-                <Link to="/login" className="text-blue-600 dark:text-blue-400 font-bold hover:underline">
-                  ⚡ 1-Click Demo Review
+                <Link to="/dashboard" className="hover:text-white transition-colors">
+                  Join with Code
                 </Link>
               </li>
-            </ul>
-          </div>
-
-          {/* Privacy & Trust */}
-          <div className="space-y-3.5">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-              Privacy & Control
-            </h4>
-            <ul className="space-y-2.5 text-sm text-slate-500 dark:text-slate-400">
               <li>
-                <a href="#privacy" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Trust & Security
-                </a>
-              </li>
-              <li>
-                <span className="text-xs text-slate-400 dark:text-slate-500">
-                  Google Drive App Data Sync
-                </span>
-              </li>
-              <li>
-                <span className="text-xs text-slate-400 dark:text-slate-500">
-                  Private Role-Based Access
+                <span className="text-white/40 cursor-default">
+                  API Documentation
                 </span>
               </li>
             </ul>
@@ -111,18 +147,18 @@ export default function LandingFooter() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <p>
-            &copy; {new Date().getFullYear()} Snaply. All rights reserved. Made for memories.
-          </p>
+        <div className="pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px] text-white/40">
+          <div>
+            © {currentYear} Snaply. Weightless Precision. All rights reserved.
+          </div>
 
-          <button
-            onClick={scrollToTop}
-            className="flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white font-bold transition-colors cursor-pointer"
-          >
-            <span>Back to top</span>
-            <ArrowUp className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-4">
+            <span className="hidden sm:inline">
+              Tip: Press <kbd className="px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.1] text-white/80">⌘K</kbd> to search vaults
+            </span>
+            <span>•</span>
+            <span className="text-[#2DD4BF]">Privacy First Architecture</span>
+          </div>
         </div>
       </div>
     </footer>
