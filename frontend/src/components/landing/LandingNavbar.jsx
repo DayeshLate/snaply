@@ -16,9 +16,9 @@ export default function LandingNavbar() {
 
   const navLinks = [
     { name: 'Features', href: '#features' },
-    { name: 'Vaults', href: '#vaults' },
-    { name: 'Workflow', href: '#workflow' },
-    { name: 'Security', href: '#security' },
+    { name: 'How It Works', href: '#workflow' },
+    { name: 'Groups', href: '#vaults' },
+    { name: 'Privacy', href: '#security' },
   ];
 
   const handleSmoothScroll = (e, href) => {
@@ -92,7 +92,7 @@ export default function LandingNavbar() {
             to="/dashboard"
             className="h-10 px-4 rounded-[8px] bg-[#5B5BF0] hover:bg-[#4E4ED9] active:scale-[0.98] text-white text-[13px] font-medium transition-all duration-200 flex items-center gap-2 shadow-[0_4px_16px_rgba(91,91,240,0.25)] focus-visible:ring-2 focus-visible:ring-[#5B5BF0] focus-visible:ring-offset-2 focus-visible:ring-offset-[#090A0F]"
           >
-            <span>Launch Vault</span>
+            <span>Create Group</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -103,7 +103,7 @@ export default function LandingNavbar() {
             to="/dashboard"
             className="h-9 px-3 rounded-[8px] bg-[#5B5BF0] text-white text-xs font-medium flex items-center gap-1.5"
           >
-            <span>Launch</span>
+            <span>Create</span>
             <ArrowRight className="w-3 h-3" />
           </Link>
 
@@ -147,7 +147,7 @@ export default function LandingNavbar() {
               onClick={() => setMobileOpen(false)}
               className="w-full h-11 rounded-[8px] bg-[#5B5BF0] text-white text-center flex items-center justify-center gap-2 text-sm font-medium"
             >
-              <span>Launch Vault</span>
+              <span>Create Group</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

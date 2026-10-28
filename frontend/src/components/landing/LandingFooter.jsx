@@ -34,7 +34,7 @@ export default function LandingFooter() {
             </Link>
 
             <p className="text-xs text-white/50 max-w-sm leading-relaxed">
-              Weightless precision in group memory preservation. Private collaborative vaults, uncompressed RAW storage, and zero-knowledge circle sharing.
+              The private photo sharing platform for friends, trips, and families. Keep all your group memories in full original quality with zero ads and complete privacy.
             </p>
 
             {/* System Status Pill */}
@@ -56,7 +56,7 @@ export default function LandingFooter() {
                   onClick={(e) => handleSmoothScroll(e, '#features')}
                   className="hover:text-white transition-colors"
                 >
-                  Features Bento
+                  Features
                 </a>
               </li>
               <li>
@@ -65,7 +65,7 @@ export default function LandingFooter() {
                   onClick={(e) => handleSmoothScroll(e, '#vaults')}
                   className="hover:text-white transition-colors"
                 >
-                  Circle Vaults
+                  Private Groups
                 </a>
               </li>
               <li>
@@ -74,12 +74,12 @@ export default function LandingFooter() {
                   onClick={(e) => handleSmoothScroll(e, '#workflow')}
                   className="hover:text-white transition-colors"
                 >
-                  3-Step Workflow
+                  How It Works
                 </a>
               </li>
               <li>
                 <Link to="/dashboard" className="hover:text-white transition-colors">
-                  Web Dashboard
+                  Web App
                 </Link>
               </li>
             </ul>
@@ -87,7 +87,7 @@ export default function LandingFooter() {
 
           <div className="space-y-3">
             <span className="text-[11px] font-mono uppercase tracking-[0.16em] text-white/40 block">
-              Security
+              Privacy & Trust
             </span>
             <ul className="space-y-2.5">
               <li>
@@ -96,22 +96,22 @@ export default function LandingFooter() {
                   onClick={(e) => handleSmoothScroll(e, '#security')}
                   className="hover:text-white transition-colors"
                 >
-                  Invite-Only Protocol
+                  Invite-Only Groups
                 </a>
               </li>
               <li>
                 <span className="text-white/40 cursor-default">
-                  Zero Public Indexing
+                  Zero Public Links
                 </span>
               </li>
               <li>
                 <span className="text-white/40 cursor-default">
-                  Google Drive Hybrid
+                  Google Drive Backup
                 </span>
               </li>
               <li>
                 <span className="text-white/40 cursor-default">
-                  AES-256 Storage
+                  Secure Storage
                 </span>
               </li>
             </ul>

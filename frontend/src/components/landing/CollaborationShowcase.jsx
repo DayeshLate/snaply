@@ -14,43 +14,49 @@ import { SOCIAL_AVATARS } from './landingData';
 export default function CollaborationShowcase() {
   const roles = [
     {
-      role: 'Circle Owner',
-      desc: 'Controls membership approval, album creation, and cloud storage destination.',
-      badge: 'Full Authority',
+      role: 'Group Organizer',
+      desc: 'Creates the group, approves or declines join requests, and organizes albums.',
+      badge: 'Full Control',
       color: 'text-[#5B5BF0] border-[#5B5BF0]/30 bg-[#5B5BF0]/10',
+      benefit: 'You have the final say on who joins',
     },
     {
-      role: 'Editor Member',
-      desc: 'Can upload uncompressed RAW frames, create albums, and chat in group channel.',
-      badge: 'Read & Write',
+      role: 'Contributing Member',
+      desc: 'Can upload photos, create new trip albums, and chat with everyone in the circle.',
+      badge: 'Can Add Photos',
       color: 'text-[#2DD4BF] border-[#2DD4BF]/30 bg-[#2DD4BF]/10',
+      benefit: 'Everyone helps build the shared album',
     },
     {
-      role: 'Circle Viewer',
-      desc: 'High-fidelity lossless streaming and full-resolution original downloads.',
-      badge: 'Read Only',
+      role: 'Family & Guest Viewer',
+      desc: 'Can browse the entire album in full quality and download photos to their phone or computer.',
+      badge: 'View & Download',
       color: 'text-white/60 border-white/10 bg-white/5',
+      benefit: 'Perfect for grandparents & casual guests',
     },
   ];
 
   return (
-    <section id="vaults" className="py-24 bg-[#090A0F] scroll-mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+    <section className="py-12 sm:py-16 bg-transparent">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Header */}
         <div className="max-w-2xl">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs font-mono uppercase tracking-[0.16em] text-[#5B5BF0]">
-              Vault Architecture
+            <span className="text-xs font-mono uppercase tracking-[0.16em] text-[#5B5BF0] font-semibold">
+              Group Management
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-[#5B5BF0]" />
+            <span className="text-xs font-mono text-white/40">
+              Clear & Simple Roles
+            </span>
           </div>
 
-          <h2 className="text-[clamp(1.75rem,3vw,2.5rem)] font-bold tracking-[-0.02em] text-white leading-tight">
-            Curated collaborative vaults. Governed by precise roles.
+          <h2 className="text-[clamp(1.75rem,2.8vw,2.5rem)] font-bold tracking-[-0.02em] text-white leading-tight">
+            Easy group sharing with total peace of mind.
           </h2>
 
-          <p className="text-[16px] leading-[1.6] text-white/60 mt-3 max-w-[62ch]">
-            Every circle is an autonomous memory vault. Structure albums, control who can upload, and review join requests with complete transparency.
+          <p className="text-[15px] sm:text-[16px] leading-[1.6] text-white/60 mt-3 max-w-[62ch]">
+            Every group is a private space. You decide who can upload, organize photos into separate albums, and approve join requests with complete transparency.
           </p>
         </div>
 
@@ -60,13 +66,13 @@ export default function CollaborationShowcase() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-white/[0.06] gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono uppercase tracking-[0.16em] text-white/50">
-                  Circle Workspace
+                <span className="text-xs font-mono uppercase tracking-[0.16em] text-[#2DD4BF]">
+                  Active Group
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2DD4BF]" />
               </div>
               <h3 className="text-xl font-bold text-white tracking-[-0.02em]">
-                Pacific Rim Photographic Vault
+                Summer Road Trip 2026
               </h3>
             </div>
 
@@ -83,7 +89,7 @@ export default function CollaborationShowcase() {
                 ))}
               </div>
               <span className="text-xs font-mono px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-white/70">
-                8 active members
+                8 friends contributing
               </span>
             </div>
           </div>
@@ -104,31 +110,31 @@ export default function CollaborationShowcase() {
                       {r.badge}
                     </span>
                   </div>
-                  <p className="text-xs text-white/50 leading-relaxed">
+                  <p className="text-xs text-white/50 leading-relaxed font-sans">
                     {r.desc}
                   </p>
                 </div>
 
                 <div className="pt-2 border-t border-white/[0.06] flex items-center gap-1.5 text-[11px] font-mono text-[#2DD4BF]">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Enforced at API Gateway</span>
+                  <span>{r.benefit}</span>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Vault Integrity Bar */}
+          {/* Group Safety Reassurance Bar */}
           <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono">
             <div className="flex items-center gap-2 text-white/70">
               <Lock className="w-4 h-4 text-[#5B5BF0]" />
-              <span>Cryptographic Vault ID:</span>
-              <span className="text-white font-semibold">PCR-8821-X9</span>
+              <span>Private Group Code:</span>
+              <span className="text-white font-semibold">ALP-94K2-10</span>
             </div>
 
             <div className="flex items-center gap-4 text-white/50">
-              <span>SHA-256 Verified</span>
+              <span>Zero Public Links</span>
               <span>•</span>
-              <span className="text-[#2DD4BF]">Zero Tracking Pixels</span>
+              <span className="text-[#2DD4BF]">Organizer Approves Every Member</span>
             </div>
           </div>
         </div>

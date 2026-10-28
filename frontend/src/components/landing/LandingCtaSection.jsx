@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Shield, KeyRound } from 'lucide-react';
+import { ArrowRight, Sparkles, Shield, KeyRound, Check } from 'lucide-react';
 
 export default function LandingCtaSection() {
   return (
-    <section className="py-24 bg-[#090A0F] relative overflow-hidden">
+    <section className="py-12 sm:py-16 bg-transparent relative overflow-hidden">
       {/* Background radial glow */}
       <div
         className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-[#5B5BF0]/10 rounded-full blur-[130px] pointer-events-none"
@@ -21,20 +21,20 @@ export default function LandingCtaSection() {
 
           {/* Heading */}
           <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-bold tracking-[-0.02em] text-white leading-tight max-w-2xl mx-auto">
-            Your memories deserve weightless precision.
+            Keep every shared memory in one private home.
           </h2>
 
-          <p className="text-[16px] leading-[1.6] text-white/60 max-w-[58ch] mx-auto">
-            Start a private group memory circle today. Invite your inner circle, store original uncompressed RAW files, and protect your moments forever.
+          <p className="text-[16px] leading-[1.6] text-white/60 max-w-[58ch] mx-auto font-sans">
+            Start a private group for your next trip, family gathering, or weekend getaway. Invite friends in seconds, upload in full original resolution, and protect your moments forever.
           </p>
 
-          {/* Buttons: Exactly ONE primary + ONE secondary */}
+          {/* Buttons */}
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/dashboard"
               className="w-full sm:w-auto h-12 px-7 rounded-[10px] bg-[#5B5BF0] hover:bg-[#4E4ED9] active:scale-[0.98] text-white text-[14px] font-medium transition-all duration-200 flex items-center justify-center gap-2.5 shadow-[0_4px_24px_rgba(91,91,240,0.35)] focus-visible:ring-2 focus-visible:ring-[#5B5BF0]"
             >
-              <span>Launch Snaply Vault</span>
+              <span>Create a Group Free</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
 
@@ -49,11 +49,11 @@ export default function LandingCtaSection() {
 
           {/* Reassurance pills */}
           <div className="pt-4 border-t border-white/[0.06] flex flex-wrap items-center justify-center gap-6 text-xs font-mono text-white/40">
-            <span>✓ No credit card required</span>
+            <span>✓ 100% Free to start</span>
             <span>•</span>
-            <span>✓ Full RAW camera support</span>
+            <span>✓ Zero ads or tracking</span>
             <span>•</span>
-            <span>✓ Complete data sovereignty</span>
+            <span>✓ Full original quality preserved</span>
           </div>
         </div>
       </div>
